@@ -1,4 +1,4 @@
-local DhLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/penguin-cmyk/legion/refs/heads/main/utils/dh_library.lua"))()
+local DhLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/Horizon89002/Empyrean.lua/refs/heads/main/stomp%20effects/library.txt"))()
 local Services   = DhLibrary:Services()
 
 local LightingService   = game:GetService("Lighting")
