@@ -1,0 +1,369 @@
+local function service(service)
+    return cloneref(game:GetService(service))
+end 
+
+local Players      = service("Players")
+local LocalPlayer  = Players.LocalPlayer
+
+local Workspace          = service("Workspace")
+local ReplicatedStorage  = service("ReplicatedStorage")
+local MainEvent          = ReplicatedStorage:WaitForChild("MainEvent")
+
+local Library    = {}
+local Images     = {"user","dice","gun","visualization-of-data","grab","help"}
+local ImagesUrl  = "https://raw.githubusercontent.com/penguin-cmyk/legion/refs/heads/main/Assets/"
+
+local Connections = {}
+
+getgenv().is_anim_playing = false;
+getgenv().play_sounds = true; 
+
+local FakeSound = Instance.new("Sound",Workspace);
+
+
+
+function Library:Initialize()
+    if not isfolder("LegionAssets") then 
+        makefolder("LegionAssets")
+    end
+    for index,image in pairs(Images) do 
+        writefile(`LegionAssets/{image}.png`, game:HttpGet(`{ImagesUrl}/{image}.png`))
+    end 
+end 
+
+function Library:getAsset(name: string) 
+    local path = `LegionAssets/{name}.png`
+    if isfile(path) then 
+        return getcustomasset(path)
+    end 
+end 
+
+function Library:AddConnection(name: string ,connection: RBXScriptConnection?)
+    assert(typeof(connection)== "RBXScriptConnection", "Connection must be a RBXScriptConnection (like .PlayerAdded,...)")
+    assert(typeof(name) == "string", "Name must be a string")
+    Connections[name] = connection
+end
+
+function Library:RemoveConnection(name: string)
+    assert(typeof(name) == "string", "Name must be a string")
+    if Connections[name] then 
+        Connections[name]:Disconnect()
+        Connections[name] = nil
+    end
+end
+
+function Library:Create(type,properties)
+    local NewInstance = Instance.new(type)
+    for i,v in pairs(properties) do 
+	NewInstance[i] = v 
+    end 
+    return NewInstance
+end 
+
+
+
+function Library:CreateAnimation(id: number)
+    local Animation = Instance.new("Animation")
+    Animation.AnimationId = "rbxassetid://"..id
+    return Animation
+end     
+
+function Library:StopAnimation(Character: Model ,id: number)
+    for index,anim in pairs(Character:FindFirstChild("Humanoid"):GetPlayingAnimationTracks()) do 
+        if anim.Animation.AnimationId:match("rbxassetid://" .. tostring(id)) then
+            anim:Stop()
+        end
+    end 
+end 
+
+function Library:IsAnimPlaying(Character: Model ,id: number)
+    for index,anim in pairs(Character:FindFirstChild("Humanoid"):GetPlayingAnimationTracks()) do 
+        if anim.Animation.AnimationId:match("rbxassetid://" .. tostring(id)) then
+            return true
+        end
+    end 
+    return false
+end     
+
+function Library:PlayAnimation(character,id,speed,time,smoothing)
+    for index, anim in pairs(character:FindFirstChildOfClass("Humanoid"):GetPlayingAnimationTracks()) do
+        if anim.Animation.AnimationId:match("rbxassetid://" .. tostring(id)) then
+            anim:Stop()
+        end
+    end
+    local Animation = Instance.new("Animation")
+	Animation.AnimationId = "rbxassetid://"..tostring(id)
+	local LoadedAnim = character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Animation)
+	LoadedAnim.Priority = Enum.AnimationPriority.Action4
+
+    getgenv().is_anim_playing = true;
+
+	if smoothing ~= nil then 
+		LoadedAnim:Play(tonumber(smoothing))
+	else 
+		LoadedAnim:Play()
+	end 
+
+	if speed ~= nil then 
+		LoadedAnim:AdjustSpeed(tonumber(speed))
+	end
+
+	if time ~= nil then 
+		LoadedAnim.TimePosition = tonumber(time)
+	end 
+
+	LoadedAnim.Ended:Connect(function()
+		getgenv().is_anim_playing = false;
+	end)
+
+	Animation:Destroy()
+end 
+
+function Library:StopAudio()
+    FakeSound:Stop()
+    MainEvent:FireServer("BoomboxStop")
+end 
+
+function Library:PlayAudio(id: number)
+    if not getgenv().play_sounds then return end 
+    local Boombox = LocalPlayer.Backpack:FindFirstChild("[Boombox]")
+    if LocalPlayer.Backpack:FindFirstChild("[Boombox]") then 
+        Boombox.Parent = LocalPlayer.Character
+        Boombox = LocalPlayer.Character:FindFirstChild("[Boombox]")
+        MainEvent:FireServer("Boombox",tonumber(id))
+
+        Boombox.RequiresHandle = false 
+        Boombox.Parent = LocalPlayer.Backpack
+
+        LocalPlayer.PlayerGui.MainScreenGui.BoomboxFrame.Visible = false 
+		
+        LocalPlayer.Character.LowerTorso:WaitForChild("BOOMBOXSOUND")
+
+        task.spawn(function()
+	    repeat wait() until LocalPlayer.Character.LowerTorso:WaitForChild("BOOMBOXSOUND").SoundId == "rbxassetid://"..tostring(id)
+            task.wait(LocalPlayer.Character.LowerTorso:WaitForChild("BOOMBOXSOUND").TimeLength)
+            Library:StopAudio()
+        end)
+    else 
+	task.spawn(function()
+	        FakeSound.SoundId = "rbxassetid://"..tostring(id)
+	        FakeSound:Play()
+	        task.wait(FakeSound.TimeLength)
+	        Library:StopAudio()
+	end)
+    end 
+    if LocalPlayer.Backpack:FindFirstChild(Boombox) then 
+	return LocalPlayer.Character.LowerTorso:WaitForChild("BOOMBOXSOUND").TimeLength
+    else 
+	return FakeSound.TimeLength
+    end 
+end 
+
+function Library:View(target)
+    if target ~= nil and Workspace.Players:FindFirstChild(target) then
+        Workspace:FindFirstChild("Camera").CameraSubject =  Workspace.Players:FindFirstChild(target).Humanoid
+    end 
+end 
+function Library:GetCar()
+    local Vehicles =  Workspace:FindFirstChild("Vehicles");
+    local Car = Vehicles:FindFirstChild(service("Players").LocalPlayer.Name)
+    if Car then 
+	return Car
+    end 
+   return nil 
+end 
+
+function Library:NoVelocity(character: Model)
+    for index,part in pairs(character:GetChildren()) do 
+        if part:IsA("Part") or part:IsA("BasePart") then 
+            part.AssemblyLinearVelocity = Vector3.zero
+            part.AssemblyAngularVelocity = Vector3.zero 
+
+            part.Velocity = Vector3.zero 
+        end 
+    end 
+end 
+
+function Library:Remove(character:Model ,part: string) 
+    if string.match(part,"all") then 
+        character.LeftUpperLeg.Position = Vector3.new(0, -1200, 0)
+		character.RightUpperLeg.Position = Vector3.new(0, -1200, 0)
+		character.LeftUpperArm.Position = Vector3.new(0, -1200, 0)
+		character.RightUpperArm.Position = Vector3.new(0, -1200, 0)
+
+        return true 
+    end 
+
+    character[part].Position = Vector3.new(0, -1200, 0)
+    return false 
+end 
+
+function Library:CanCollide(character:Model,value: boolean)
+    for index,part in pairs(character:GetDescendants()) do 
+        if part:IsA("Part") or part:IsA("BasePart") then 
+            part.CanCollide = value 
+        end 
+    end
+end 
+
+function Library:Chat(message)
+    ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents").SayMessageRequest:FireServer(message, "All")
+end 
+
+function Library:Void(character, part,drop)
+    local BodyVelocity = Instance.new("BodyVelocity")
+    BodyVelocity.MaxForce = Vector3.new(9e9,9e9,9e9)
+    BodyVelocity.Velocity = Vector3.new(0,-9e9,0)
+    if part ~= nil then 
+        BodyVelocity.Parent = character[part]
+    else
+        BodyVelocity.Parent = character.UpperTorso
+    end
+    if not drop or drop ~= nil then 
+        MainEvent:FireServer("Grabbing",false)
+    end 
+end 
+-- useage: Library:Tween(part,duration, {CFrame = CFrame.new(0,0,0)})
+function Library:Tween(part,duration,properties)
+    local Tween = game:GetService("TweenService"):Create(part,TweenInfo.new(duration),properties)
+    Tween:Play()
+end
+
+function Library:Animations()
+    return {
+        ["Grab"] = Library:CreateAnimation("3135389157"),
+		["Roll"] = Library:CreateAnimation("2791328524"),
+		["Angry"] = Library:CreateAnimation("2788838708"),
+		["Punch"] = Library:CreateAnimation("3354696735"),
+		["Elevate"] = Library:CreateAnimation("11394033602"),
+
+		["Double_Handle"] = Library:CreateAnimation("4784557631"),
+		["Get Over Here"] = Library:CreateAnimation("16768625968"),
+
+		--Iron Man
+		["IM_Freefall"] = Library:CreateAnimation("13850654420"),
+		["IM_Land"] = Library:CreateAnimation("13850663836"),
+		["IM_Rizzler"] = Library:CreateAnimation("13850680182"),
+
+		-- Ora
+		["Ora1"] = Library:CreateAnimation("8254787838"),
+		["Ora2"] = Library:CreateAnimation("8254794168"),
+
+		-- Punch back 
+		["Punch back"] = Library:CreateAnimation("17360699557"),
+		["Time Stop Charging"] = Library:CreateAnimation("10714177846"),
+    }
+end 
+
+function Library:Sounds()
+    return {
+        ["Rip"] = "429400881",
+        ["Ora"] = "6889746326",
+        ["Kick"] = "6899466638",
+        ["Punch"] = "3280066384",
+        ["Lightning"] = "6955233353",
+
+        ["LoudPunch"] = "2319521125",
+        ["Loud Za Warudo"] = "8981087259",
+        ["N Word Spam"] = "5986485937",
+
+        -- Get Over Here
+        ["Get Over Here!"] = "8643750815",
+        ["Chain"] = "7592607446",
+
+        -- Barrages, JoJo
+        ["Dora"] = "6995347277", -- Josuke
+        ["Ora Barrage"] = "6678126154", -- Jotaro
+        ["SaW Ora Barrage"] = "6599245588", -- Josuke P8
+        ["Short Muda"] = "6564057272", -- Diego AU 
+
+        -- Time Stop 
+        ["Time Stop"] = "5455437798",
+        ["Time Resume"] = "3084539117",
+        ["When Time is Stopped, There is Only Dio!"] = "6964764259",
+        ["Muda Muda Muda"] = "6889746326",
+        ["Muda!"] = "6191764144",
+        ["Countdown"] = "6675055864",
+        ["Zero."] = "7099835652",    
+        ["Loud Time Resume"] = "6995347277",
+
+        ["VoiceLines"] = {
+                ["This is a test"] = "6949881467", -- Doppio
+                ["Impossible!? I can't Move"] = "6946266008", -- Dio
+                ["The one who misread one move... were You."] = "6665016112", -- Funny Valentine
+                ["Weakling, Weakling!"] = "6924545163", -- Dio
+                ["I'll teach you the meaning of the word 'retire'"] = "7075003019", -- Diego AU
+                ["but for you, I feel no pity at all."] = "5842011186",
+                ["I've been possessed by an evil spirit."] = "5463102834",
+                ["The one to Judge you is my Stand!"] = "5807033225",
+                ["I'll smash you to pieces."] = "5584305519",
+                ["Hm."] = "9127269834",
+                ["Hm? Not bad."] = "4894428927",
+                ["Haha!"] = "9127270745",
+                ["ZA WARUDO!"] = "1571597070",
+                ["yare yare."] = "8657023668",
+                ["This is The Greatest High!"] = "6177204732",
+                ["Monions, Monions"] = "5986485937",
+                ["IMMORTALITY, ETERNAL STANDO POWER!"] = "4580050667",
+                ["In the name of GOD I will smite you!"] = "5114781956",
+                ["Do you understand?"] = "8925079995",
+                ["Good Grief. I made it in time."] = "6520270988",
+            
+                ["You did well on your own."] = "5554488284",
+                ["But even if u stop time, I'm still going to blow your head off!"] = "6520346428",
+                ["Why you? I will fight u later.."] = "4894016902",
+                ["I, Jotaro, shall show no mercy!"] = "6186957635",
+                ["Star Platinum Over Heaven!"] = "5684695930",
+                ["Star Platinum!"] = "5059176420",
+                ["Barrage!"] = "5487424124",
+                ["Ora!"] = "5867741895",
+                ["I'll be the judge!"] = "5344619446",
+                ["What you Just saw, What just hit you, was ME!"] = "5258899114",
+                ["😴"] = "9084006093",
+                ["Ho ho ho ho"] = "8974931854",
+                ["Ben."] = "8974933491",
+                ["Yes"] = "8974932300",
+                ["No"] = "8974931344",
+                ["IP leaked? NO"] = "9074550320",
+                ["😜😜😜"] = "5531057176",
+                ["I love monions"] = "9087418452",
+                ["The hell you keep yammering about.."] = "8397361051",
+                ["Hey! What do you mean?"] = "8322982206",
+                ["Shut up! You're damn annyoing..."] = "6066726827",
+                ["Yarou.."] = "8366318357",
+                ["He can come."] = "4903897880",
+                ["You're done for.."] = "8404022704",
+                ["What's wrong?"] = "8600140455",
+
+            
+
+                ["You will definitely pay!"] = "4903895449",
+                ["I, Jotara will end you myself."] = "5296176563",
+                ["Ally or Enemy? It's your choice."] = "8825179323",
+                ["Do you want a fight? I'll give you a fight."] = "5111658124",
+                ["What did you just call me?"] = "8322803654",
+                ["Hold it."] = "8404017376",
+                ["Star Platinum ! ZA WARUDO!"] = "5736107502",
+                ["Time Has Begun to Move again."] = "6678124632",
+                ["Time shall resume!"] = "6678124632",
+        }
+    }
+end 
+
+function Library:Services()
+    return {
+        Players = Players,
+        LocalPlayer = LocalPlayer,
+        ReplicatedStorage = ReplicatedStorage,
+        MainEvent = MainEvent,
+        RunService = service("RunService"),
+        Workspace = service("Workspace"),
+        Lighting = service("Lighting"),
+        TweenService = service("TweenService"),
+        HttpService = service("HttpService"),
+        UserInputService = service("UserInputService"),
+        VirtualInputManager = Instance.new("VirtualInputManager"),
+    }
+end 
+
+return Library
