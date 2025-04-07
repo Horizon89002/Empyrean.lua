@@ -74,14 +74,17 @@ local espLibrary = {
     },
 };
 espLibrary.__index = espLibrary;
+
+
 if _G.ESPOverrides then
     for key, value in pairs(_G.ESPOverrides) do
         if espLibrary.options[key] ~= nil then
-            espLibrary.options[key] = value
+            espLibrary.options[key] = value  -- Apply the global overrides
         end
     end
 end
 
+espLibrary.__index = espLibrary
 -- variables
 local getService = game.GetService;
 local instanceNew = Instance.new;
