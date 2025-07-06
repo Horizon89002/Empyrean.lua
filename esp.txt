@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and ickey#5612
+    made by siper#9938 and ickey#5612222
 ]]
 
 -- main module
@@ -72,6 +72,7 @@ local espLibrary = {
         chamsOutlineColor = Color3.new(),
         chamsOutlineTransparency = 0,
         image = true,
+        rotateimage = false,
     },
 };
 espLibrary.__index = espLibrary;
