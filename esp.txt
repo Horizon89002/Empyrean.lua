@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#561
+    made by siper#9938 and mickey#561eeeeeeeeeeee
 ]]
 
 -- main module
@@ -78,6 +78,9 @@ local espLibrary = {
 };
 
 
+espLibrary.options.healthBarUseImages = true
+espLibrary.options.healthBarFlipEnabled = true
+espLibrary.options.healthBarFlipColor = Color3.new(1, 0, 0)
 
 espLibrary.__index = espLibrary;
 
@@ -282,6 +285,57 @@ function espLibrary.addEsp(player)
         return
     end
 
+    local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
+    if not container then
+        container = Instance.new("ScreenGui")
+        container.Name = "espContainerGui"
+        container.ResetOnSpawn = false
+        container.IgnoreGuiInset = true
+        container.Parent = game:GetService("CoreGui")
+    end
+
+    local function makeImage(name, rotation)
+        local img = Instance.new("ImageLabel")
+        img.Name = name
+        img.BackgroundTransparency = 1
+        img.Visible = false
+        img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+        img.ImageColor3 = Color3.new(1, 1, 1)
+        img.ScaleType = Enum.ScaleType.Stretch
+        img.Size = UDim2.new(1, 0, 1, 0)
+        img.Position = UDim2.new(0, 0, 0, 0)
+        img.Rotation = rotation
+        img.Parent = container
+        return img
+    end
+
+    local function makeWrappedImage(name)
+        local wrapper = Instance.new("Frame")
+        wrapper.Name = name .. "_Wrapper"
+        wrapper.BackgroundTransparency = 1
+        wrapper.ClipsDescendants = true
+        wrapper.Visible = false
+        wrapper.Size = UDim2.new(0, 0, 0, 0)
+        wrapper.Position = UDim2.new(0, 0, 0, 0)
+        wrapper.Parent = container
+
+        local img = Instance.new("ImageLabel")
+        img.Name = name
+        img.BackgroundTransparency = 1
+        img.Image = espLibrary.options.healthBarImageAssetPath or "rbxassetid://0"
+        img.ImageColor3 = Color3.new(1, 1, 1)
+        img.ScaleType = Enum.ScaleType.Stretch
+        img.AnchorPoint = Vector2.new(0, 0)
+        img.Position = UDim2.new(0, 0, 0, 0)
+        img.Size = UDim2.new(1, 0, 1, 0)
+        img.Parent = wrapper
+
+        return wrapper, img
+    end
+
+    local healthWrapperTop, healthTop = makeWrappedImage("healthBarTop")
+    local healthWrapperFlipped, healthFlipped = makeWrappedImage("healthBarFlipped")
+
     local objects = {
         arrow = create("Triangle", {
             Thickness = 1,
@@ -309,42 +363,17 @@ function espLibrary.addEsp(player)
             OutlineColor = color3New(),
             Font = 2,
         }),
-       boxFill = espLibrary.options.image and (function()
-    local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
-    if not container then
-        container = Instance.new("ScreenGui")
-        container.Name = "espContainerGui"
-        container.ResetOnSpawn = false
-        container.IgnoreGuiInset = true
-        container.Parent = game:GetService("CoreGui")
-    end
-
-    local function makeImage(name, rotation)
-        local img = Instance.new("ImageLabel")
-        img.Name = name
-        img.BackgroundTransparency = 1
-        img.Visible = false
-        img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
-        img.ImageColor3 = Color3.new(1, 1, 1)
-        img.ScaleType = Enum.ScaleType.Stretch
-        img.Size = UDim2.new(1, 0, 1, 0)
-        img.Position = UDim2.new(0, 0, 0, 0)
-        img.Rotation = rotation
-        img.Parent = container
-        return img
-    end
-
-    return {
-        top = makeImage("boxFillTop", 0),
-        flipped = makeImage("boxFillFlipped", 180)
-    }
-end)() or create("Square", {
-    Thickness = 1,
-    Filled = true,
-    Visible = false,
-    Color = Color3.new(1, 1, 1)
-}),
-
+        boxFill = espLibrary.options.image and (function()
+            return {
+                top = makeImage("boxFillTop", 0),
+                flipped = makeImage("boxFillFlipped", 180)
+            }
+        end)() or create("Square", {
+            Thickness = 1,
+            Filled = true,
+            Visible = false,
+            Color = Color3.new(1, 1, 1)
+        }),
 
         boxOutline = create("Square", {
             Thickness = 3,
@@ -358,10 +387,15 @@ end)() or create("Square", {
             Color = color3New(),
             Filled = true
         }),
-        healthBar = create("Square", {
-            Thickness = 1,
-            Filled = true
-        }),
+
+
+        healthBar = {
+            topWrapper = healthWrapperTop,
+            flippedWrapper = healthWrapperFlipped,
+            top = healthTop,
+            flipped = healthFlipped,
+        },
+
         line = create("Line")
     };
 
@@ -637,16 +671,31 @@ end
 
 
 
-                objects.healthBar.Visible = show and self.options.healthBars;
-                objects.healthBar.Color = color or self.options.healthBarsColor;
-                objects.healthBar.Transparency = self.options.healthBarsTransparency;
-                objects.healthBar.Size = healthBarSize;
-                objects.healthBar.Position = healthBarPosition;
+                local barVisible = show and self.options.healthBars
+local barColor = color or self.options.healthBarsColor
+local barTransparency = self.options.healthBarsTransparency
 
-                objects.healthBarOutline.Visible = show and self.options.healthBars;
-                objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
-                objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
-                objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1);
+
+objects.healthBar.topWrapper.Visible = barVisible
+objects.healthBar.topWrapper.Size = healthBarSize
+objects.healthBar.topWrapper.Position = healthBarPosition
+
+objects.healthBar.flippedWrapper.Visible = barVisible
+objects.healthBar.flippedWrapper.Size = healthBarSize
+objects.healthBar.flippedWrapper.Position = healthBarPosition
+
+
+objects.healthBar.top.ImageColor3 = barColor
+objects.healthBar.top.ImageTransparency = barTransparency
+
+objects.healthBar.flipped.ImageColor3 = barColor
+objects.healthBar.flipped.ImageTransparency = barTransparency
+
+
+objects.healthBarOutline.Visible = barVisible
+objects.healthBarOutline.Transparency = barTransparency
+objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2))
+objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1)
 
                 objects.line.Visible = show and self.options.tracers;
                 objects.line.Color = color or self.options.tracerColor;
