@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and ickey#5612222
+    made by siper#9938 and mickey#5612
 ]]
 
 -- main module
@@ -72,7 +72,6 @@ local espLibrary = {
         chamsOutlineColor = Color3.new(),
         chamsOutlineTransparency = 0,
         image = true,
-        rotateimage = false,
     },
 };
 espLibrary.__index = espLibrary;
@@ -589,17 +588,6 @@ if boxFill and show and self.options.boxFill then
         boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
         boxFill.ImageTransparency = self.options.boxFillTransparency
         boxFill.ImageColor3 = color or self.options.boxFillColor
-        if self.options.rotateImage then
-            boxFill.Rotation = 45  
-            boxFill.AnchorPoint = Vector2.new(0.5, 0.5)
-            boxFill.Position = UDim2.new(0, position.X + size.X/2, 0, position.Y + size.Y/2)
-            boxFill.Size = UDim2.new(0, size.X, 0, size.Y) 
-        else
-            boxFill.Rotation = 0
-            boxFill.AnchorPoint = Vector2.new(0, 0)
-            boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
-            boxFill.Size = UDim2.new(0, size.X, 0, size.Y)
-        end
     elseif typeof(boxFill) == "table" and boxFill.__OBJECT_TYPE == "Square" then
         boxFill.Visible = true
         boxFill.Size = size
