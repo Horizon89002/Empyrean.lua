@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#561
+    made by siper#9938 
 ]]
 
 -- main module
@@ -730,6 +730,24 @@ end
             cache.text.Color = cache.options.color;
             cache.text.Text = cache.options.text;
             cache.text.Position = round(screenPosition);
+            for player, objects in next, self.espCache do
+    if not players:FindFirstChild(player.Name) then
+        self.removeEsp(player)
+        self.removeChams(player)
+    end
+end
+
+for player, highlight in next, self.chamsCache do
+    if not players:FindFirstChild(player.Name) then
+        self.removeChams(player)
+    end
+end
+
+for object, cache in next, self.objectCache do
+    if not object or not object.Parent then
+        self.removeObject(object)
+    end
+end
         end
     end);
 end
