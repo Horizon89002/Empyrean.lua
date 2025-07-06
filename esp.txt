@@ -293,11 +293,16 @@ function espLibrary.addEsp(player)
             Font = 2,
         }),
         boxFill = espLibrary.options.image and create("Image", {
-        Data = espLibrary.options.imageAssetPath,
-        }) or create("Square", {
-          Thickness = 1,
-          Filled = true,
-        }),
+    Data = espLibrary.options.imageAssetPath,
+    Visible = false,
+    Tint = Color3.new(1, 1, 1)
+}) or create("Square", {
+    Thickness = 1,
+    Filled = true,
+    Visible = false,
+    Color = Color3.new(1, 1, 1)
+}),
+
         boxOutline = create("Square", {
             Thickness = 3,
             Color = color3New()
@@ -544,19 +549,21 @@ function espLibrary:Load(renderValue)
                 objects.boxOutline.Size = size;
                 objects.boxOutline.Position = position;
 
-                if self.options.image and objects.boxFill and objects.boxFill.__OBJECT_TYPE == "Image" then
-              objects.boxFill.Visible = show and self.options.boxFill
+                if show and self.options.boxFill and objects.boxFill then
+    objects.boxFill.Visible = true
     objects.boxFill.Size = size
     objects.boxFill.Position = position
     objects.boxFill.Transparency = self.options.boxFillTransparency
 
-    objects.boxFill.Tint = color or self.options.boxFillColor
+    if self.options.image and typeof(objects.boxFill.Image) == "string" then
+        objects.boxFill.Tint = color or self.options.boxFillColor
+    else
+        objects.boxFill.Color = color or self.options.boxFillColor
+    end
 else
-    objects.boxFill.Visible = show and self.options.boxFill
-    objects.boxFill.Color = color or self.options.boxFillColor
-    objects.boxFill.Transparency = self.options.boxFillTransparency
-    objects.boxFill.Size = size
-    objects.boxFill.Position = position
+    if objects.boxFill then
+        objects.boxFill.Visible = false
+    end
 end
 
 
