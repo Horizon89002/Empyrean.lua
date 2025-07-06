@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#5612
+    made by siperrrrrrrrrrr#9938 and mickey#5612
 ]]
 
 -- main module
@@ -630,25 +630,27 @@ end
                 local healthBar = objects.healthBar
 local healthBarOutline = objects.healthBarOutline
 
+local visible = (show and self.options.healthBars) == true
+
 if healthBar then
     if self.options.image and typeof(healthBar) == "Instance" and healthBar:IsA("ImageLabel") then
-        healthBar.Visible = show and self.options.healthBars
+        healthBar.Visible = visible
         healthBar.ImageColor3 = color or self.options.healthBarsColor
-        healthBar.ImageTransparency = self.options.healthBarsTransparency
+        healthBar.ImageTransparency = self.options.healthBarsTransparency or 0
         healthBar.Size = UDim2.new(0, healthBarSize.X, 0, healthBarSize.Y)
         healthBar.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y)
     elseif typeof(healthBar) == "table" and healthBar.__OBJECT_TYPE == "Square" then
-        healthBar.Visible = show and self.options.healthBars
+        healthBar.Visible = visible
         healthBar.Color = color or self.options.healthBarsColor
-        healthBar.Transparency = self.options.healthBarsTransparency
+        healthBar.Transparency = self.options.healthBarsTransparency or 0
         healthBar.Size = healthBarSize
         healthBar.Position = healthBarPosition
     end
 end
 
 if healthBarOutline then
-    healthBarOutline.Visible = show and self.options.healthBars
-    healthBarOutline.Transparency = self.options.healthBarsTransparency
+    healthBarOutline.Visible = visible
+    healthBarOutline.Transparency = self.options.healthBarsTransparency or 0
     healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2))
     healthBarOutline.Position = healthBarPosition - vector2New(1, -1)
 end
