@@ -77,8 +77,7 @@ local espLibrary = {
     },
 };
 
-self.options.flippedBoxFillEnabled = true
-self.options.flippedBoxFillColor = Color3.new(1, 0, 0) 
+
 
 espLibrary.__index = espLibrary;
 
