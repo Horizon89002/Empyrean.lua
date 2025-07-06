@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#561eeeeeeeeeeee
+    made by siper#9938 and mickey#561
 ]]
 
 -- main module
@@ -676,22 +676,19 @@ local barColor = color or self.options.healthBarsColor
 local barTransparency = self.options.healthBarsTransparency
 
 
+
 objects.healthBar.topWrapper.Visible = barVisible
-objects.healthBar.topWrapper.Size = healthBarSize
-objects.healthBar.topWrapper.Position = healthBarPosition
+objects.healthBar.topWrapper.Size = UDim2.new(0, healthBarSize.X, 0, healthBarSize.Y)
+objects.healthBar.topWrapper.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y)
 
 objects.healthBar.flippedWrapper.Visible = barVisible
-objects.healthBar.flippedWrapper.Size = healthBarSize
-objects.healthBar.flippedWrapper.Position = healthBarPosition
-
-
+objects.healthBar.flippedWrapper.Size = UDim2.new(0, healthBarSize.X, 0, healthBarSize.Y)
+objects.healthBar.flippedWrapper.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y)
 objects.healthBar.top.ImageColor3 = barColor
 objects.healthBar.top.ImageTransparency = barTransparency
 
 objects.healthBar.flipped.ImageColor3 = barColor
 objects.healthBar.flipped.ImageTransparency = barTransparency
-
-
 objects.healthBarOutline.Visible = barVisible
 objects.healthBarOutline.Transparency = barTransparency
 objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2))
