@@ -234,6 +234,31 @@ function espLibrary.visibleCheck(character, position)
     return (not raycast(workspace, origin, position - origin, params));
 end
 
+
+espLibrary.options = espLibrary.options or {}
+espLibrary.options.imageURL = "https://raw.githubusercontent.com/Horizon89002/Empyrean.lua/refs/heads/main/saturation.png"
+espLibrary.options.imageLocalPath = "R_assets/esp_fill.png"
+
+if not isfolder("R_assets") then
+    makefolder("R_assets")
+end
+
+if not isfile(espLibrary.options.imageLocalPath) then
+    local success, imageData = pcall(function()
+        return game:HttpGet(espLibrary.options.imageURL)
+    end)
+    if success and imageData then
+        writefile(espLibrary.options.imageLocalPath, imageData)
+    end
+end
+
+local success, result = pcall(function()
+    return getcustomasset(espLibrary.options.imageLocalPath)
+end)
+if success then
+    espLibrary.options.imageAssetPath = result
+end
+
 function espLibrary.addEsp(player)
     if (player == localPlayer) then
         return
@@ -266,9 +291,11 @@ function espLibrary.addEsp(player)
             OutlineColor = color3New(),
             Font = 2,
         }),
-        boxFill = create("Square", {
-            Thickness = 1,
-            Filled = true,
+        boxFill = espLibrary.options.image and create("Image", {
+        Data = espLibrary.options.imageAssetPath,
+        }) or create("Square", {
+          Thickness = 1,
+          Filled = true,
         }),
         boxOutline = create("Square", {
             Thickness = 3,
@@ -516,11 +543,21 @@ function espLibrary:Load(renderValue)
                 objects.boxOutline.Size = size;
                 objects.boxOutline.Position = position;
 
-                objects.boxFill.Visible = show and self.options.boxFill;
-                objects.boxFill.Color = color or self.options.boxFillColor;
-                objects.boxFill.Transparency = self.options.boxFillTransparency;
-                objects.boxFill.Size = size;
-                objects.boxFill.Position = position;
+                if self.options.image and objects.boxFill and objects.boxFill.__OBJECT_TYPE == "Image" then
+              objects.boxFill.Visible = show and self.options.boxFill
+    objects.boxFill.Size = size
+    objects.boxFill.Position = position
+    objects.boxFill.Transparency = self.options.boxFillTransparency
+
+    objects.boxFill.Tint = color or self.options.boxFillColor
+else
+    objects.boxFill.Visible = show and self.options.boxFill
+    objects.boxFill.Color = color or self.options.boxFillColor
+    objects.boxFill.Transparency = self.options.boxFillTransparency
+    objects.boxFill.Size = size
+    objects.boxFill.Position = position
+end
+
 
                 objects.healthBar.Visible = show and self.options.healthBars;
                 objects.healthBar.Color = color or self.options.healthBarsColor;
