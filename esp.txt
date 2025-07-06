@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938
+    made by siper#99389999
 ]]
 
 -- main module
@@ -273,9 +273,7 @@ boxFillGui.Image = espLibrary.options.imageAssetPath or ""
 boxFillGui.Parent = espGui
 
 function espLibrary.addEsp(player)
-    if (player == localPlayer) then
-        return
-    end
+    if player == localPlayer then return end
 
     local objects = {
         arrow = create("Triangle", {
@@ -304,77 +302,84 @@ function espLibrary.addEsp(player)
             OutlineColor = color3New(),
             Font = 2,
         }),
-       boxFill = espLibrary.options.image and (function()
-    local img = Instance.new("ImageLabel")
-    img.Name = "boxFill"
-    img.BackgroundTransparency = 1
-    img.Visible = false
-    img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
-    img.ImageColor3 = Color3.new(1, 1, 1)
-    img.ScaleType = Enum.ScaleType.Stretch
-    img.Size = UDim2.new(1, 0, 1, 0) -- nigger 2
-    img.Position = UDim2.new(0, 0, 0, 0) -- nigger
 
-    local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
-    if not container then
-        container = Instance.new("ScreenGui")
-        container.Name = "espContainerGui"
-        container.ResetOnSpawn = false
-        container.IgnoreGuiInset = true
-        container.Parent = game:GetService("CoreGui")
-    end
+        boxFill = espLibrary.options.image and (function()
+            local img = Instance.new("ImageLabel")
+            img.Name = "boxFill"
+            img.BackgroundTransparency = 1
+            img.Visible = false
+            img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+            img.ImageColor3 = Color3.new(1, 1, 1)
+            img.ScaleType = Enum.ScaleType.Stretch
+            img.Size = UDim2.new(1, 0, 1, 0)
+            img.Position = UDim2.new(0, 0, 0, 0)
 
-    img.Parent = container
-    return img
-end)() or create("Square", {
-    Thickness = 1,
-    Filled = true,
-    Visible = false,
-    Color = Color3.new(1, 1, 1)
-}),
+            local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
+            if not container then
+                container = Instance.new("ScreenGui")
+                container.Name = "espContainerGui"
+                container.ResetOnSpawn = false
+                container.IgnoreGuiInset = true
+                container.Parent = game:GetService("CoreGui")
+            end
+
+            img.Parent = container
+            return img
+        end)() or create("Square", {
+            Thickness = 1,
+            Filled = true,
+            Visible = false,
+            Color = Color3.new(1, 1, 1)
+        }),
 
         boxOutline = create("Square", {
             Thickness = 3,
             Color = color3New()
         }),
+
         box = create("Square", {
             Thickness = 1
         }),
+
         healthBarOutline = create("Square", {
             Thickness = 1,
             Color = color3New(),
             Filled = true
         }),
+
         healthBar = espLibrary.options.image and (function()
-    local img = Instance.new("ImageLabel")
-    img.Name = "healthBar"
-    img.BackgroundTransparency = 1
-    img.Visible = false
-    img.Image = espLibrary.options.healthBarImageAssetPath or "rbxassetid://0" 
-    img.ImageColor3 = Color3.new(0, 1, 0) 
-    img.ScaleType = Enum.ScaleType.Stretch
-    img.Size = UDim2.new(1, 0, 1, 0)
-    img.Position = UDim2.new(0, 0, 0, 0)
-    
-    local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
-    if not container then
-        container = Instance.new("ScreenGui")
-        container.Name = "espContainerGui"
-        container.ResetOnSpawn = false
-        container.IgnoreGuiInset = true
-        container.Parent = game:GetService("CoreGui")
-    end
+            local img = Instance.new("ImageLabel")
+            img.Name = "healthBar"
+            img.BackgroundTransparency = 1
+            img.Visible = false
+            img.Image = espLibrary.options.healthBarImageAssetPath or "rbxassetid://0"
+            img.ImageColor3 = Color3.new(0, 1, 0)
+            img.ScaleType = Enum.ScaleType.Stretch
+            img.Size = UDim2.new(1, 0, 1, 0)
+            img.Position = UDim2.new(0, 0, 0, 0)
 
-    img.Parent = container
-    return img
-end)() or create("Square", {
-    Thickness = 1,
-    Filled = true
-}),
-    };
+            local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
+            if not container then
+                container = Instance.new("ScreenGui")
+                container.Name = "espContainerGui"
+                container.ResetOnSpawn = false
+                container.IgnoreGuiInset = true
+                container.Parent = game:GetService("CoreGui")
+            end
 
-    espLibrary.espCache[player] = objects;
+            img.Parent = container
+            return img
+        end)() or create("Square", {
+            Thickness = 1,
+            Filled = true
+        }),
+
+        line = create("Line")
+    }
+
+    espLibrary.espCache[player] = objects
 end
+
 
 function espLibrary.removeEsp(player)
     local espCache = espLibrary.espCache[player];
