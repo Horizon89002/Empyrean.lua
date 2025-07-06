@@ -235,6 +235,35 @@ function espLibrary.visibleCheck(character, position)
     return (not raycast(workspace, origin, position - origin, params));
 end
 
+local frame = Instance.new("Frame")
+frame.Name = "boxFillContainer"
+frame.BackgroundTransparency = 1
+frame.Size = UDim2.new(0, 100, 0, 100)
+frame.Position = UDim2.new(0, 0, 0, 0)
+frame.Visible = false
+frame.Parent = container
+
+local imgNormal = Instance.new("ImageLabel")
+imgNormal.Name = "boxFillNormal"
+imgNormal.BackgroundTransparency = 1
+imgNormal.Size = UDim2.new(0.5, 0, 1, 0)
+imgNormal.Position = UDim2.new(0, 0, 0, 0)
+imgNormal.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+imgNormal.ImageColor3 = Color3.new(1, 1, 1)
+imgNormal.ScaleType = Enum.ScaleType.Stretch
+imgNormal.Parent = frame
+
+local imgFlipped = Instance.new("ImageLabel")
+imgFlipped.Name = "boxFillFlipped"
+imgFlipped.BackgroundTransparency = 1
+imgFlipped.Size = UDim2.new(0.5, 0, 1, 0)
+imgFlipped.AnchorPoint = Vector2.new(1, 0)
+imgFlipped.Position = UDim2.new(1, 0, 0, 0)
+imgFlipped.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+imgFlipped.ImageColor3 = Color3.new(1, 1, 1)
+imgFlipped.ScaleType = Enum.ScaleType.Stretch
+imgFlipped.Rotation = 180
+imgFlipped.Parent = frame
 
 espLibrary.options = espLibrary.options or {}
 espLibrary.options.imageURL = "https://github.com/Horizon89002/Empyrean.lua/blob/main/saturation.png?raw=true"
@@ -259,25 +288,13 @@ end)
 if success then
     espLibrary.options.imageAssetPath = result
 end
-
 espLibrary.options.boxFillColor = Color3.new(1, 1, 1)         
 espLibrary.options.boxFillFlippedColor = Color3.new(1, 1, 1)   
 espLibrary.options.boxFillTransparency = 0.5                 
-espLibrary.options.boxFillFlippedTransparency = 0.5                                     
+espLibrary.options.boxFillFlippedTransparency = 0.5                             
 espLibrary.options.boxFillFlipped = true                        
 
-
-local CoreGui = game:GetService("CoreGui")
-local espGui = Instance.new("ScreenGui")
-espGui.Name = "EspGui"
-espGui.ResetOnSpawn = false
-espGui.Parent = CoreGui
-
-local boxFillGui = Instance.new("ImageLabel")
-boxFillGui.BackgroundTransparency = 1
-boxFillGui.Visible = false
-boxFillGui.Image = espLibrary.options.imageAssetPath or "" 
-boxFillGui.Parent = espGui
+local localPlayer = game:GetService("Players").LocalPlayer
 
 function espLibrary.addEsp(player)
     if (player == localPlayer) then
@@ -311,54 +328,50 @@ function espLibrary.addEsp(player)
             OutlineColor = color3New(),
             Font = 2,
         }),
+
         boxFill = (function()
-    local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
-    if not container then
-        container = Instance.new("ScreenGui")
-        container.Name = "containeroftheniggas"
-        container.ResetOnSpawn = false
-        container.IgnoreGuiInset = true
-        container.Parent = game:GetService("CoreGui")
-    end
+            local CoreGui = game:GetService("CoreGui")
+            local container = CoreGui:FindFirstChild("espContainerGui")
+            if not container then
+                container = Instance.new("ScreenGui")
+                container.Name = "espContainerGui"
+                container.ResetOnSpawn = false
+                container.IgnoreGuiInset = true
+                container.Parent = CoreGui
+            end
 
-    local frame = Instance.new("Frame")
-    frame.Name = "boxFillContainer"
-    frame.BackgroundTransparency = 1
-    frame.Size = UDim2.new(0, 100, 0, 100)
-    frame.Position = UDim2.new(0, 0, 0, 0)
-    frame.Visible = false
-    frame.Parent = container
+            local frame = Instance.new("Frame")
+            frame.Name = "boxFillContainer"
+            frame.BackgroundTransparency = 1
+            frame.Size = UDim2.new(0, 100, 0, 100)
+            frame.Position = UDim2.new(0, 0, 0, 0)
+            frame.Visible = false
+            frame.Parent = container
 
-    local imgNormal = Instance.new("ImageLabel")
-    imgNormal.Name = "boxFillNormal"
-    imgNormal.BackgroundTransparency = 1
-    imgNormal.Size = UDim2.new(0.5, 0, 1, 0) 
-    imgNormal.Position = UDim2.new(0, 0, 0, 0)
-    imgNormal.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
-    imgNormal.ImageColor3 = Color3.new(1, 1, 1)
-    imgNormal.ScaleType = Enum.ScaleType.Stretch
-    imgNormal.Parent = frame
+            local imgNormal = Instance.new("ImageLabel")
+            imgNormal.Name = "boxFillNormal"
+            imgNormal.BackgroundTransparency = 1
+            imgNormal.Size = UDim2.new(0.5, 0, 1, 0) 
+            imgNormal.Position = UDim2.new(0, 0, 0, 0)
+            imgNormal.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+            imgNormal.ImageColor3 = espLibrary.options.boxFillColor or Color3.new(1, 1, 1)
+            imgNormal.ScaleType = Enum.ScaleType.Stretch
+            imgNormal.Parent = frame
 
-    local imgFlipped = Instance.new("ImageLabel")
-    imgFlipped.Name = "boxFillFlipped"
-    imgFlipped.BackgroundTransparency = 1
-    imgFlipped.Size = UDim2.new(0.5, 0, 1, 0) 
-    imgFlipped.Position = UDim2.new(0.5, 0, 0, 0)
-    imgFlipped.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
-    imgFlipped.ImageColor3 = Color3.new(1, 1, 1)
-    imgFlipped.ScaleType = Enum.ScaleType.Stretch
-    imgFlipped.Rotation = 180
-    imgFlipped.AnchorPoint = Vector2.new(1, 0)
-    imgFlipped.Position = UDim2.new(1, 0, 0, 0)
-    imgFlipped.Parent = frame
+            local imgFlipped = Instance.new("ImageLabel")
+            imgFlipped.Name = "boxFillFlipped"
+            imgFlipped.BackgroundTransparency = 1
+            imgFlipped.Size = UDim2.new(0.5, 0, 1, 0) 
+            imgFlipped.AnchorPoint = Vector2.new(1, 0)
+            imgFlipped.Position = UDim2.new(1, 0, 0, 0)
+            imgFlipped.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+            imgFlipped.ImageColor3 = espLibrary.options.boxFillFlippedColor or Color3.new(1, 1, 1)
+            imgFlipped.ScaleType = Enum.ScaleType.Stretch
+            imgFlipped.Rotation = 180
+            imgFlipped.Parent = frame
 
-    return frame
-end)() or create("Square", {
-    Thickness = 1,
-    Filled = true,
-    Visible = false,
-    Color = Color3.new(1, 1, 1)
-})
+            return frame
+        end)(),
 
         boxOutline = create("Square", {
             Thickness = 3,
@@ -377,23 +390,28 @@ end)() or create("Square", {
             Filled = true
         }),
         line = create("Line")
-    };
+    }
 
-    espLibrary.espCache[player] = objects;
+    espLibrary.espCache[player] = objects
 end
 
 function espLibrary.removeEsp(player)
-    local espCache = espLibrary.espCache[player];
+    local espCache = espLibrary.espCache[player]
 
-    if (espCache) then
-        espLibrary.espCache[player] = nil;
+    if espCache then
+        espLibrary.espCache[player] = nil
 
-        for index, object in next, espCache do
-            espCache[index] = nil;
-            object:Remove();
+        for index, object in pairs(espCache) do
+            espCache[index] = nil
+            if typeof(object) == "Instance" and object.Parent then
+                object:Destroy()
+            elseif type(object) == "table" and object.Remove then
+                object:Remove()
+            end
         end
     end
 end
+
 
 function espLibrary.addChams(player)
     if (player == localPlayer) then
@@ -618,16 +636,16 @@ if boxFill and show and self.options.boxFill then
         local flippedImg = boxFill:FindFirstChild("boxFillFlipped")
 
         if normalImg then
-    normalImg.Visible = true
-    normalImg.ImageTransparency = self.options.boxFillTransparency
-    normalImg.ImageColor3 = color or self.options.boxFillColor
-end
+            normalImg.Visible = true
+            normalImg.ImageTransparency = self.options.boxFillTransparency
+            normalImg.ImageColor3 = color or self.options.boxFillColor
+        end
 
-if flippedImg then
-    flippedImg.Visible = self.options.boxFillFlipped or false
-    flippedImg.ImageTransparency = self.options.boxFillFlippedTransparency or self.options.boxFillTransparency
-    flippedImg.ImageColor3 = color or self.options.boxFillFlippedColor
-end
+        if flippedImg then
+            flippedImg.Visible = self.options.boxFillFlipped or false
+            flippedImg.ImageTransparency = self.options.boxFillFlippedTransparency or self.options.boxFillTransparency
+            flippedImg.ImageColor3 = color or self.options.boxFillFlippedColor
+        end
 
     elseif typeof(boxFill) == "table" and boxFill.__OBJECT_TYPE == "Square" then
         boxFill.Visible = true
