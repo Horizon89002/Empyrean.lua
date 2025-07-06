@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#5612222
+    made by siper#9938 and mickey#561
 ]]
 
 -- main module
@@ -74,6 +74,10 @@ local espLibrary = {
         image = true,
     },
 };
+
+self.options.flippedBoxFillEnabled = true
+self.options.flippedBoxFillColor = Color3.new(1, 0, 0) 
+
 espLibrary.__index = espLibrary;
 
 -- variables
