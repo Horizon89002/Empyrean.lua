@@ -1,3 +1,6 @@
+--[[
+    made by siper#9938 and mickey#561
+]]
 
 -- main module
 local espLibrary = {
@@ -74,7 +77,7 @@ local espLibrary = {
     },
 };
 
-espLibrary.options.rotatefill = true
+
 
 espLibrary.__index = espLibrary;
 
@@ -205,8 +208,6 @@ function espLibrary.getScaleFactor(fov, depth)
     return 1 / (depth * lastScale) * 1000;
 end
 
-
-
 function espLibrary.getBoxData(position, size)
     local torsoPosition, onScreen, depth = worldToViewportPoint(position);
     local scaleFactor = espLibrary.getScaleFactor(currentCamera.FieldOfView, depth);
@@ -318,40 +319,24 @@ function espLibrary.addEsp(player)
         container.Parent = game:GetService("CoreGui")
     end
 
-    local function makeWrappedImage(name, rotation)
-        local wrapper = Instance.new("Frame")
-        wrapper.Name = name .. "_Wrapper"
-        wrapper.BackgroundTransparency = 1
-        wrapper.ClipsDescendants = true
-        wrapper.Visible = false
-        wrapper.Size = UDim2.new(0, 0, 0, 0)
-        wrapper.Position = UDim2.new(0, 0, 0, 0)
-        wrapper.Parent = container
-
+    local function makeImage(name, rotation)
         local img = Instance.new("ImageLabel")
         img.Name = name
         img.BackgroundTransparency = 1
+        img.Visible = false
         img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
         img.ImageColor3 = Color3.new(1, 1, 1)
         img.ScaleType = Enum.ScaleType.Stretch
-        img.AnchorPoint = Vector2.new(0.5, 0.5)
-        img.Position = UDim2.new(0.5, 0, 0.5, 0)
         img.Size = UDim2.new(1, 0, 1, 0)
+        img.Position = UDim2.new(0, 0, 0, 0)
         img.Rotation = rotation
-        img.Parent = wrapper
-
-        return wrapper, img
+        img.Parent = container
+        return img
     end
 
-    local topWrapper, top = makeWrappedImage("boxFillTop", 0)
-    local flippedWrapper, flipped = makeWrappedImage("boxFillFlipped", 180)
-
     return {
-        topWrapper = topWrapper,
-        flippedWrapper = flippedWrapper,
-        top = top,
-        flipped = flipped,
-        _angle = 0
+        top = makeImage("boxFillTop", 0),
+        flipped = makeImage("boxFillFlipped", 180)
     }
 end)() or create("Square", {
     Thickness = 1,
@@ -395,37 +380,6 @@ function espLibrary.removeEsp(player)
         end
     end
 end
-
-local function getSafeScale_StaticBox(angleDeg)
-	local angle = math.rad(angleDeg)
-	local sinA = math.abs(math.sin(angle))
-	local cosA = math.abs(math.cos(angle))
-
-	return 1 / (sinA + cosA)
-end
-
-local RunService = game:GetService("RunService")
-
-RunService.RenderStepped:Connect(function(dt)
-	if not espLibrary.options.rotatefill then return end
-
-	for _, data in pairs(espLibrary.espCache) do
-		local boxFill = data.boxFill
-		if boxFill and typeof(boxFill) == "table" and boxFill.top and boxFill.flipped then
-			boxFill._angle = (boxFill._angle or 0) + dt * 100
-			local angle = boxFill._angle % 360
-			local safeScale = getSafeScale_StaticBox(angle)
-			local scaledSize = UDim2.new(safeScale, 0, safeScale, 0)
-			local center = UDim2.new(0.5, 0, 0.5, 0)
-			boxFill.top.Size = scaledSize
-			boxFill.top.Position = center
-			boxFill.top.Rotation = angle
-			boxFill.flipped.Size = scaledSize
-			boxFill.flipped.Position = center
-			boxFill.flipped.Rotation = (angle + 180) % 360
-		end
-	end
-end)
 
 function espLibrary.addChams(player)
     if (player == localPlayer) then
@@ -642,28 +596,17 @@ function espLibrary:Load(renderValue)
 
 if boxFill and show and self.options.boxFill then
     if self.options.image and typeof(boxFill) == "table" and boxFill.top and boxFill.flipped then
-        local width, height = size.X, size.Y
-        local posX, posY = position.X, position.Y
-
-        if boxFill.topWrapper then
-            boxFill.topWrapper.Visible = true
-            boxFill.topWrapper.Size = UDim2.new(0, width, 0, height)
-            boxFill.topWrapper.Position = UDim2.new(0, posX, 0, posY)
-        end
-
-        if boxFill.flippedWrapper then
-            boxFill.flippedWrapper.Visible = true
-            boxFill.flippedWrapper.Size = UDim2.new(0, width, 0, height)
-            boxFill.flippedWrapper.Position = UDim2.new(0, posX, 0, posY)
-        end
-
+        boxFill.top.Visible = true
+        boxFill.top.Size = UDim2.new(0, size.X, 0, size.Y)
+        boxFill.top.Position = UDim2.new(0, position.X, 0, position.Y)
         boxFill.top.ImageTransparency = self.options.boxFillTransparency
         boxFill.top.ImageColor3 = color or self.options.boxFillColor
 
+        boxFill.flipped.Visible = true
+        boxFill.flipped.Size = UDim2.new(0, size.X, 0, size.Y)
+        boxFill.flipped.Position = UDim2.new(0, position.X, 0, position.Y)
         boxFill.flipped.ImageTransparency = self.options.boxFillTransparency
-        boxFill.flipped.ImageColor3 = self.options.flippedBoxFillEnabled
-            and self.options.flippedBoxFillColor
-            or (color or self.options.boxFillColor)
+        boxFill.flipped.ImageColor3 = self.options.flippedBoxFillEnabled and self.options.flippedBoxFillColor or (color or self.options.boxFillColor)
 
     elseif typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
         boxFill.Visible = true
@@ -682,8 +625,8 @@ if boxFill and show and self.options.boxFill then
 else
     if boxFill then
         if typeof(boxFill) == "table" and boxFill.top and boxFill.flipped then
-            if boxFill.topWrapper then boxFill.topWrapper.Visible = false end
-            if boxFill.flippedWrapper then boxFill.flippedWrapper.Visible = false end
+            boxFill.top.Visible = false
+            boxFill.flipped.Visible = false
         elseif typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
             boxFill.Visible = false
         elseif typeof(boxFill) == "table" and boxFill.__OBJECT_TYPE == "Square" then
