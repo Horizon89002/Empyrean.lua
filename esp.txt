@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#5612
+    made by siper#9938 and mickey#5612222
 ]]
 
 -- main module
@@ -305,16 +305,6 @@ function espLibrary.addEsp(player)
             Font = 2,
         }),
        boxFill = espLibrary.options.image and (function()
-    local img = Instance.new("ImageLabel")
-    img.Name = "boxFill"
-    img.BackgroundTransparency = 1
-    img.Visible = false
-    img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
-    img.ImageColor3 = Color3.new(1, 1, 1)
-    img.ScaleType = Enum.ScaleType.Stretch
-    img.Size = UDim2.new(1, 0, 1, 0) -- nigger 2
-    img.Position = UDim2.new(0, 0, 0, 0) -- nigger
-
     local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
     if not container then
         container = Instance.new("ScreenGui")
@@ -324,14 +314,32 @@ function espLibrary.addEsp(player)
         container.Parent = game:GetService("CoreGui")
     end
 
-    img.Parent = container
-    return img
+    local function makeImage(name, rotation)
+        local img = Instance.new("ImageLabel")
+        img.Name = name
+        img.BackgroundTransparency = 1
+        img.Visible = false
+        img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+        img.ImageColor3 = Color3.new(1, 1, 1)
+        img.ScaleType = Enum.ScaleType.Stretch
+        img.Size = UDim2.new(1, 0, 1, 0)
+        img.Position = UDim2.new(0, 0, 0, 0)
+        img.Rotation = rotation
+        img.Parent = container
+        return img
+    end
+
+    return {
+        top = makeImage("boxFillTop", 0),
+        flipped = makeImage("boxFillFlipped", 180)
+    }
 end)() or create("Square", {
     Thickness = 1,
     Filled = true,
     Visible = false,
     Color = Color3.new(1, 1, 1)
 }),
+
 
         boxOutline = create("Square", {
             Thickness = 3,
@@ -582,12 +590,26 @@ function espLibrary:Load(renderValue)
                 local boxFill = espLibrary.espCache[player] and espLibrary.espCache[player].boxFill
 
 if boxFill and show and self.options.boxFill then
-    if self.options.image and typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
+    if self.options.image and typeof(boxFill) == "table" and boxFill.top and boxFill.flipped then
+        boxFill.top.Visible = true
+        boxFill.top.Size = UDim2.new(0, size.X, 0, size.Y)
+        boxFill.top.Position = UDim2.new(0, position.X, 0, position.Y)
+        boxFill.top.ImageTransparency = self.options.boxFillTransparency
+        boxFill.top.ImageColor3 = color or self.options.boxFillColor
+
+        boxFill.flipped.Visible = true
+        boxFill.flipped.Size = UDim2.new(0, size.X, 0, size.Y)
+        boxFill.flipped.Position = UDim2.new(0, position.X, 0, position.Y)
+        boxFill.flipped.ImageTransparency = self.options.boxFillTransparency
+        boxFill.flipped.ImageColor3 = self.options.flippedBoxFillEnabled and self.options.flippedBoxFillColor or (color or self.options.boxFillColor)
+
+    elseif typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
         boxFill.Visible = true
         boxFill.Size = UDim2.new(0, size.X, 0, size.Y)
         boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
         boxFill.ImageTransparency = self.options.boxFillTransparency
         boxFill.ImageColor3 = color or self.options.boxFillColor
+
     elseif typeof(boxFill) == "table" and boxFill.__OBJECT_TYPE == "Square" then
         boxFill.Visible = true
         boxFill.Size = size
@@ -597,13 +619,17 @@ if boxFill and show and self.options.boxFill then
     end
 else
     if boxFill then
-        if typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
+        if typeof(boxFill) == "table" and boxFill.top and boxFill.flipped then
+            boxFill.top.Visible = false
+            boxFill.flipped.Visible = false
+        elseif typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
             boxFill.Visible = false
         elseif typeof(boxFill) == "table" and boxFill.__OBJECT_TYPE == "Square" then
             boxFill.Visible = false
         end
     end
 end
+
 
 
                 objects.healthBar.Visible = show and self.options.healthBars;
