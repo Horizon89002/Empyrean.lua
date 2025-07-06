@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#5617887
+    made by siper#9938 and mickey#561
 ]]
 
 -- main module
@@ -336,24 +336,40 @@ function espLibrary.addEsp(player)
         container.Parent = game:GetService("CoreGui")
     end
 
-    local function makeImage(name, rotation)
+    local function makeWrappedImage(name, rotation)
+        local wrapper = Instance.new("Frame")
+        wrapper.Name = name .. "_Wrapper"
+        wrapper.BackgroundTransparency = 1
+        wrapper.ClipsDescendants = true
+        wrapper.Visible = false
+        wrapper.Size = UDim2.new(0, 0, 0, 0)
+        wrapper.Position = UDim2.new(0, 0, 0, 0)
+        wrapper.Parent = container
+
         local img = Instance.new("ImageLabel")
         img.Name = name
         img.BackgroundTransparency = 1
-        img.Visible = false
         img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
         img.ImageColor3 = Color3.new(1, 1, 1)
         img.ScaleType = Enum.ScaleType.Stretch
+        img.AnchorPoint = Vector2.new(0.5, 0.5)
+        img.Position = UDim2.new(0.5, 0, 0.5, 0)
         img.Size = UDim2.new(1, 0, 1, 0)
-        img.Position = UDim2.new(0, 0, 0, 0)
         img.Rotation = rotation
-        img.Parent = container
-        return img
+        img.Parent = wrapper
+
+        return wrapper, img
     end
 
+    local topWrapper, top = makeWrappedImage("boxFillTop", 0)
+    local flippedWrapper, flipped = makeWrappedImage("boxFillFlipped", 180)
+
     return {
-        top = makeImage("boxFillTop", 0),
-        flipped = makeImage("boxFillFlipped", 180)
+        topWrapper = topWrapper,
+        flippedWrapper = flippedWrapper,
+        top = top,
+        flipped = flipped,
+        _angle = 0
     }
 end)() or create("Square", {
     Thickness = 1,
@@ -613,17 +629,28 @@ function espLibrary:Load(renderValue)
 
 if boxFill and show and self.options.boxFill then
     if self.options.image and typeof(boxFill) == "table" and boxFill.top and boxFill.flipped then
-        boxFill.top.Visible = true
-        boxFill.top.Size = UDim2.new(0, size.X, 0, size.Y)
-        boxFill.top.Position = UDim2.new(0, position.X, 0, position.Y)
+        local width, height = size.X, size.Y
+        local posX, posY = position.X, position.Y
+
+        if boxFill.topWrapper then
+            boxFill.topWrapper.Visible = true
+            boxFill.topWrapper.Size = UDim2.new(0, width, 0, height)
+            boxFill.topWrapper.Position = UDim2.new(0, posX, 0, posY)
+        end
+
+        if boxFill.flippedWrapper then
+            boxFill.flippedWrapper.Visible = true
+            boxFill.flippedWrapper.Size = UDim2.new(0, width, 0, height)
+            boxFill.flippedWrapper.Position = UDim2.new(0, posX, 0, posY)
+        end
+
         boxFill.top.ImageTransparency = self.options.boxFillTransparency
         boxFill.top.ImageColor3 = color or self.options.boxFillColor
 
-        boxFill.flipped.Visible = true
-        boxFill.flipped.Size = UDim2.new(0, size.X, 0, size.Y)
-        boxFill.flipped.Position = UDim2.new(0, position.X, 0, position.Y)
         boxFill.flipped.ImageTransparency = self.options.boxFillTransparency
-        boxFill.flipped.ImageColor3 = self.options.flippedBoxFillEnabled and self.options.flippedBoxFillColor or (color or self.options.boxFillColor)
+        boxFill.flipped.ImageColor3 = self.options.flippedBoxFillEnabled
+            and self.options.flippedBoxFillColor
+            or (color or self.options.boxFillColor)
 
     elseif typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
         boxFill.Visible = true
@@ -642,8 +669,8 @@ if boxFill and show and self.options.boxFill then
 else
     if boxFill then
         if typeof(boxFill) == "table" and boxFill.top and boxFill.flipped then
-            boxFill.top.Visible = false
-            boxFill.flipped.Visible = false
+            if boxFill.topWrapper then boxFill.topWrapper.Visible = false end
+            if boxFill.flippedWrapper then boxFill.flippedWrapper.Visible = false end
         elseif typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
             boxFill.Visible = false
         elseif typeof(boxFill) == "table" and boxFill.__OBJECT_TYPE == "Square" then
