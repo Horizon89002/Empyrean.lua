@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#561
+    made by siper#9938 and mickey#561eee
 ]]
 
 -- main module
@@ -208,22 +208,7 @@ function espLibrary.getScaleFactor(fov, depth)
     return 1 / (depth * lastScale) * 1000;
 end
 
-local runService = game:GetService("RunService")
-local rotationAngle = 0
 
-runService.RenderStepped:Connect(function(dt)
-    if espLibrary.options.rotatefill then
-        rotationAngle = (rotationAngle + dt * 100) % 360
-
-        for _, espData in pairs(espLibrary.espCache) do
-            local boxFill = espData.boxFill
-            if boxFill and typeof(boxFill) == "table" and boxFill.top and boxFill.flipped then
-                boxFill.top.Rotation = rotationAngle
-                boxFill.flipped.Rotation = rotationAngle
-            end
-        end
-    end
-end)
 
 function espLibrary.getBoxData(position, size)
     local torsoPosition, onScreen, depth = worldToViewportPoint(position);
@@ -413,6 +398,34 @@ function espLibrary.removeEsp(player)
         end
     end
 end
+
+local RunService = game:GetService("RunService")
+
+RunService.RenderStepped:Connect(function(dt)
+    if not espLibrary.options.rotatefill then return end
+
+    for _, data in pairs(espLibrary.espCache) do
+        local boxFill = data.boxFill
+        if boxFill and typeof(boxFill) == "table" and boxFill.top and boxFill.flipped then
+
+            boxFill._angle = (boxFill._angle or 0) + dt * 100
+            local angle = boxFill._angle % 360
+
+
+            local scale = math.abs(math.cos(math.rad(angle))) * 0.3 + 0.7
+
+       
+            boxFill.top.Size = UDim2.new(scale, 0, scale, 0)
+            boxFill.top.Rotation = angle
+            boxFill.top.Position = UDim2.new(0.5, 0, 0.5, 0)
+
+    
+            boxFill.flipped.Size = UDim2.new(scale, 0, scale, 0)
+            boxFill.flipped.Rotation = (angle + 180) % 360
+            boxFill.flipped.Position = UDim2.new(0.5, 0, 0.5, 0)
+        end
+    end
+end)
 
 function espLibrary.addChams(player)
     if (player == localPlayer) then
