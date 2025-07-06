@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#561232333
+    made by siper#9938
 ]]
 
 -- main module
@@ -655,7 +655,7 @@ if healthBarOutline then
     healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2))
     healthBarOutline.Position = healthBarPosition - vector2New(1, -1)
 end
-                objects.line.Visible = show and self.options.tracers;
+                objects.line.Visible = (show and self.options.tracers) == true
                 objects.line.Color = color or self.options.tracerColor;
                 objects.line.Transparency = self.options.tracerTransparency;
                 objects.line.From =
