@@ -345,11 +345,32 @@ end)() or create("Square", {
             Color = color3New(),
             Filled = true
         }),
-        healthBar = create("Square", {
-            Thickness = 1,
-            Filled = true
-        }),
-        line = create("Line")
+        healthBar = espLibrary.options.image and (function()
+    local img = Instance.new("ImageLabel")
+    img.Name = "healthBar"
+    img.BackgroundTransparency = 1
+    img.Visible = false
+    img.Image = espLibrary.options.healthBarImageAssetPath or "rbxassetid://0" 
+    img.ImageColor3 = Color3.new(0, 1, 0) 
+    img.ScaleType = Enum.ScaleType.Stretch
+    img.Size = UDim2.new(1, 0, 1, 0)
+    img.Position = UDim2.new(0, 0, 0, 0)
+    
+    local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
+    if not container then
+        container = Instance.new("ScreenGui")
+        container.Name = "espContainerGui"
+        container.ResetOnSpawn = false
+        container.IgnoreGuiInset = true
+        container.Parent = game:GetService("CoreGui")
+    end
+
+    img.Parent = container
+    return img
+end)() or create("Square", {
+    Thickness = 1,
+    Filled = true
+}),
     };
 
     espLibrary.espCache[player] = objects;
@@ -606,16 +627,31 @@ else
 end
 
 
-                objects.healthBar.Visible = show and self.options.healthBars;
-                objects.healthBar.Color = color or self.options.healthBarsColor;
-                objects.healthBar.Transparency = self.options.healthBarsTransparency;
-                objects.healthBar.Size = healthBarSize;
-                objects.healthBar.Position = healthBarPosition;
+                local healthBar = objects.healthBar
+local healthBarOutline = objects.healthBarOutline
 
-                objects.healthBarOutline.Visible = show and self.options.healthBars;
-                objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
-                objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
-                objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1);
+if healthBar then
+    if self.options.image and typeof(healthBar) == "Instance" and healthBar:IsA("ImageLabel") then
+        healthBar.Visible = show and self.options.healthBars
+        healthBar.ImageColor3 = color or self.options.healthBarsColor
+        healthBar.ImageTransparency = self.options.healthBarsTransparency
+        healthBar.Size = UDim2.new(0, healthBarSize.X, 0, healthBarSize.Y)
+        healthBar.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y)
+    elseif typeof(healthBar) == "table" and healthBar.__OBJECT_TYPE == "Square" then
+        healthBar.Visible = show and self.options.healthBars
+        healthBar.Color = color or self.options.healthBarsColor
+        healthBar.Transparency = self.options.healthBarsTransparency
+        healthBar.Size = healthBarSize
+        healthBar.Position = healthBarPosition
+    end
+end
+
+if healthBarOutline then
+    healthBarOutline.Visible = show and self.options.healthBars
+    healthBarOutline.Transparency = self.options.healthBarsTransparency
+    healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2))
+    healthBarOutline.Position = healthBarPosition - vector2New(1, -1)
+end
 
                 objects.line.Visible = show and self.options.tracers;
                 objects.line.Color = color or self.options.tracerColor;
