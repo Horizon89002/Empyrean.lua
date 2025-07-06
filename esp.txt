@@ -1,5 +1,5 @@
 --[[
-    made by siper#99389999
+    made by siper#9938 and ickey#5612
 ]]
 
 -- main module
@@ -273,7 +273,9 @@ boxFillGui.Image = espLibrary.options.imageAssetPath or ""
 boxFillGui.Parent = espGui
 
 function espLibrary.addEsp(player)
-    if player == localPlayer then return end
+    if (player == localPlayer) then
+        return
+    end
 
     local objects = {
         arrow = create("Triangle", {
@@ -302,84 +304,56 @@ function espLibrary.addEsp(player)
             OutlineColor = color3New(),
             Font = 2,
         }),
+       boxFill = espLibrary.options.image and (function()
+    local img = Instance.new("ImageLabel")
+    img.Name = "boxFill"
+    img.BackgroundTransparency = 1
+    img.Visible = false
+    img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+    img.ImageColor3 = Color3.new(1, 1, 1)
+    img.ScaleType = Enum.ScaleType.Stretch
+    img.Size = UDim2.new(1, 0, 1, 0) -- nigger 2
+    img.Position = UDim2.new(0, 0, 0, 0) -- nigger
 
-        boxFill = espLibrary.options.image and (function()
-            local img = Instance.new("ImageLabel")
-            img.Name = "boxFill"
-            img.BackgroundTransparency = 1
-            img.Visible = false
-            img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
-            img.ImageColor3 = Color3.new(1, 1, 1)
-            img.ScaleType = Enum.ScaleType.Stretch
-            img.Size = UDim2.new(1, 0, 1, 0)
-            img.Position = UDim2.new(0, 0, 0, 0)
+    local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
+    if not container then
+        container = Instance.new("ScreenGui")
+        container.Name = "espContainerGui"
+        container.ResetOnSpawn = false
+        container.IgnoreGuiInset = true
+        container.Parent = game:GetService("CoreGui")
+    end
 
-            local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
-            if not container then
-                container = Instance.new("ScreenGui")
-                container.Name = "espContainerGui"
-                container.ResetOnSpawn = false
-                container.IgnoreGuiInset = true
-                container.Parent = game:GetService("CoreGui")
-            end
-
-            img.Parent = container
-            return img
-        end)() or create("Square", {
-            Thickness = 1,
-            Filled = true,
-            Visible = false,
-            Color = Color3.new(1, 1, 1)
-        }),
+    img.Parent = container
+    return img
+end)() or create("Square", {
+    Thickness = 1,
+    Filled = true,
+    Visible = false,
+    Color = Color3.new(1, 1, 1)
+}),
 
         boxOutline = create("Square", {
             Thickness = 3,
             Color = color3New()
         }),
-
         box = create("Square", {
             Thickness = 1
         }),
-
         healthBarOutline = create("Square", {
             Thickness = 1,
             Color = color3New(),
             Filled = true
         }),
-
-        healthBar = espLibrary.options.image and (function()
-            local img = Instance.new("ImageLabel")
-            img.Name = "healthBar"
-            img.BackgroundTransparency = 1
-            img.Visible = false
-            img.Image = espLibrary.options.healthBarImageAssetPath or "rbxassetid://0"
-            img.ImageColor3 = Color3.new(0, 1, 0)
-            img.ScaleType = Enum.ScaleType.Stretch
-            img.Size = UDim2.new(1, 0, 1, 0)
-            img.Position = UDim2.new(0, 0, 0, 0)
-
-            local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
-            if not container then
-                container = Instance.new("ScreenGui")
-                container.Name = "espContainerGui"
-                container.ResetOnSpawn = false
-                container.IgnoreGuiInset = true
-                container.Parent = game:GetService("CoreGui")
-            end
-
-            img.Parent = container
-            return img
-        end)() or create("Square", {
+        healthBar = create("Square", {
             Thickness = 1,
             Filled = true
         }),
-
         line = create("Line")
-    }
+    };
 
-    espLibrary.espCache[player] = objects
+    espLibrary.espCache[player] = objects;
 end
-
 
 function espLibrary.removeEsp(player)
     local espCache = espLibrary.espCache[player];
@@ -614,6 +588,17 @@ if boxFill and show and self.options.boxFill then
         boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
         boxFill.ImageTransparency = self.options.boxFillTransparency
         boxFill.ImageColor3 = color or self.options.boxFillColor
+        if self.options.rotateImage then
+            boxFill.Rotation = 45  
+            boxFill.AnchorPoint = Vector2.new(0.5, 0.5)
+            boxFill.Position = UDim2.new(0, position.X + size.X/2, 0, position.Y + size.Y/2)
+            boxFill.Size = UDim2.new(0, size.X, 0, size.Y) 
+        else
+            boxFill.Rotation = 0
+            boxFill.AnchorPoint = Vector2.new(0, 0)
+            boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
+            boxFill.Size = UDim2.new(0, size.X, 0, size.Y)
+        end
     elseif typeof(boxFill) == "table" and boxFill.__OBJECT_TYPE == "Square" then
         boxFill.Visible = true
         boxFill.Size = size
@@ -632,35 +617,18 @@ else
 end
 
 
-                local healthBar = objects.healthBar
-local healthBarOutline = objects.healthBarOutline
+                objects.healthBar.Visible = show and self.options.healthBars;
+                objects.healthBar.Color = color or self.options.healthBarsColor;
+                objects.healthBar.Transparency = self.options.healthBarsTransparency;
+                objects.healthBar.Size = healthBarSize;
+                objects.healthBar.Position = healthBarPosition;
 
-local visible = (show and self.options.healthBars) == true
+                objects.healthBarOutline.Visible = show and self.options.healthBars;
+                objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
+                objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
+                objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1);
 
-
-if healthBar then
-    if self.options.image and typeof(healthBar) == "Instance" and healthBar:IsA("ImageLabel") then
-        if visible ~= nil then healthBar.Visible = visible end
-        healthBar.ImageColor3 = color or self.options.healthBarsColor
-        healthBar.ImageTransparency = self.options.healthBarsTransparency or 0
-        healthBar.Size = UDim2.new(0, healthBarSize.X, 0, healthBarSize.Y)
-        healthBar.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y)
-    elseif typeof(healthBar) == "table" and healthBar.__OBJECT_TYPE == "Square" then
-        if visible ~= nil then healthBar.Visible = visible end
-        healthBar.Color = color or self.options.healthBarsColor
-        healthBar.Transparency = self.options.healthBarsTransparency or 0
-        healthBar.Size = healthBarSize
-        healthBar.Position = healthBarPosition
-    end
-end
-
-if healthBarOutline then
-    if visible ~= nil then healthBarOutline.Visible = visible end
-    healthBarOutline.Transparency = self.options.healthBarsTransparency or 0
-    healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2))
-    healthBarOutline.Position = healthBarPosition - vector2New(1, -1)
-end
-                objects.line.Visible = (show and self.options.tracers) == true
+                objects.line.Visible = show and self.options.tracers;
                 objects.line.Color = color or self.options.tracerColor;
                 objects.line.Transparency = self.options.tracerTransparency;
                 objects.line.From =
