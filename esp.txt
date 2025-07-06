@@ -260,6 +260,18 @@ if success then
     espLibrary.options.imageAssetPath = result
 end
 
+local CoreGui = game:GetService("CoreGui")
+local espGui = Instance.new("ScreenGui")
+espGui.Name = "EspGui"
+espGui.ResetOnSpawn = false
+espGui.Parent = CoreGui
+
+local boxFillGui = Instance.new("ImageLabel")
+boxFillGui.BackgroundTransparency = 1
+boxFillGui.Visible = false
+boxFillGui.Image = espLibrary.options.imageAssetPath or "" 
+boxFillGui.Parent = espGui
+
 function espLibrary.addEsp(player)
     if (player == localPlayer) then
         return
@@ -292,11 +304,29 @@ function espLibrary.addEsp(player)
             OutlineColor = color3New(),
             Font = 2,
         }),
-        boxFill = espLibrary.options.image and create("Image", {
-    Data = espLibrary.options.imageAssetPath,
-    Visible = false,
-    Tint = Color3.new(1, 1, 1)
-}) or create("Square", {
+        boxFill = espLibrary.options.image and (function()
+    local img = Instance.new("ImageLabel")
+    img.Name = "boxFill"
+    img.BackgroundTransparency = 1
+    img.Visible = false
+    img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+    img.ImageColor3 = Color3.new(1, 1, 1)
+    img.ScaleType = Enum.ScaleType.Stretch
+    img.Size = UDim2.new(0, 100, 0, 100)
+    img.Position = UDim2.new(0, 0, 0, 0)
+
+    local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
+    if not container then
+        container = Instance.new("ScreenGui")
+        container.Name = "espContainerGui"
+        container.ResetOnSpawn = false
+        container.IgnoreGuiInset = true
+        container.Parent = game:GetService("CoreGui")
+    end
+
+    img.Parent = container
+    return img
+end)() or create("Square", {
     Thickness = 1,
     Filled = true,
     Visible = false,
@@ -549,20 +579,29 @@ function espLibrary:Load(renderValue)
                 objects.boxOutline.Size = size;
                 objects.boxOutline.Position = position;
 
-                if show and self.options.boxFill and objects.boxFill then
-    objects.boxFill.Visible = true
-    objects.boxFill.Size = size
-    objects.boxFill.Position = position
-    objects.boxFill.Transparency = self.options.boxFillTransparency
+                local boxFill = espLibrary.espCache[player] and espLibrary.espCache[player].boxFill
 
-    if self.options.image and typeof(objects.boxFill.Image) == "string" then
-        objects.boxFill.Tint = color or self.options.boxFillColor
-    else
-        objects.boxFill.Color = color or self.options.boxFillColor
+if boxFill and show and self.options.boxFill then
+    if self.options.image and typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
+        boxFill.Visible = true
+        boxFill.Size = UDim2.new(0, size.X, 0, size.Y)
+        boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
+        boxFill.ImageTransparency = self.options.boxFillTransparency
+        boxFill.ImageColor3 = color or self.options.boxFillColor
+    elseif typeof(boxFill) == "table" and boxFill.__OBJECT_TYPE == "Square" then
+        boxFill.Visible = true
+        boxFill.Size = size
+        boxFill.Position = position
+        boxFill.Transparency = self.options.boxFillTransparency
+        boxFill.Color = color or self.options.boxFillColor
     end
 else
-    if objects.boxFill then
-        objects.boxFill.Visible = false
+    if boxFill then
+        if typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
+            boxFill.Visible = false
+        elseif typeof(boxFill) == "table" and boxFill.__OBJECT_TYPE == "Square" then
+            boxFill.Visible = false
+        end
     end
 end
 
