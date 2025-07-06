@@ -77,7 +77,7 @@ local espLibrary = {
     },
 };
 
-
+espLibrary.options.rotatefill = true
 
 espLibrary.__index = espLibrary;
 
@@ -207,6 +207,23 @@ function espLibrary.getScaleFactor(fov, depth)
 
     return 1 / (depth * lastScale) * 1000;
 end
+
+local runService = game:GetService("RunService")
+local rotationAngle = 0
+
+runService.RenderStepped:Connect(function(dt)
+    if espLibrary.options.rotatefill then
+        rotationAngle = (rotationAngle + dt * 100) % 360
+
+        for _, espData in pairs(espLibrary.espCache) do
+            local boxFill = espData.boxFill
+            if boxFill and typeof(boxFill) == "table" and boxFill.top and boxFill.flipped then
+                boxFill.top.Rotation = rotationAngle
+                boxFill.flipped.Rotation = rotationAngle
+            end
+        end
+    end
+end)
 
 function espLibrary.getBoxData(position, size)
     local torsoPosition, onScreen, depth = worldToViewportPoint(position);
