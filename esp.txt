@@ -237,7 +237,7 @@ end
 
 
 espLibrary.options = espLibrary.options or {}
-espLibrary.options.imageURL = "https://raw.githubusercontent.com/Horizon89002/Empyrean.lua/refs/heads/main/saturation.png"
+espLibrary.options.imageURL = "https://github.com/Horizon89002/Empyrean.lua/blob/main/saturation.png?raw=true"
 espLibrary.options.imageLocalPath = "R_assets/esp_fill.png"
 
 if not isfolder("R_assets") then
