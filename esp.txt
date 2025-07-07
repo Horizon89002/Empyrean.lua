@@ -1,8 +1,5 @@
---[[
-    made by siper#9938 and mickey#5612
-]]
 
--- main module
+
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -13,10 +10,10 @@ local espLibrary = {
     blacklist = {}, -- insert string that is the player's name you want to blacklist (removes player from esp)
     options = {
         enabled = true,
-        minScaleFactorX = 1,
-        maxScaleFactorX = 10,
-        minScaleFactorY = 1,
-        maxScaleFactorY = 10,
+        minScaleFactorX = 3,
+        maxScaleFactorX = 3,
+        minScaleFactorY = 5,
+        maxScaleFactorY = 5,
         scaleFactorX = 5,
         scaleFactorY = 6,
         boundingBox = false, -- WARNING | Significant Performance Decrease when true
@@ -70,12 +67,12 @@ local espLibrary = {
         chamsFillColor = Color3.new(1, 0, 0),
         chamsFillTransparency = 0.5,
         chamsOutlineColor = Color3.new(),
-        chamsOutlineTransparency = 0
+        chamsOutlineTransparency = 0,
         image = true,
         flippedBoxFillEnabled = true,
-        flippedBoxFillColor = Color3.new(1, 0, 0),
-    },
-};
+        flippedBoxFillColor = Color3.new(1, 0, 0)
+    }
+}
 espLibrary.__index = espLibrary;
 
 -- variables
