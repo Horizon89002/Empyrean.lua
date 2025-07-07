@@ -312,8 +312,20 @@ function espLibrary.addEsp(player)
     img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
     img.ImageColor3 = Color3.new(1, 1, 1)
     img.ScaleType = Enum.ScaleType.Stretch
-    img.Size = UDim2.new(1, 0, 1, 0) -- nigger 2
-    img.Position = UDim2.new(0, 0, 0, 0) -- nigger
+    img.Size = UDim2.new(1, 0, 1, 0)
+    img.Position = UDim2.new(0, 0, 0, 0)
+
+    local flipped = Instance.new("ImageLabel")
+    flipped.Name = "boxFillFlipped"
+    flipped.BackgroundTransparency = 1
+    flipped.Visible = false
+    flipped.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+    flipped.ImageColor3 = Color3.new(1, 0, 0)
+    flipped.ScaleType = Enum.ScaleType.Stretch
+    flipped.Size = UDim2.new(1, 0, 1, 0)
+    flipped.Position = UDim2.new(0, 0, 0, 0)
+    flipped.Rotation = 180
+    flipped.Parent = img
 
     local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
     if not container then
@@ -325,6 +337,8 @@ function espLibrary.addEsp(player)
     end
 
     img.Parent = container
+    img.Flipped = flipped
+
     return img
 end)() or create("Square", {
     Thickness = 1,
@@ -588,6 +602,15 @@ if boxFill and show and self.options.boxFill then
         boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
         boxFill.ImageTransparency = self.options.boxFillTransparency
         boxFill.ImageColor3 = color or self.options.boxFillColor
+
+        if boxFill:FindFirstChild("boxFillFlipped") then
+            local flipped = boxFill.boxFillFlipped
+            flipped.Visible = true
+            flipped.Size = UDim2.new(0, size.X, 0, size.Y)
+            flipped.Position = UDim2.new(0, position.X, 0, position.Y)
+            flipped.ImageTransparency = self.options.boxFillTransparency
+            flipped.ImageColor3 = self.options.boxFillFlipColor or Color3.new(1, 0, 0)
+        end
     elseif typeof(boxFill) == "table" and boxFill.__OBJECT_TYPE == "Square" then
         boxFill.Visible = true
         boxFill.Size = size
@@ -599,6 +622,9 @@ else
     if boxFill then
         if typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
             boxFill.Visible = false
+            if boxFill:FindFirstChild("boxFillFlipped") then
+                boxFill.boxFillFlipped.Visible = false
+            end
         elseif typeof(boxFill) == "table" and boxFill.__OBJECT_TYPE == "Square" then
             boxFill.Visible = false
         end
