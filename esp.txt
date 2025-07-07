@@ -1,6 +1,4 @@
---[[
-    made by siper#9938 and 
-]]
+
 
 -- main module
 local espLibrary = {
@@ -305,16 +303,6 @@ function espLibrary.addEsp(player)
             Font = 2,
         }),
        boxFill = espLibrary.options.image and (function()
-    local img = Instance.new("ImageLabel")
-    img.Name = "boxFill"
-    img.BackgroundTransparency = 1
-    img.Visible = false
-    img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
-    img.ImageColor3 = Color3.new(1, 1, 1)
-    img.ScaleType = Enum.ScaleType.Stretch
-    img.Size = UDim2.new(1, 0, 1, 0)
-    img.Position = UDim2.new(0, 0, 0, 0)
-
     local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
     if not container then
         container = Instance.new("ScreenGui")
@@ -324,6 +312,15 @@ function espLibrary.addEsp(player)
         container.Parent = game:GetService("CoreGui")
     end
 
+    local img = Instance.new("ImageLabel")
+    img.Name = "boxFill"
+    img.BackgroundTransparency = 1
+    img.Visible = false
+    img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+    img.ImageColor3 = Color3.new(1, 1, 1)
+    img.ScaleType = Enum.ScaleType.Stretch
+    img.Size = UDim2.new(1, 0, 1, 0)
+    img.Position = UDim2.new(0, 0, 0, 0)
     img.Parent = container
 
     local flippedImg = Instance.new("ImageLabel")
@@ -332,21 +329,14 @@ function espLibrary.addEsp(player)
     flippedImg.Visible = false
     flippedImg.Image = img.Image
     flippedImg.ImageColor3 = img.ImageColor3
-    flippedImg.ScaleType = img.ScaleType
+    flippedImg.ScaleType = Enum.ScaleType.Stretch
     flippedImg.Size = img.Size
     flippedImg.Position = img.Position
-
-    local flipFrame = Instance.new("Frame")
-    flipFrame.BackgroundTransparency = 1
-    flipFrame.Size = img.Size
-    flipFrame.Position = img.Position
-    flipFrame.AnchorPoint = img.AnchorPoint
-    flipFrame.Parent = container
-
-    flippedImg.Parent = flipFrame
+    flippedImg.AnchorPoint = Vector2.new(1, 0)
+    flippedImg.Parent = container
 
     local uiScale = Instance.new("UIScale")
-    uiScale.Parent = flipFrame
+    uiScale.Parent = flippedImg
     uiScale.Scale = Vector3.new(-1, 1, 1)
 
     return img
