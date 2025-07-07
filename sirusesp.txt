@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 ss
+    made by siper#9938 sssss
 ]]
 
 -- main module
@@ -368,6 +368,7 @@ end)() or create("Square", {
     espLibrary.espCache[player] = objects;
 end
 
+
 function espLibrary.removeEsp(player)
     local espCache = espLibrary.espCache[player]
 
@@ -376,18 +377,35 @@ function espLibrary.removeEsp(player)
 
         for index, object in next, espCache do
             espCache[index] = nil
-            if typeof(object) == "Instance" then
-                object:Destroy()
-            elseif typeof(object) == "table" and object.Remove then
-                object:Remove()
-            elseif typeof(object) == "table" and object.Destroy then
-                object:Destroy()
-            elseif typeof(object) == "table" then
-                object.Visible = false
+
+            if index == "boxFill" then
+                if typeof(object) == "table" then
+                    if typeof(object.top) == "Instance" then
+                        object.top:Destroy()
+                    end
+                    if typeof(object.flipped) == "Instance" then
+                        object.flipped:Destroy()
+                    end
+                elseif typeof(object) == "Instance" then
+                    object:Destroy()
+                elseif typeof(object) == "table" and object.Destroy then
+                    object:Destroy()
+                end
+            else
+                if typeof(object) == "Instance" then
+                    object:Destroy()
+                elseif typeof(object) == "table" and object.Remove then
+                    object:Remove()
+                elseif typeof(object) == "table" and object.Destroy then
+                    object:Destroy()
+                elseif typeof(object) == "table" then
+                    object.Visible = false
+                end
             end
         end
     end
 end
+
 function espLibrary.addChams(player)
     if (player == localPlayer) then
         return
@@ -737,13 +755,27 @@ end
             cache.text.Color = cache.options.color;
             cache.text.Text = cache.options.text;
             cache.text.Position = round(screenPosition);
-            for player, objects in next, self.espCache do
-    if not players:FindFirstChild(player.Name) then
-        self.removeEsp(player)
-        self.removeChams(player)
+            local stalePlayers = {}
+for player in pairs(self.espCache) do
+    if typeof(player) ~= "Instance" or not players:FindFirstChild(player.Name) then
+        table.insert(stalePlayers, player)
     end
 end
+for _, player in ipairs(stalePlayers) do
+    self.removeEsp(player)
+    self.removeChams(player)
+end
 
+
+local staleChams = {}
+for player in pairs(self.chamsCache) do
+    if typeof(player) ~= "Instance" or not players:FindFirstChild(player.Name) then
+        table.insert(staleChams, player)
+    end
+end
+for _, player in ipairs(staleChams) do
+    self.removeChams(player)
+end
 for player, highlight in next, self.chamsCache do
     if not players:FindFirstChild(player.Name) then
         self.removeChams(player)
