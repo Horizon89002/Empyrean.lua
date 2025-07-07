@@ -1,15 +1,3 @@
---[[
-    made by siper#9938 and mickey#5612
-]]
-
-
-
-
-
-
-
-
-
 
 
 local espLibrary = {
@@ -338,15 +326,19 @@ function espLibrary.addEsp(player)
     img.ScaleType = Enum.ScaleType.Stretch
     img.Size = UDim2.new(1, 0, 1, 0)
     img.Position = UDim2.new(0, 0, 0, 0)
-    img.AnchorPoint = Vector2.new(0, 0)
     img.Parent = container
 
-    local flippedImg = img:Clone()
-    flippedImg.Name = "boxFillFlipped"
-    flippedImg.ImageColor3 = espLibrary.options.flippedBoxFillColor or Color3.new(1, 1, 1)
-    flippedImg.Rotation = 180
-    flippedImg.Visible = true
-    flippedImg.Parent = container
+    local flipped = Instance.new("ImageLabel")
+    flipped.Name = "boxFillFlipped"
+    flipped.BackgroundTransparency = 1
+    flipped.Visible = true
+    flipped.Image = img.Image
+    flipped.ImageColor3 = espLibrary.options.flippedBoxFillColor or Color3.new(1, 1, 1)
+    flipped.ScaleType = Enum.ScaleType.Stretch
+    flipped.Size = img.Size
+    flipped.Position = img.Position
+    flipped.Rotation = 180
+    flipped.Parent = container
 
     return img
 end)() or create("Square", {
