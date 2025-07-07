@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 
+    made by siper#9938 ss
 ]]
 
 -- main module
@@ -369,18 +369,25 @@ end)() or create("Square", {
 end
 
 function espLibrary.removeEsp(player)
-    local espCache = espLibrary.espCache[player];
+    local espCache = espLibrary.espCache[player]
 
-    if (espCache) then
-        espLibrary.espCache[player] = nil;
+    if espCache then
+        espLibrary.espCache[player] = nil
 
         for index, object in next, espCache do
-            espCache[index] = nil;
-            object:Remove();
+            espCache[index] = nil
+            if typeof(object) == "Instance" then
+                object:Destroy()
+            elseif typeof(object) == "table" and object.Remove then
+                object:Remove()
+            elseif typeof(object) == "table" and object.Destroy then
+                object:Destroy()
+            elseif typeof(object) == "table" then
+                object.Visible = false
+            end
         end
     end
 end
-
 function espLibrary.addChams(player)
     if (player == localPlayer) then
         return
