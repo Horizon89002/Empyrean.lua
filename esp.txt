@@ -1,4 +1,6 @@
-
+--[[
+    made by siper#9938 and mick
+]]
 
 local espLibrary = {
     instances = {},
@@ -338,40 +340,40 @@ end
 
 function espLibrary.removeEsp(player)
     local espCache = espLibrary.espCache[player]
+    if not espCache then return end
 
-    if espCache then
-        espLibrary.espCache[player] = nil
+    espLibrary.espCache[player] = nil
 
-        for index, object in next, espCache do
-            espCache[index] = nil
-
-            if index == "boxFill" then
-                if typeof(object) == "table" then
-                    if typeof(object.top) == "Instance" then
-                        object.top:Destroy()
-                    end
-                    if typeof(object.flipped) == "Instance" then
-                        object.flipped:Destroy()
-                    end
-                elseif typeof(object) == "Instance" then
-                    object:Destroy()
-                elseif typeof(object) == "table" and object.Destroy then
-                    object:Destroy()
+    local function safelyRemove(obj)
+        if typeof(obj) == "Instance" then
+            obj:Destroy()
+        elseif typeof(obj) == "table" then
+            if obj.Remove then
+                pcall(function() obj:Remove() end)
+            elseif obj.Destroy then
+                pcall(function() obj:Destroy() end)
+            elseif obj.top and obj.flipped then
+                if typeof(obj.top) == "Instance" then
+                    pcall(function() obj.top:Destroy() end)
+                elseif obj.top.Remove then
+                    pcall(function() obj.top:Remove() end)
                 end
-            else
-                if typeof(object) == "Instance" then
-                    object:Destroy()
-                elseif typeof(object) == "table" and object.Remove then
-                    object:Remove()
-                elseif typeof(object) == "table" and object.Destroy then
-                    object:Destroy()
-                elseif typeof(object) == "table" then
-                    object.Visible = false
+                if typeof(obj.flipped) == "Instance" then
+                    pcall(function() obj.flipped:Destroy() end)
+                elseif obj.flipped.Remove then
+                    pcall(function() obj.flipped:Remove() end)
                 end
+            elseif obj.Visible ~= nil then
+                obj.Visible = false
             end
         end
     end
+
+    for _, object in next, espCache do
+        safelyRemove(object)
+    end
 end
+
 
 function espLibrary.addChams(player)
     if (player == localPlayer) then
@@ -743,6 +745,23 @@ end
             cache.text.Color = cache.options.color;
             cache.text.Text = cache.options.text;
             cache.text.Position = round(screenPosition);
+
+            local currentPlayers = {}
+for _, p in ipairs(players:GetPlayers()) do
+    currentPlayers[p] = true
+end
+
+for player in pairs(self.espCache) do
+    if not currentPlayers[player] then
+        self.removeEsp(player)
+    end
+end
+
+for player in pairs(self.chamsCache) do
+    if not currentPlayers[player] then
+        self.removeChams(player)
+    end
+end
         end
     end);
 end
