@@ -1,5 +1,5 @@
 --[[
-  
+  e
 ]]
 
 -- main module
@@ -325,8 +325,7 @@ function espLibrary.addEsp(player)
     flipped.ImageColor3 = espLibrary.options.flippedBoxFillColor or Color3.new(1, 0, 0)
     flipped.ScaleType = Enum.ScaleType.Stretch
     flipped.Size = UDim2.new(1, 0, 1, 0)
-    flipped.AnchorPoint = Vector2.new(0.5, 0.5)
-    flipped.Position = UDim2.new(0.5, 0, 0.5, 0)
+    flipped.Position = UDim2.new(0, 0, 0, 0)
     flipped.Rotation = 180
     flipped.ZIndex = img.ZIndex + 1
     flipped.Parent = img
@@ -349,6 +348,7 @@ end)() or create("Square", {
     Visible = false,
     Color = Color3.new(1, 1, 1)
 }),
+
         boxOutline = create("Square", {
             Thickness = 3,
             Color = color3New()
