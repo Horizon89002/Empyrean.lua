@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#561 and final VERSION
+    made by siper#9938 and mickey#561 and finalll
 ]]
 
 -- main module
@@ -397,15 +397,32 @@ end
 function espLibrary.removeEsp(player)
     local espCache = espLibrary.espCache[player]
     if not espCache then return end
-    espLibrary.removeEspGuiObjects(player)
-    for index, object in pairs(espCache) do
-        if typeof(object) == "userdata" and object.Remove then
-            pcall(function() object:Remove() end)
-        elseif typeof(object) == "table" and object.__OBJECT_TYPE and object.Remove then
-            pcall(function() object:Remove() end)
+
+    local function destroy(obj)
+        if typeof(obj) == "table" then
+            for _, v in pairs(obj) do
+                destroy(v)
+            end
+        elseif typeof(obj) == "userdata" then
+            pcall(function()
+                if obj.Remove then obj:Remove() end
+            end)
+        elseif typeof(obj) == "Instance" then
+            pcall(function()
+                if obj:IsA("Instance") and obj:IsDescendantOf(game) then
+                    obj:Destroy()
+                end
+            end)
         end
-        espCache[index] = nil
     end
+
+
+    for key, object in pairs(espCache) do
+        destroy(object)
+        espCache[key] = nil
+    end
+
+    espLibrary.cleanUpGuiElements(player)
 
     espLibrary.espCache[player] = nil
 end
@@ -499,11 +516,27 @@ function espLibrary:Unload()
     runService:UnbindFromRenderStep("esp_rendering");
 end
 
-game:GetService("RunService"):BindToRenderStep("CleanUpEsp", Enum.RenderPriority.Last.Value, function()
-    for player, _ in pairs(espLibrary.espCache) do
-        if not game:GetService("Players"):FindFirstChild(player.Name) then
-            espLibrary.removeEsp(player)
-            espLibrary.removeChams(player)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    local playersService = game:GetService("Players")
+    local livePlayers = {} 
+    for _, p in ipairs(playersService:GetPlayers()) do
+        livePlayers[p] = true
+    end
+    for cachedPlayer, _ in pairs(espLibrary.espCache) do
+        local isPlayer = typeof(cachedPlayer) == "Instance" and cachedPlayer:IsA("Player")
+        local isAlive = isPlayer and livePlayers[cachedPlayer]
+
+        if not isAlive then
+            pcall(function()
+                espLibrary.removeEsp(cachedPlayer)
+            end)
+            pcall(function()
+                espLibrary.removeChams(cachedPlayer)
+            end)
+
+            espLibrary.espCache[cachedPlayer] = nil
+            espLibrary.chamsCache[cachedPlayer] = nil
         end
     end
 end)
