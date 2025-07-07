@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#56
+    made by siper#9938 and mickey#561 and final VERSION
 ]]
 
 -- main module
@@ -498,6 +498,15 @@ function espLibrary:Unload()
     screenGui:Destroy();
     runService:UnbindFromRenderStep("esp_rendering");
 end
+
+game:GetService("RunService"):BindToRenderStep("CleanUpEsp", Enum.RenderPriority.Last.Value, function()
+    for player, _ in pairs(espLibrary.espCache) do
+        if not game:GetService("Players"):FindFirstChild(player.Name) then
+            espLibrary.removeEsp(player)
+            espLibrary.removeChams(player)
+        end
+    end
+end)
 
 function espLibrary:Load(renderValue)
     insert(self.conns, players.PlayerAdded:Connect(function(player)
