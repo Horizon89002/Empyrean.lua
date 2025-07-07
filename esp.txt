@@ -1,4 +1,6 @@
-
+--[[
+    made by siper#9938 and mickey#5612
+]]
 
 -- main module
 local espLibrary = {
@@ -302,7 +304,7 @@ function espLibrary.addEsp(player)
             OutlineColor = color3New(),
             Font = 2,
         }),
-        boxFill = espLibrary.options.image and (function()
+       boxFill = espLibrary.options.image and (function()
     local img = Instance.new("ImageLabel")
     img.Name = "boxFill"
     img.BackgroundTransparency = 1
@@ -310,8 +312,8 @@ function espLibrary.addEsp(player)
     img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
     img.ImageColor3 = Color3.new(1, 1, 1)
     img.ScaleType = Enum.ScaleType.Stretch
-    img.Size = UDim2.new(0, 100, 0, 100)
-    img.Position = UDim2.new(0, 0, 0, 0)
+    img.Size = UDim2.new(1, 0, 1, 0) -- nigger 2
+    img.Position = UDim2.new(0, 0, 0, 0) -- nigger
 
     local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
     if not container then
