@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#5612
+    made by siper#9938 and 
 ]]
 
 -- main module
@@ -312,8 +312,8 @@ function espLibrary.addEsp(player)
     img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
     img.ImageColor3 = Color3.new(1, 1, 1)
     img.ScaleType = Enum.ScaleType.Stretch
-    img.Size = UDim2.new(1, 0, 1, 0) -- nigger 2
-    img.Position = UDim2.new(0, 0, 0, 0) -- nigger
+    img.Size = UDim2.new(1, 0, 1, 0)
+    img.Position = UDim2.new(0, 0, 0, 0)
 
     local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
     if not container then
@@ -325,6 +325,30 @@ function espLibrary.addEsp(player)
     end
 
     img.Parent = container
+
+    local flippedImg = Instance.new("ImageLabel")
+    flippedImg.Name = "boxFillFlipped"
+    flippedImg.BackgroundTransparency = 1
+    flippedImg.Visible = false
+    flippedImg.Image = img.Image
+    flippedImg.ImageColor3 = img.ImageColor3
+    flippedImg.ScaleType = img.ScaleType
+    flippedImg.Size = img.Size
+    flippedImg.Position = img.Position
+
+    local flipFrame = Instance.new("Frame")
+    flipFrame.BackgroundTransparency = 1
+    flipFrame.Size = img.Size
+    flipFrame.Position = img.Position
+    flipFrame.AnchorPoint = img.AnchorPoint
+    flipFrame.Parent = container
+
+    flippedImg.Parent = flipFrame
+
+    local uiScale = Instance.new("UIScale")
+    uiScale.Parent = flipFrame
+    uiScale.Scale = Vector3.new(-1, 1, 1)
+
     return img
 end)() or create("Square", {
     Thickness = 1,
