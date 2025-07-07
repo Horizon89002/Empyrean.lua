@@ -1,5 +1,8 @@
+--[[
+    made by siper#9938 and mickey#5612
+]]
 
-
+-- main module
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -69,15 +72,9 @@ local espLibrary = {
         chamsOutlineColor = Color3.new(),
         chamsOutlineTransparency = 0,
         image = true,
-        flippedImageColor = Color3.fromRGB(1, 1, 1),
     },
 };
 espLibrary.__index = espLibrary;
-
-espLibrary.options.boxFillColorEnabled = true 
-espLibrary.options.boxFillFlippedColorEnabled = true
-espLibrary.options.flippedBoxFillColor = Color3.fromRGB(1, 1, 1)
-
 
 -- variables
 local getService = game.GetService;
@@ -308,6 +305,16 @@ function espLibrary.addEsp(player)
             Font = 2,
         }),
        boxFill = espLibrary.options.image and (function()
+    local img = Instance.new("ImageLabel")
+    img.Name = "boxFill"
+    img.BackgroundTransparency = 1
+    img.Visible = false
+    img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+    img.ImageColor3 = Color3.new(1, 1, 1)
+    img.ScaleType = Enum.ScaleType.Stretch
+    img.Size = UDim2.new(1, 0, 1, 0) -- nigger 2
+    img.Position = UDim2.new(0, 0, 0, 0) -- nigger
+
     local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
     if not container then
         container = Instance.new("ScreenGui")
@@ -317,29 +324,7 @@ function espLibrary.addEsp(player)
         container.Parent = game:GetService("CoreGui")
     end
 
-    local img = Instance.new("ImageLabel")
-    img.Name = "boxFill"
-    img.BackgroundTransparency = 1
-    img.Visible = true
-    img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
-    img.ImageColor3 = espLibrary.options.boxFillColor or Color3.new(1, 1, 1)
-    img.ScaleType = Enum.ScaleType.Stretch
-    img.Size = UDim2.new(1, 0, 1, 0)
-    img.Position = UDim2.new(0, 0, 0, 0)
     img.Parent = container
-
-    local flipped = Instance.new("ImageLabel")
-    flipped.Name = "boxFillFlipped"
-    flipped.BackgroundTransparency = 1
-    flipped.Visible = true
-    flipped.Image = img.Image
-    flipped.ImageColor3 = espLibrary.options.flippedBoxFillColor or Color3.new(1, 1, 1)
-    flipped.ScaleType = Enum.ScaleType.Stretch
-    flipped.Size = img.Size
-    flipped.Position = img.Position
-    flipped.Rotation = 180
-    flipped.Parent = container
-
     return img
 end)() or create("Square", {
     Thickness = 1,
