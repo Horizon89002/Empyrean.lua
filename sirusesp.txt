@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#5612
+    made by siper#9938 
 ]]
 
 -- main module
@@ -12,11 +12,11 @@ local espLibrary = {
     whitelist = {}, -- insert string that is the player's name you want to whitelist (turns esp color to whitelistColor in options)
     blacklist = {}, -- insert string that is the player's name you want to blacklist (removes player from esp)
     options = {
-        enabled = false,
-        minScaleFactorX = 8,
-        maxScaleFactorX = 10,
-        minScaleFactorY = 8,
-        maxScaleFactorY = 10,
+        enabled = true,
+        minScaleFactorX = 3,
+        maxScaleFactorX = 3,
+        minScaleFactorY = 5,
+        maxScaleFactorY = 5,
         scaleFactorX = 5,
         scaleFactorY = 6,
         boundingBox = false, -- WARNING | Significant Performance Decrease when true
@@ -31,34 +31,34 @@ local espLibrary = {
         teamColor = false,
         fillColor = nil,
         whitelistColor = Color3.new(1, 0, 0),
-        outOfViewArrows = false,
-        outOfViewArrowsFilled = false,
+        outOfViewArrows = true,
+        outOfViewArrowsFilled = true,
         outOfViewArrowsSize = 25,
         outOfViewArrowsRadius = 100,
         outOfViewArrowsColor = Color3.new(1, 1, 1),
         outOfViewArrowsTransparency = 0.5,
-        outOfViewArrowsOutline = false,
+        outOfViewArrowsOutline = true,
         outOfViewArrowsOutlineFilled = false,
         outOfViewArrowsOutlineColor = Color3.new(1, 1, 1),
         outOfViewArrowsOutlineTransparency = 1,
-        names = false,
+        names = true,
         nameTransparency = 1,
         nameColor = Color3.new(1, 1, 1),
-        boxes = false,
+        boxes = true,
         boxesTransparency = 1,
         boxesColor = Color3.new(1, 0, 0),
         boxFill = false,
         boxFillTransparency = 0.5,
         boxFillColor = Color3.new(1, 0, 0),
-        healthBars = false,
+        healthBars = true,
         healthBarsSize = 1,
         healthBarsTransparency = 1,
         healthBarsColor = Color3.new(0, 1, 0),
-        healthText = false,
+        healthText = true,
         healthTextTransparency = 1,
         healthTextSuffix = "%",
         healthTextColor = Color3.new(1, 1, 1),
-        distance = false,
+        distance = true,
         distanceTransparency = 1,
         distanceSuffix = " Studs",
         distanceColor = Color3.new(1, 1, 1),
@@ -70,21 +70,17 @@ local espLibrary = {
         chamsFillColor = Color3.new(1, 0, 0),
         chamsFillTransparency = 0.5,
         chamsOutlineColor = Color3.new(),
-        chamsOutlineTransparency = 0
+        chamsOutlineTransparency = 0,
+        image = true,
+        flippedBoxFillEnabled = true,
+        flippedBoxFillColor = Color3.new(1, 0, 0),
     },
 };
+
+
+
 espLibrary.__index = espLibrary;
 
-
-if _G.ESPOverrides then
-    for key, value in pairs(_G.ESPOverrides) do
-        if espLibrary.options[key] ~= nil then
-            espLibrary.options[key] = value  -- Apply the global overrides
-        end
-    end
-end
-
-espLibrary.__index = espLibrary
 -- variables
 local getService = game.GetService;
 local instanceNew = Instance.new;
@@ -244,6 +240,43 @@ function espLibrary.visibleCheck(character, position)
     return (not raycast(workspace, origin, position - origin, params));
 end
 
+
+espLibrary.options = espLibrary.options or {}
+espLibrary.options.imageURL = "https://github.com/Horizon89002/Empyrean.lua/blob/main/saturation.png?raw=true"
+espLibrary.options.imageLocalPath = "R_assets/esp_fill.png"
+
+if not isfolder("R_assets") then
+    makefolder("R_assets")
+end
+
+if not isfile(espLibrary.options.imageLocalPath) then
+    local success, imageData = pcall(function()
+        return game:HttpGet(espLibrary.options.imageURL)
+    end)
+    if success and imageData then
+        writefile(espLibrary.options.imageLocalPath, imageData)
+    end
+end
+
+local success, result = pcall(function()
+    return getcustomasset(espLibrary.options.imageLocalPath)
+end)
+if success then
+    espLibrary.options.imageAssetPath = result
+end
+
+local CoreGui = game:GetService("CoreGui")
+local espGui = Instance.new("ScreenGui")
+espGui.Name = "EspGui"
+espGui.ResetOnSpawn = false
+espGui.Parent = CoreGui
+
+local boxFillGui = Instance.new("ImageLabel")
+boxFillGui.BackgroundTransparency = 1
+boxFillGui.Visible = false
+boxFillGui.Image = espLibrary.options.imageAssetPath or "" 
+boxFillGui.Parent = espGui
+
 function espLibrary.addEsp(player)
     if (player == localPlayer) then
         return
@@ -276,10 +309,43 @@ function espLibrary.addEsp(player)
             OutlineColor = color3New(),
             Font = 2,
         }),
-        boxFill = create("Square", {
-            Thickness = 1,
-            Filled = true,
-        }),
+       boxFill = espLibrary.options.image and (function()
+    local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
+    if not container then
+        container = Instance.new("ScreenGui")
+        container.Name = "espContainerGui"
+        container.ResetOnSpawn = false
+        container.IgnoreGuiInset = true
+        container.Parent = game:GetService("CoreGui")
+    end
+
+    local function makeImage(name, rotation)
+        local img = Instance.new("ImageLabel")
+        img.Name = name
+        img.BackgroundTransparency = 1
+        img.Visible = false
+        img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+        img.ImageColor3 = Color3.new(1, 1, 1)
+        img.ScaleType = Enum.ScaleType.Stretch
+        img.Size = UDim2.new(1, 0, 1, 0)
+        img.Position = UDim2.new(0, 0, 0, 0)
+        img.Rotation = rotation
+        img.Parent = container
+        return img
+    end
+
+    return {
+        top = makeImage("boxFillTop", 0),
+        flipped = makeImage("boxFillFlipped", 180)
+    }
+end)() or create("Square", {
+    Thickness = 1,
+    Filled = true,
+    Visible = false,
+    Color = Color3.new(1, 1, 1)
+}),
+
+
         boxOutline = create("Square", {
             Thickness = 3,
             Color = color3New()
@@ -526,11 +592,50 @@ function espLibrary:Load(renderValue)
                 objects.boxOutline.Size = size;
                 objects.boxOutline.Position = position;
 
-                objects.boxFill.Visible = show and self.options.boxFill;
-                objects.boxFill.Color = color or self.options.boxFillColor;
-                objects.boxFill.Transparency = self.options.boxFillTransparency;
-                objects.boxFill.Size = size;
-                objects.boxFill.Position = position;
+                local boxFill = espLibrary.espCache[player] and espLibrary.espCache[player].boxFill
+
+if boxFill and show and self.options.boxFill then
+    if self.options.image and typeof(boxFill) == "table" and boxFill.top and boxFill.flipped then
+        boxFill.top.Visible = true
+        boxFill.top.Size = UDim2.new(0, size.X, 0, size.Y)
+        boxFill.top.Position = UDim2.new(0, position.X, 0, position.Y)
+        boxFill.top.ImageTransparency = self.options.boxFillTransparency
+        boxFill.top.ImageColor3 = color or self.options.boxFillColor
+
+        boxFill.flipped.Visible = true
+        boxFill.flipped.Size = UDim2.new(0, size.X, 0, size.Y)
+        boxFill.flipped.Position = UDim2.new(0, position.X, 0, position.Y)
+        boxFill.flipped.ImageTransparency = self.options.boxFillTransparency
+        boxFill.flipped.ImageColor3 = self.options.flippedBoxFillEnabled and self.options.flippedBoxFillColor or (color or self.options.boxFillColor)
+
+    elseif typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
+        boxFill.Visible = true
+        boxFill.Size = UDim2.new(0, size.X, 0, size.Y)
+        boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
+        boxFill.ImageTransparency = self.options.boxFillTransparency
+        boxFill.ImageColor3 = color or self.options.boxFillColor
+
+    elseif typeof(boxFill) == "table" and boxFill.__OBJECT_TYPE == "Square" then
+        boxFill.Visible = true
+        boxFill.Size = size
+        boxFill.Position = position
+        boxFill.Transparency = self.options.boxFillTransparency
+        boxFill.Color = color or self.options.boxFillColor
+    end
+else
+    if boxFill then
+        if typeof(boxFill) == "table" and boxFill.top and boxFill.flipped then
+            boxFill.top.Visible = false
+            boxFill.flipped.Visible = false
+        elseif typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
+            boxFill.Visible = false
+        elseif typeof(boxFill) == "table" and boxFill.__OBJECT_TYPE == "Square" then
+            boxFill.Visible = false
+        end
+    end
+end
+
+
 
                 objects.healthBar.Visible = show and self.options.healthBars;
                 objects.healthBar.Color = color or self.options.healthBarsColor;
@@ -625,6 +730,24 @@ function espLibrary:Load(renderValue)
             cache.text.Color = cache.options.color;
             cache.text.Text = cache.options.text;
             cache.text.Position = round(screenPosition);
+            for player, objects in next, self.espCache do
+    if not players:FindFirstChild(player.Name) then
+        self.removeEsp(player)
+        self.removeChams(player)
+    end
+end
+
+for player, highlight in next, self.chamsCache do
+    if not players:FindFirstChild(player.Name) then
+        self.removeChams(player)
+    end
+end
+
+for object, cache in next, self.objectCache do
+    if not object or not object.Parent then
+        self.removeObject(object)
+    end
+end
         end
     end);
 end
