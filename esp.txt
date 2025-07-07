@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mick
+    made by siper#9938
 ]]
 
 local espLibrary = {
@@ -407,38 +407,34 @@ function espLibrary.addObject(object, options)
     };
 end
 
-function espLibrary.removeObject(object)
-    local cache = espLibrary.objectCache[object]
+function espLibrary.removeEsp(player)
+    local cache = espLibrary.espCache[player]
     if not cache then return end
 
-    espLibrary.objectCache[object] = nil
+    espLibrary.espCache[player] = nil
 
     local function safelyRemove(obj)
         if typeof(obj) == "Instance" then
-            obj:Destroy()
+            pcall(function() obj:Destroy() end)
         elseif typeof(obj) == "table" then
-            if obj.Remove then
-                obj:Remove()
+            if obj.top and obj.flipped then
+                safelyRemove(obj.top)
+                safelyRemove(obj.flipped)
+            elseif obj.Remove then
+                pcall(function() obj:Remove() end)
             elseif obj.Destroy then
-                obj:Destroy()
-            elseif obj.top and obj.flipped then
-                if typeof(obj.top) == "Instance" then
-                    obj.top:Destroy()
-                end
-                if typeof(obj.flipped) == "Instance" then
-                    obj.flipped:Destroy()
-                end
+                pcall(function() obj:Destroy() end)
             elseif obj.Visible ~= nil then
                 obj.Visible = false
             end
         end
     end
 
-    safelyRemove(cache.text)
-    if cache.boxFill then
-        safelyRemove(cache.boxFill)
+    for _, v in pairs(cache) do
+        safelyRemove(v)
     end
 end
+
 function espLibrary:AddObjectEsp(object, defaultOptions)
     assert(object and object.Parent, "invalid object passed");
 
@@ -536,6 +532,11 @@ function espLibrary:Load(renderValue)
 
                 if (self.options.teamCheck and (team == self.getTeam(localPlayer))) then
                     enabled = false;
+                end
+                if not players:FindFirstChild(player.Name) then
+                self.removeEsp(player)
+                self.removeChams(player)
+                         continue
                 end
 
                 local viewportSize = currentCamera.ViewportSize;
@@ -751,11 +752,18 @@ for _, p in ipairs(players:GetPlayers()) do
     currentPlayers[p] = true
 end
 
+
 for player in pairs(self.espCache) do
     if not currentPlayers[player] then
         self.removeEsp(player)
     end
 end
+
+local gui = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
+if gui and #gui:GetChildren() == 0 then
+    gui:Destroy()
+end
+
 
 for player in pairs(self.chamsCache) do
     if not currentPlayers[player] then
