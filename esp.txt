@@ -1,5 +1,12 @@
+
+
+
+
+
+
+
 --[[
-    made by siper#9938
+    made by siper#9938 and mickey#5612
 ]]
 
 -- main module
@@ -76,6 +83,10 @@ local espLibrary = {
     },
 };
 espLibrary.__index = espLibrary;
+
+espLibrary.options.boxFillColorEnabled = true 
+espLibrary.options.boxFillFlippedColorEnabled = true
+
 
 -- variables
 local getService = game.GetService;
