@@ -1,4 +1,6 @@
-
+--[[
+    made by siper#9938 and mickey#5612
+]]
 
 -- main module
 local espLibrary = {
@@ -70,6 +72,7 @@ local espLibrary = {
         chamsOutlineColor = Color3.new(),
         chamsOutlineTransparency = 0,
         image = true,
+        flippedImageColor = Color3.fromRGB(1, 1, 1),
     },
 };
 espLibrary.__index = espLibrary;
@@ -328,7 +331,7 @@ function espLibrary.addEsp(player)
     flippedImg.BackgroundTransparency = 1
     flippedImg.Visible = false
     flippedImg.Image = img.Image
-    flippedImg.ImageColor3 = img.ImageColor3
+    flippedImg.ImageColor3 = espLibrary.options.flippedImageColor or Color3.new(1, 1, 1) 
     flippedImg.ScaleType = Enum.ScaleType.Stretch
     flippedImg.Size = img.Size
     flippedImg.Position = img.Position
