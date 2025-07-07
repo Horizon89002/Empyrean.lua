@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey#5612
+    made by siper#9938
 ]]
 
 -- main module
@@ -320,27 +320,21 @@ function espLibrary.addEsp(player)
     img.BackgroundTransparency = 1
     img.Visible = false
     img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
-    img.ImageColor3 = Color3.new(1, 1, 1)
+    img.ImageColor3 = espLibrary.options.boxFillColor or Color3.new(1, 1, 1)
     img.ScaleType = Enum.ScaleType.Stretch
     img.Size = UDim2.new(1, 0, 1, 0)
     img.Position = UDim2.new(0, 0, 0, 0)
     img.Parent = container
 
-    local flippedImg = Instance.new("ImageLabel")
+    local flippedImg = img:Clone()
     flippedImg.Name = "boxFillFlipped"
-    flippedImg.BackgroundTransparency = 1
-    flippedImg.Visible = false
-    flippedImg.Image = img.Image
-    flippedImg.ImageColor3 = espLibrary.options.flippedImageColor or Color3.new(1, 1, 1) 
-    flippedImg.ScaleType = Enum.ScaleType.Stretch
-    flippedImg.Size = img.Size
-    flippedImg.Position = img.Position
-    flippedImg.AnchorPoint = Vector2.new(1, 0)
     flippedImg.Parent = container
+    flippedImg.AnchorPoint = Vector2.new(1, 0)
+    flippedImg.Position = UDim2.new(1, 0, 0, 0)
 
     local uiScale = Instance.new("UIScale")
-    uiScale.Parent = flippedImg
     uiScale.Scale = Vector3.new(-1, 1, 1)
+    uiScale.Parent = flippedImg
 
     return img
 end)() or create("Square", {
