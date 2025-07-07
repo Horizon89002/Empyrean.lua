@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 and mickey
+  
 ]]
 
 -- main module
@@ -72,8 +72,10 @@ local espLibrary = {
         chamsOutlineColor = Color3.new(),
         chamsOutlineTransparency = 0,
         image = true,
+        flippedBoxFillColor = Color3.new(1, 1, 1)
     },
 };
+
 espLibrary.__index = espLibrary;
 
 -- variables
@@ -320,10 +322,9 @@ function espLibrary.addEsp(player)
     flipped.BackgroundTransparency = 1
     flipped.Visible = false
     flipped.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
-    flipped.ImageColor3 = Color3.new(1, 0, 0)
+    flipped.ImageColor3 = espLibrary.options.flippedBoxFillColor or Color3.new(1, 0, 0)
     flipped.ScaleType = Enum.ScaleType.Stretch
     flipped.Size = UDim2.new(1, 0, 1, 0)
-    flipped.Position = UDim2.new(0, 0, 0, 0)
     flipped.AnchorPoint = Vector2.new(0.5, 0.5)
     flipped.Position = UDim2.new(0.5, 0, 0.5, 0)
     flipped.Rotation = 180
