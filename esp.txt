@@ -1,15 +1,8 @@
-
-
-
-
-
-
-
 --[[
     made by siper#9938 and mickey#5612
 ]]
 
--- main module
+
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -86,6 +79,7 @@ espLibrary.__index = espLibrary;
 
 espLibrary.options.boxFillColorEnabled = true 
 espLibrary.options.boxFillFlippedColorEnabled = true
+espLibrary.options.flippedBoxFillColor = Color3.fromRGB(1, 1, 1)
 
 
 -- variables
@@ -329,7 +323,7 @@ function espLibrary.addEsp(player)
     local img = Instance.new("ImageLabel")
     img.Name = "boxFill"
     img.BackgroundTransparency = 1
-    img.Visible = false
+    img.Visible = true
     img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
     img.ImageColor3 = espLibrary.options.boxFillColor or Color3.new(1, 1, 1)
     img.ScaleType = Enum.ScaleType.Stretch
@@ -339,13 +333,12 @@ function espLibrary.addEsp(player)
 
     local flippedImg = img:Clone()
     flippedImg.Name = "boxFillFlipped"
+    flippedImg.ImageColor3 = espLibrary.options.flippedBoxFillColor or Color3.new(1, 1, 1)
+    flippedImg.AnchorPoint = Vector2.new(0.5, 0.5)
+    flippedImg.Position = UDim2.new(0.5, 0, 0.5, 0)
+    flippedImg.Rotation = 180
+    flippedImg.Visible = true
     flippedImg.Parent = container
-    flippedImg.AnchorPoint = Vector2.new(1, 0)
-    flippedImg.Position = UDim2.new(1, 0, 0, 0)
-
-    local uiScale = Instance.new("UIScale")
-    uiScale.Scale = Vector3.new(-1, 1, 1)
-    uiScale.Parent = flippedImg
 
     return img
 end)() or create("Square", {
@@ -354,6 +347,7 @@ end)() or create("Square", {
     Visible = false,
     Color = Color3.new(1, 1, 1)
 }),
+
 
         boxOutline = create("Square", {
             Thickness = 3,
