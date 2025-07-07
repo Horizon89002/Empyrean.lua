@@ -1,5 +1,5 @@
 --[[
-    made by siper#9938 ss
+    made by siper#9938 and mickey#5612
 ]]
 
 -- main module
@@ -13,10 +13,10 @@ local espLibrary = {
     blacklist = {}, -- insert string that is the player's name you want to blacklist (removes player from esp)
     options = {
         enabled = true,
-        minScaleFactorX = 3,
-        maxScaleFactorX = 3,
-        minScaleFactorY = 5,
-        maxScaleFactorY = 5,
+        minScaleFactorX = 1,
+        maxScaleFactorX = 10,
+        minScaleFactorY = 1,
+        maxScaleFactorY = 10,
         scaleFactorX = 5,
         scaleFactorY = 6,
         boundingBox = false, -- WARNING | Significant Performance Decrease when true
@@ -70,15 +70,12 @@ local espLibrary = {
         chamsFillColor = Color3.new(1, 0, 0),
         chamsFillTransparency = 0.5,
         chamsOutlineColor = Color3.new(),
-        chamsOutlineTransparency = 0,
+        chamsOutlineTransparency = 0
         image = true,
         flippedBoxFillEnabled = true,
         flippedBoxFillColor = Color3.new(1, 0, 0),
     },
 };
-
-
-
 espLibrary.__index = espLibrary;
 
 -- variables
@@ -241,35 +238,10 @@ function espLibrary.visibleCheck(character, position)
 end
 
 
-espLibrary.options = espLibrary.options or {}
-espLibrary.options.imageURL = "https://github.com/Horizon89002/Empyrean.lua/blob/main/saturation.png?raw=true"
-espLibrary.options.imageLocalPath = "R_assets/esp_fill.png"
-
-if not isfolder("R_assets") then
-    makefolder("R_assets")
-end
-
-if not isfile(espLibrary.options.imageLocalPath) then
-    local success, imageData = pcall(function()
-        return game:HttpGet(espLibrary.options.imageURL)
-    end)
-    if success and imageData then
-        writefile(espLibrary.options.imageLocalPath, imageData)
-    end
-end
-
-local success, result = pcall(function()
-    return getcustomasset(espLibrary.options.imageLocalPath)
-end)
-if success then
-    espLibrary.options.imageAssetPath = result
-end
-
-local CoreGui = game:GetService("CoreGui")
 local espGui = Instance.new("ScreenGui")
-espGui.Name = "EspGui"
+espGui.Name = "ee564eryfdgfgc"
 espGui.ResetOnSpawn = false
-espGui.Parent = CoreGui
+espGui.Parent = game:GetService("CoreGui")
 
 local boxFillGui = Instance.new("ImageLabel")
 boxFillGui.BackgroundTransparency = 1
@@ -309,7 +281,7 @@ function espLibrary.addEsp(player)
             OutlineColor = color3New(),
             Font = 2,
         }),
-       boxFill = espLibrary.options.image and (function()
+        boxFill = espLibrary.options.image and (function()
     local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
     if not container then
         container = Instance.new("ScreenGui")
@@ -344,8 +316,6 @@ end)() or create("Square", {
     Visible = false,
     Color = Color3.new(1, 1, 1)
 }),
-
-
         boxOutline = create("Square", {
             Thickness = 3,
             Color = color3New()
@@ -439,14 +409,37 @@ function espLibrary.addObject(object, options)
 end
 
 function espLibrary.removeObject(object)
-    local cache = espLibrary.objectCache[object];
+    local cache = espLibrary.objectCache[object]
+    if not cache then return end
 
-    if (cache) then
-        espLibrary.objectCache[object] = nil;
-        cache.text:Remove();
+    espLibrary.objectCache[object] = nil
+
+    local function safelyRemove(obj)
+        if typeof(obj) == "Instance" then
+            obj:Destroy()
+        elseif typeof(obj) == "table" then
+            if obj.Remove then
+                obj:Remove()
+            elseif obj.Destroy then
+                obj:Destroy()
+            elseif obj.top and obj.flipped then
+                if typeof(obj.top) == "Instance" then
+                    obj.top:Destroy()
+                end
+                if typeof(obj.flipped) == "Instance" then
+                    obj.flipped:Destroy()
+                end
+            elseif obj.Visible ~= nil then
+                obj.Visible = false
+            end
+        end
+    end
+
+    safelyRemove(cache.text)
+    if cache.boxFill then
+        safelyRemove(cache.boxFill)
     end
 end
-
 function espLibrary:AddObjectEsp(object, defaultOptions)
     assert(object and object.Parent, "invalid object passed");
 
@@ -660,8 +653,6 @@ else
     end
 end
 
-
-
                 objects.healthBar.Visible = show and self.options.healthBars;
                 objects.healthBar.Color = color or self.options.healthBarsColor;
                 objects.healthBar.Transparency = self.options.healthBarsTransparency;
@@ -755,24 +746,6 @@ end
             cache.text.Color = cache.options.color;
             cache.text.Text = cache.options.text;
             cache.text.Position = round(screenPosition);
-            for player, objects in next, self.espCache do
-    if not players:FindFirstChild(player.Name) then
-        self.removeEsp(player)
-        self.removeChams(player)
-    end
-end
-
-for player, highlight in next, self.chamsCache do
-    if not players:FindFirstChild(player.Name) then
-        self.removeChams(player)
-    end
-end
-
-for object, cache in next, self.objectCache do
-    if not object or not object.Parent then
-        self.removeObject(object)
-    end
-end
         end
     end);
 end
