@@ -1,6 +1,4 @@
---[[
-  eeeeeesss
-]]
+
 
 -- main module
 local espLibrary = {
@@ -363,14 +361,10 @@ end)() or create("Square", {
             Color = color3New(),
             Filled = true
         }),
-        healthBar = create("Square", {
-    Thickness = 1,
-    Filled = true
-}),
-
-healthBarImage = espLibrary.options.healthBarImage and (function()
+        
+        healthBar = espLibrary.options.healthBarImage and (function()
     local img = Instance.new("ImageLabel")
-    img.Name = "healthBarImage"
+    img.Name = "healthBar"
     img.BackgroundTransparency = 1
     img.Visible = false
     img.Image = espLibrary.options.healthBarImageAsset or "rbxassetid://0"
@@ -378,9 +372,24 @@ healthBarImage = espLibrary.options.healthBarImage and (function()
     img.ScaleType = Enum.ScaleType.Stretch
     img.Size = UDim2.new(0, 0, 0, 0)
     img.Position = UDim2.new(0, 0, 0, 0)
-    img.Parent = game:GetService("CoreGui")
+
+    local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
+    if not container then
+        container = Instance.new("ScreenGui")
+        container.Name = "espContainerGui"
+        container.ResetOnSpawn = false
+        container.IgnoreGuiInset = true
+        container.Parent = game:GetService("CoreGui")
+    end
+
+    img.Parent = container
     return img
-end)(),
+end)() or create("Square", {
+    Thickness = 1,
+    Filled = true
+}),
+
+
         line = create("Line")
     };
 
@@ -645,24 +654,19 @@ end
 
 
 
-                if self.options.healthBarImage then
-    objects.healthBar.Visible = false
+                objects.healthBar.Visible = show and self.options.healthBars
 
-    if objects.healthBarImage then
-        objects.healthBarImage.Visible = show and self.options.healthBars
-        objects.healthBarImage.ImageColor3 = self.options.healthBarImageColor or Color3.new(1, 1, 1)
-        objects.healthBarImage.ImageTransparency = self.options.healthBarsTransparency
-        objects.healthBarImage.Size = UDim2.new(0, healthBarSize.X, 0, healthBarSize.Y)
-        objects.healthBarImage.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y)
-    end
+if typeof(objects.healthBar) == "Instance" and objects.healthBar:IsA("ImageLabel") then
+    objects.healthBar.ImageColor3 = self.options.healthBarImageColor or Color3.new(1, 1, 1)
+    objects.healthBar.ImageTransparency = self.options.healthBarsTransparency
+    objects.healthBar.Size = UDim2.new(0, healthBarSize.X, 0, healthBarSize.Y)
+    objects.healthBar.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y)
 else
-    objects.healthBar.Visible = show and self.options.healthBars
     objects.healthBar.Color = color or self.options.healthBarsColor
     objects.healthBar.Transparency = self.options.healthBarsTransparency
     objects.healthBar.Size = healthBarSize
     objects.healthBar.Position = healthBarPosition
 end
-
                 objects.healthBarOutline.Visible = show and self.options.healthBars;
                 objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
                 objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
