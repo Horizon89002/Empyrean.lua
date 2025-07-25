@@ -1,6 +1,4 @@
---[[
-  eeeeee
-]]
+
 
 -- main module
 local espLibrary = {
@@ -279,10 +277,26 @@ function espLibrary.addEsp(player)
         return
     end
 
+    
+local glowImage = Instance.new("ImageLabel")
+glowImage.Name = "glowImage"
+glowImage.BackgroundTransparency = 1
+glowImage.Image = "http://www.roblox.com/asset/?id=18245826428"
+glowImage.ImageTransparency = 0.2
+glowImage.ScaleType = Enum.ScaleType.Slice
+glowImage.SliceCenter = Rect.new(Vector2.new(21, 21), Vector2.new(79, 79))
+glowImage.ZIndex = 2
+glowImage.BorderSizePixel = 0
+glowImage.Size = UDim2.new(0, 100, 0, 100)
+glowImage.Position = UDim2.new(0, 0, 0, 0)
+
+
     local objects = {
         arrow = create("Triangle", {
             Thickness = 1,
         }),
+        glowImage = glowImage,
+        
         arrowOutline = create("Triangle", {
             Thickness = 1,
         }),
@@ -306,6 +320,7 @@ function espLibrary.addEsp(player)
             OutlineColor = color3New(),
             Font = 2,
         }),
+        
        boxFill = espLibrary.options.image and (function()
     local img = Instance.new("ImageLabel")
     img.Name = "boxFill"
@@ -338,6 +353,7 @@ function espLibrary.addEsp(player)
         container.IgnoreGuiInset = true
         container.Parent = game:GetService("CoreGui")
     end
+    
 
     img.Parent = container
 
@@ -353,19 +369,6 @@ end)() or create("Square", {
             Thickness = 3,
             Color = color3New()
         }),
-
-        boxGlow = create("ImageLabel", {
-    ScaleType = Enum.ScaleType.Slice,
-    Image = "http://www.roblox.com/asset/?id=18245826428",
-    SliceCenter = rect(vec2(21, 21), vec2(79, 79)),
-    BackgroundTransparency = 1,
-    ImageTransparency = 0.8,
-    BorderSizePixel = 0,
-    ZIndex = 2,
-    Visible = true,
-    Size = dim2(1, 40, 1, 40),
-    Position = dim2(0, -20, 0, -20),
-}),
         box = create("Square", {
             Thickness = 1
         }),
@@ -393,6 +396,8 @@ function espLibrary.removeEsp(player)
         for index, object in next, espCache do
             espCache[index] = nil;
             object:Remove();
+
+        
         end
     end
 end
@@ -603,15 +608,10 @@ function espLibrary:Load(renderValue)
                 objects.box.Size = size;
                 objects.box.Position = position;
 
-                objects.boxOutline.Visible = show and self.options.boxes
-objects.boxOutline.Transparency = self.options.boxesTransparency
-objects.boxOutline.Size = size
-objects.boxOutline.Position = position
-
-objects.boxGlow.Visible = show and self.options.boxes
-objects.boxGlow.Transparency = self.options.boxesTransparency
-objects.boxGlow.Size = size + udim2(0, 40, 0, 40)
-objects.boxGlow.Position = position - udim2(0, 20, 0, 20)
+                objects.boxOutline.Visible = show and self.options.boxes;
+                objects.boxOutline.Transparency = self.options.boxesTransparency;
+                objects.boxOutline.Size = size;
+                objects.boxOutline.Position = position;
 
                 local boxFill = espLibrary.espCache[player] and espLibrary.espCache[player].boxFill
 
@@ -646,7 +646,15 @@ else
 end
 
 
+                if objects.glowImage then
+    local absSize = Vector2.new(size.X, size.Y)
+    local absPos = Vector2.new(position.X, position.Y)
 
+    objects.glowImage.Visible = show and self.options.boxes
+    objects.glowImage.Size = UDim2.new(0, absSize.X + 40, 0, absSize.Y + 40) -- glow expands beyond box
+    objects.glowImage.Position = UDim2.new(0, absPos.X - 20, 0, absPos.Y - 20) -- offset outward
+    objects.glowImage.ImageTransparency = self.options.boxesTransparency + 0.2
+end
                 objects.healthBar.Visible = show and self.options.healthBars;
                 objects.healthBar.Color = color or self.options.healthBarsColor;
                 objects.healthBar.Transparency = self.options.healthBarsTransparency;
