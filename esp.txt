@@ -1,6 +1,4 @@
 
--- eeeee
-
 
 
 local espLibrary = {
@@ -684,14 +682,15 @@ if playerCache then
         local glowColor = color or self.options.boxesColor
         local glowTransparency = self.options.glowTransparency or 0.5
 
+local scaleFactor = espLibrary.getScaleFactor(currentCamera.FieldOfView, depth)
 
--- per-side pixel expansion (screen space, FOV-proof)
-local glowLeft   = 9.1
-local glowRight  = 9.1
-local glowTop    = 9.1
-local glowBottom = 9.1
+local staticGlowPixels = 10
 
--- LOCK glow to the box rectangle
+local glowLeft   = staticGlowPixels / scaleFactor
+local glowRight  = staticGlowPixels / scaleFactor
+local glowTop    = staticGlowPixels / scaleFactor
+local glowBottom = staticGlowPixels / scaleFactor
+
 local glowPosX = objects.box.Position.X - glowLeft
 local glowPosY = objects.box.Position.Y - glowTop
 
