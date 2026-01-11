@@ -677,14 +677,17 @@ local playerCache = espLibrary.espCache[player]
 if playerCache then
     local glow = playerCache.glow
     if glow then
+        local glowColor = color or self.options.boxesColor
+        local glowTransparency = self.options.glowTransparency or 0.5 -- brighter
+        local glowPadding = 6 -- pixels outside the box
+
         glow.Visible = show and self.options.glowImage
-        glow.Position = UDim2.new(0, position.X, 0, position.Y)
-        glow.Size = UDim2.new(0, size.X, 0, size.Y)
-        glow.ImageColor3 = color or self.options.boxesColor
-        glow.ImageTransparency = self.options.boxFillTransparency or 0.8
+        glow.Size = UDim2.new(0, size.X + glowPadding, 0, size.Y + glowPadding)
+        glow.Position = UDim2.new(0, position.X - glowPadding / 2, 0, position.Y - glowPadding / 2)
+        glow.ImageColor3 = glowColor
+        glow.ImageTransparency = glowTransparency
     end
 end
-
 
                
                 objects.healthBar.Visible = show and self.options.healthBars;
