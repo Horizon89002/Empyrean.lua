@@ -1,6 +1,6 @@
 
 
--- m
+-- EEEEEEEEEEEEEEEE
 
 local espLibrary = {
     instances = {},
@@ -682,14 +682,14 @@ if playerCache then
     if glow then
         local glowColor = color or self.options.boxesColor
         local glowTransparency = self.options.glowTransparency or 0.3 
-        local glowPadding = 12 -- pixels outside the box
+        local glowPadding = 6
 
 
-     
-local glowSizeX = size.X + glowPadding
-local glowSizeY = size.Y + glowPadding
-local glowPosX = position.X - (glowPadding / 2)
-local glowPosY = position.Y - (glowPadding / 2)
+
+local glowSizeX = size.X + glowPadding * 2
+local glowSizeY = size.Y + glowPadding * 2
+local glowPosX = position.X - glowPadding
+local glowPosY = position.Y - glowPadding
 
 
         glow.Visible = show and self.options.glowImage
