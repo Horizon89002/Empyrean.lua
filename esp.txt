@@ -684,12 +684,11 @@ if playerCache then
         local glowTransparency = self.options.glowTransparency or 0.3 
         local glowPadding = 6
 
-
-
 local glowSizeX = size.X + glowPadding * 2
 local glowSizeY = size.Y + glowPadding * 2
-local glowPosX = position.X - glowSizeX + size.X
-local glowPosY = position.Y - glowSizeY + size.Y
+
+local glowPosX = position.X + glowPadding
+local glowPosY = position.Y + glowPadding
 
 
         glow.Visible = show and self.options.glowImage
