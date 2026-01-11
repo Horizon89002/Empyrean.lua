@@ -386,7 +386,7 @@ end)() or create("Square", {
         line = create("Line")
     };
 
-espLibrary.options.glowImage = false
+
 
 if espLibrary.options.glowImage then
     objects.glow = Instance.new("ImageLabel")
