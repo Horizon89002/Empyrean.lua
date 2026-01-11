@@ -678,14 +678,29 @@ if playerCache then
     local glow = playerCache.glow
     if glow then
         local glowColor = color or self.options.boxesColor
-        local glowTransparency = self.options.glowTransparency or 0.5 -- brighter
+        local glowTransparency = self.options.glowTransparency or 0.3 
         local glowPadding = 6 -- pixels outside the box
 
+
+        local glowSizeX = size.X + glowPadding
+        local glowSizeY = size.Y + glowPadding
+        local glowPosX = position.X - glowPadding / 2
+        local glowPosY = position.Y - glowPadding / 2
+
         glow.Visible = show and self.options.glowImage
-        glow.Size = UDim2.new(0, size.X + glowPadding, 0, size.Y + glowPadding)
-        glow.Position = UDim2.new(0, position.X - glowPadding / 2, 0, position.Y - glowPadding / 2)
-        glow.ImageColor3 = glowColor
-        glow.ImageTransparency = glowTransparency
+
+
+        if typeof(glow) == "Instance" and glow:IsA("ImageLabel") then
+            glow.Size = UDim2.new(0, glowSizeX, 0, glowSizeY)
+            glow.Position = UDim2.new(0, glowPosX, 0, glowPosY)
+            glow.ImageColor3 = glowColor
+            glow.ImageTransparency = glowTransparency
+        elseif typeof(glow) == "userdata" then -- Drawing.Image
+            glow.Size = vector2New(glowSizeX, glowSizeY)
+            glow.Position = vector2New(glowPosX, glowPosY)
+            glow.Color = glowColor
+            glow.Transparency = 1 - glowTransparency -- Drawing uses 0 = invisible, 1 = opaque
+        end
     end
 end
 
