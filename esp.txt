@@ -278,18 +278,6 @@ function espLibrary.addEsp(player)
         return
     end
 
-    
-local glowImage = Instance.new("ImageLabel")
-glowImage.Name = "glowImage"
-glowImage.BackgroundTransparency = 1
-glowImage.Image = "http://www.roblox.com/asset/?id=18245826428"
-glowImage.ImageTransparency = 0.2
-glowImage.ScaleType = Enum.ScaleType.Slice
-glowImage.SliceCenter = Rect.new(Vector2.new(21, 21), Vector2.new(79, 79))
-glowImage.ZIndex = 2
-glowImage.BorderSizePixel = 0
-glowImage.Size = UDim2.new(0, 100, 0, 100)
-glowImage.Position = UDim2.new(0, 0, 0, 0)
 
 
     local objects = {
@@ -389,7 +377,6 @@ end)() or create("Square", {
     espLibrary.espCache[player] = objects;
 end
 
-
 objects.glow = Instance.new("ImageLabel", objects.box)
 objects.glow.Name = "GlowEffect"
 objects.glow.BackgroundTransparency = 1
@@ -399,7 +386,7 @@ objects.glow.ImageTransparency = 0.8
 objects.glow.ScaleType = Enum.ScaleType.Slice
 objects.glow.SliceCenter = Rect.new(21, 21, 79, 79)
 objects.glow.Size = UDim2.new(1, 0, 1, 0)     -- SAME SIZE AS BOX
-objects.glow.Position = UDim2.new(0, 0, 0, 0) -- align with box
+objects.glow.Position = UDim2.new(0, 0, 0, 0)
 objects.glow.ZIndex = 2
 objects.glow.Visible = false
 
