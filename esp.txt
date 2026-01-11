@@ -681,18 +681,17 @@ if playerCache then
     local glow = playerCache.glow
     if glow then
         local glowColor = color or self.options.boxesColor
-        local glowTransparency = self.options.glowTransparency or 0.3 
+        local glowTransparency = self.options.glowTransparency or 0.7
         local glowPadding = 6
 
 
 
 local verticalScale = 1.1 -- <1 shrinks top & bottom, >1 expands
-local horizontalScale = 2 -- keep left & right the same
+local horizontalScale = 1.2 -- keep left & right the same
 
 local glowSizeX = (size.X + glowPadding * 2) * horizontalScale
 local glowSizeY = (size.Y + glowPadding * 2) * verticalScale
 
--- keep it centered
 local glowPosX = position.X + size.X/2 - glowSizeX/2
 local glowPosY = position.Y + size.Y/2 - glowSizeY/2
 
