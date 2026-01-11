@@ -673,7 +673,7 @@ else
 end
 
                 
--- ==== STATIC GLOW UPDATE ====
+-- ==== TRUE STATIC GLOW (SCREEN SPACE) ====
 local playerCache = espLibrary.espCache[player]
 if playerCache then
     local glow = playerCache.glow
@@ -684,23 +684,21 @@ if playerCache then
         -- STATIC size in pixels
         local staticGlowSizeX, staticGlowSizeY = 50, 50
 
-        -- safely get box position and size
-        local boxPosX, boxPosY, boxSizeX, boxSizeY = 0, 0, 0, 0
+        -- get box center in screen space
+        local boxCenterX, boxCenterY = 0, 0
         local box = objects.box
 
-        if typeof(box.Position) == "Vector2" then
-            boxPosX, boxPosY = box.Position.X, box.Position.Y
-            boxSizeX, boxSizeY = box.Size.X, box.Size.Y
-        elseif typeof(box.Position) == "UDim2" then
-            boxPosX = box.Position.X.Offset
-            boxPosY = box.Position.Y.Offset
-            boxSizeX = box.Size.X.Offset
-            boxSizeY = box.Size.Y.Offset
+        if typeof(box.Position) == "Vector2" and typeof(box.Size) == "Vector2" then
+            boxCenterX = box.Position.X + (box.Size.X / 2)
+            boxCenterY = box.Position.Y + (box.Size.Y / 2)
+        elseif typeof(box.Position) == "UDim2" and typeof(box.Size) == "UDim2" then
+            boxCenterX = box.Position.X.Offset + (box.Size.X.Offset / 2)
+            boxCenterY = box.Position.Y.Offset + (box.Size.Y.Offset / 2)
         end
 
-        -- center the glow on the box
-        local glowPosX = boxPosX + (boxSizeX / 2) - (staticGlowSizeX / 2)
-        local glowPosY = boxPosY + (boxSizeY / 2) - (staticGlowSizeY / 2)
+        -- set glow top-left so it's centered on box
+        local glowPosX = boxCenterX - (staticGlowSizeX / 2)
+        local glowPosY = boxCenterY - (staticGlowSizeY / 2)
 
         glow.Visible = show and espLibrary.options.glowImage
 
@@ -713,7 +711,7 @@ if playerCache then
             glow.Size = vector2New(staticGlowSizeX, staticGlowSizeY)
             glow.Position = vector2New(glowPosX, glowPosY)
             glow.Color = glowColor
-            glow.Transparency = 1 - glowTransparency -- Drawing.Image uses 1 = opaque
+            glow.Transparency = 1 - glowTransparency
         end
     end
 end
