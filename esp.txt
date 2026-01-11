@@ -1,5 +1,4 @@
 
---  EEE
 
 local espLibrary = {
     instances = {},
@@ -331,7 +330,7 @@ function espLibrary.addEsp(player)
     }
 
   
-    if espLibrary.options.glowImage and objects.boxes then
+    if espLibrary.options.glowImage and espLibrary.options.boxes then
         local glow = Instance.new("ImageLabel")
         glow.Name = "Glow"
         glow.BackgroundTransparency = 1
