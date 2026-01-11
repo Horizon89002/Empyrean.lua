@@ -1,6 +1,6 @@
 
 
--- main mod
+-- main mo
 
 local espLibrary = {
     instances = {},
@@ -530,8 +530,6 @@ function espLibrary:Load(renderValue)
         self.addChams(player);
     end
 
-local boxFill = espLibrary.espCache[player].boxFill
-local glow = espLibrary.espCache[player].glow
 
 
     runService:BindToRenderStep("esp_rendering", renderValue or (Enum.RenderPriority.Camera.Value + 1), function()
@@ -680,6 +678,22 @@ if glow then
     glow.Size = UDim2.new(0, size.X, 0, size.Y)
     glow.ImageColor3 = color or espLibrary.options.boxesColor
 end
+
+local playerCache = espLibrary.espCache[player]
+
+if playerCache then
+    local boxFill = playerCache.boxFill
+    local glow = playerCache.glow
+
+    if boxFill then
+        -- update boxFill properties safely here
+    end
+
+    if glow then
+        -- update glow properties safely here
+    end
+end
+
 
                
                 objects.healthBar.Visible = show and self.options.healthBars;
