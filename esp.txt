@@ -1,6 +1,6 @@
 
 
--- main m
+-- main 
 
 local espLibrary = {
     instances = {},
@@ -672,25 +672,16 @@ end
 
                 
 
-if glow then
-    glow.Visible = show and espLibrary.options.glowImage
-    glow.Position = UDim2.new(0, position.X, 0, position.Y)
-    glow.Size = UDim2.new(0, size.X, 0, size.Y)
-    glow.ImageColor3 = color or espLibrary.options.boxesColor
-end
 
 local playerCache = espLibrary.espCache[player]
-
 if playerCache then
-    local boxFill = playerCache.boxFill
     local glow = playerCache.glow
-
-    if boxFill then
-        -- update boxFill properties safely here
-    end
-
     if glow then
-        -- update glow properties safely here
+        glow.Visible = show and self.options.glowImage
+        glow.Position = UDim2.new(0, position.X, 0, position.Y)
+        glow.Size = UDim2.new(0, size.X, 0, size.Y)
+        glow.ImageColor3 = color or self.options.boxesColor
+        glow.ImageTransparency = self.options.boxFillTransparency or 0.8
     end
 end
 
