@@ -1,6 +1,6 @@
 
 
--- main module
+
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -71,6 +71,7 @@ local espLibrary = {
         chamsOutlineTransparency = 0,
         image = true,
         flippedBoxFillColor = Color3.new(1, 1, 1)
+        glowImage = false,
     },
 };
 
@@ -646,7 +647,7 @@ else
 end
 
 
-                if objects.glowImage then
+                if espLibrary.objects.glowImage then
     local absSize = Vector2.new(size.X, size.Y)
     local absPos = Vector2.new(position.X, position.Y)
 
