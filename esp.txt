@@ -1,5 +1,6 @@
 
 
+-- main module
 
 local espLibrary = {
     instances = {},
@@ -70,7 +71,7 @@ local espLibrary = {
         chamsOutlineColor = Color3.new(),
         chamsOutlineTransparency = 0,
         image = true,
-        flippedBoxFillColor = Color3.new(1, 1, 1)
+        flippedBoxFillColor = Color3.new(1, 1, 1),
         glowImage = false,
     },
 };
