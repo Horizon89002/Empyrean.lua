@@ -1,5 +1,5 @@
 
---d
+--FINALL
 
 local espLibrary = {
     instances = {},
@@ -274,66 +274,6 @@ boxFillGui.Image = espLibrary.options.imageAssetPath or ""
 boxFillGui.Parent = espGui
 
 
-local glowContainer = CoreGui:FindFirstChild("espGlowContainer")
-if not glowContainer then
-    glowContainer = Instance.new("ScreenGui")
-    glowContainer.Name = "espGlowContainer"
-    glowContainer.ResetOnSpawn = false
-    glowContainer.IgnoreGuiInset = true
-    glowContainer.Parent = CoreGui
-end
-
-local GlowManager = {}
-GlowManager.glows = {} 
-
-
-function GlowManager:AddGlow(player)
-    if self.glows[player] then return end
-
-    local glow = Instance.new("ImageLabel")
-    glow.Name = "GlowEffect"
-    glow.BackgroundTransparency = 1
-    glow.Image = "http://www.roblox.com/asset/?id=18245826428"
-    glow.ImageColor3 = Color3.new(1,1,1)
-    glow.ImageTransparency = espLibrary.options.glowTransparency or 0.5
-    glow.ScaleType = Enum.ScaleType.Slice
-    glow.SliceCenter = Rect.new(21, 21, 79, 79)
-    glow.Size = UDim2.new(0, 70, 0, 70) 
-    glow.Position = UDim2.new(0, 0, 0, 0)
-    glow.Visible = false
-    glow.ZIndex = 1
-    glow.Parent = glowContainer
-
-    self.glows[player] = glow
-end
-
-function GlowManager:RemoveGlow(player)
-    local glow = self.glows[player]
-    if glow then
-        glow:Destroy()
-        self.glows[player] = nil
-    end
-end
-
-
-function GlowManager:UpdateGlow(player, boxPosition, show, color)
-    local glow = self.glows[player]
-    if not glow then
-        self:AddGlow(player)
-        glow = self.glows[player]
-    end
-
-    local glowWidth = 70 
-    local glowHeight = 70 
-    local glowPosX = boxPosition.X + (5/2) - (glowWidth / 2) 
-    local glowPosY = boxPosition.Y + (6/2) - (glowHeight / 2)
-
-    glow.Visible = show and espLibrary.options.glowImage
-    glow.Size = UDim2.new(0, glowWidth, 0, glowHeight)
-    glow.Position = UDim2.new(0, glowPosX, 0, glowPosY)
-    glow.ImageColor3 = color
-end
-
 
 function espLibrary.addEsp(player)
     if (player == localPlayer) then
@@ -346,7 +286,7 @@ function espLibrary.addEsp(player)
         arrow = create("Triangle", {
             Thickness = 1,
         }),
-        
+        glowImage = glowImage,
         
         arrowOutline = create("Triangle", {
             Thickness = 1,
@@ -437,9 +377,23 @@ end)() or create("Square", {
     };
 
 
-if espLibrary.options.glowImage then
-    GlowManager:AddGlow(player) 
-end
+
+if espLibrary.options.glowImage and boxFill then
+    local glow = Instance.new("ImageLabel", boxFill)
+    glow.Name = "Glow"
+    glow.BackgroundTransparency = 1
+    glow.Image = "http://www.roblox.com/asset/?id=18245826428"
+    glow.ImageColor3 = Color3.new(1, 1, 1) 
+    glow.ImageTransparency = 0.8
+    glow.ScaleType = Enum.ScaleType.Slice
+    glow.SliceCenter = Rect.new(21, 21, 79, 79)
+    glow.Size = UDim2.new(1, 40, 1, 40) 
+    glow.Position = UDim2.new(0, -20, 0, -20) 
+    glow.ZIndex = 2
+    glow.Visible = false
+
+  
+
 
 
     espLibrary.espCache[player] = objects;
@@ -712,13 +666,7 @@ else
 end
 
 
-               if espLibrary.options.glowImage then
-    GlowManager:UpdateGlow(player, position, show, color or espLibrary.options.boxesColor)
-end
 
-
-
- 
                 objects.healthBar.Visible = show and self.options.healthBars;
                 objects.healthBar.Color = color or self.options.healthBarsColor;
                 objects.healthBar.Transparency = self.options.healthBarsTransparency;
