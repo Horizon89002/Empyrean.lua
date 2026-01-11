@@ -1,5 +1,5 @@
 
---
+-- e
 
 
 local espLibrary = {
@@ -685,12 +685,13 @@ if playerCache then
         local glowPadding = 6
 
 
+local verticalScale = 0.6 -- <1 shrinks top & bottom, >1 expands
+local horizontalScale = 1 -- keep left & right the same
 
-local glowScaleMultiplier = 1 -- scale factor for overall glow size
+local glowSizeX = (size.X + glowPadding * 2) * horizontalScale
+local glowSizeY = (size.Y + glowPadding * 2) * verticalScale
 
-local glowSizeX = (size.X + glowPadding * 2) * glowScaleMultiplier
-local glowSizeY = (size.Y + glowPadding * 2) * glowScaleMultiplier
-
+-- keep it centered
 local glowPosX = position.X + size.X/2 - glowSizeX/2
 local glowPosY = position.Y + size.Y/2 - glowSizeY/2
 
