@@ -1,6 +1,6 @@
 
 
--- main modul
+-- main modu
 
 local espLibrary = {
     instances = {},
@@ -375,9 +375,6 @@ end)() or create("Square", {
         line = create("Line")
     };
 
-    espLibrary.espCache[player] = objects;
-end
-
 objects.glow = Instance.new("ImageLabel")
 objects.glow.Name = "GlowEffect"
 objects.glow.BackgroundTransparency = 1
@@ -391,6 +388,11 @@ objects.glow.Position = UDim2.new(0, 0, 0, 0)
 objects.glow.ZIndex = 2
 objects.glow.Visible = false
 objects.glow.Parent = objects.box  
+
+
+    espLibrary.espCache[player] = objects;
+end
+
 
 function espLibrary.removeEsp(player)
     local espCache = espLibrary.espCache[player];
