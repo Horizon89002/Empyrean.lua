@@ -1,5 +1,5 @@
 
---
+-- TEST
 
 local espLibrary = {
     instances = {},
@@ -672,50 +672,28 @@ else
     end
 end
 
--- ==== GLOW STAYS STATIC SIZE ====
-local playerCache = espLibrary.espCache[player]
-if playerCache then
-    local glow = playerCache.glow
-    if glow then
-        local glowColor = color or espLibrary.options.boxesColor
-        local glowTransparency = espLibrary.options.glowTransparency or 0.5
+-- STATIC glow size
+local staticGlowWidth = 70   -- width in pixels
+local staticGlowHeight = 70  -- height in pixels
 
-        -- fixed on-screen size
-        local glowWidth, glowHeight = 300, 300 -- pixels
+-- Position it centered around the box
+local glowPosX = objects.box.Position.X + (objects.box.Size.X / 2) - (staticGlowWidth / 2)
+local glowPosY = objects.box.Position.Y + (objects.box.Size.Y / 2) - (staticGlowHeight / 2)
 
-        -- center of the box in screen space
-        local box = objects.box
-        local boxPosX, boxPosY, boxSizeX, boxSizeY
+glow.Visible = show and self.options.glowImage
 
-        if typeof(box.Position) == "Vector2" then
-            boxPosX, boxPosY = box.Position.X, box.Position.Y
-            boxSizeX, boxSizeY = box.Size.X, box.Size.Y
-        elseif typeof(box.Position) == "UDim2" then
-            boxPosX = box.Position.X.Offset
-            boxPosY = box.Position.Y.Offset
-            boxSizeX = box.Size.X.Offset
-            boxSizeY = box.Size.Y.Offset
-        end
-
-        -- center glow on box
-        local glowPosX = boxPosX + (boxSizeX / 2) - (glowWidth / 2)
-        local glowPosY = boxPosY + (boxSizeY / 2) - (glowHeight / 2)
-
-        glow.Visible = show and espLibrary.options.glowImage
-
-        if typeof(glow) == "Instance" and glow:IsA("ImageLabel") then
-            glow.Size = UDim2.new(0, glowWidth, 0, glowHeight)
-            glow.Position = UDim2.new(0, glowPosX, 0, glowPosY)
-            glow.ImageColor3 = glowColor
-            glow.ImageTransparency = glowTransparency
-        elseif typeof(glow) == "userdata" then -- Drawing.Image
-            glow.Size = vector2New(glowWidth, glowHeight)
-            glow.Position = vector2New(glowPosX, glowPosY)
-            glow.Color = glowColor
-            glow.Transparency = 1 - glowTransparency -- Drawing.Image uses 1=opaque
-        end
-    end
+if typeof(glow) == "Instance" and glow:IsA("ImageLabel") then
+    glow.Size = UDim2.new(0, staticGlowWidth, 0, staticGlowHeight)
+    glow.Position = UDim2.new(0, glowPosX, 0, glowPosY)
+    glow.ImageColor3 = glowColor
+    glow.ImageTransparency = glowTransparency
+elseif typeof(glow) == "userdata" then -- Drawing.Image
+    glow.Size = vector2New(staticGlowWidth, staticGlowHeight)
+    glow.Position = vector2New(glowPosX, glowPosY)
+    glow.Color = glowColor
+    glow.Transparency = 1 - glowTransparency
 end
+
 
                 objects.healthBar.Visible = show and self.options.healthBars;
                 objects.healthBar.Color = color or self.options.healthBarsColor;
