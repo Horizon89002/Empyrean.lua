@@ -1,5 +1,5 @@
 
---
+-- ee
 
 
 local espLibrary = {
@@ -686,15 +686,13 @@ if playerCache then
 
 
 
-local verticalScale = 1.1 -- <1 shrinks top & bottom, >1 expands
-local horizontalScale = 1.2 -- keep left & right the same
 
-local glowSizeX = (size.X + glowPadding * 2) * horizontalScale
-local glowSizeY = (size.Y + glowPadding * 2) * verticalScale
+-- lock to box edges, NOT scale math
+local glowPosX = position.X - glowPadding
+local glowPosY = position.Y - glowPadding
 
-local glowPosX = position.X + size.X/2 - glowSizeX/2
-local glowPosY = position.Y + size.Y/2 - glowSizeY/2
-
+local glowSizeX = size.X + glowPadding * 2
+local glowSizeY = size.Y + glowPadding * 2
 
         glow.Visible = show and self.options.glowImage
 
