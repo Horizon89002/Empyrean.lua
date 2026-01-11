@@ -685,11 +685,10 @@ if playerCache then
         local glowPadding = 6
 
 
-
 local glowSizeX = size.X + glowPadding * 2
 local glowSizeY = size.Y + glowPadding * 2
-local glowPosX = position.X - glowPadding
-local glowPosY = position.Y - glowPadding
+local glowPosX = position.X - (glowSizeX - size.X)/2
+local glowPosY = position.Y - (glowSizeY - size.Y)/2
 
 
         glow.Visible = show and self.options.glowImage
