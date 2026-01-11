@@ -673,22 +673,36 @@ else
 end
 
                 
+-- ==== STATIC GLOW UPDATE ====
 local playerCache = espLibrary.espCache[player]
 if playerCache then
     local glow = playerCache.glow
     if glow then
-        local glowColor = color or self.options.boxesColor
-        local glowTransparency = self.options.glowTransparency or 0.5
+        local glowColor = color or espLibrary.options.boxesColor
+        local glowTransparency = espLibrary.options.glowTransparency or 0.5
 
-        -- STATIC glow size (screen-space)
-        local staticGlowSizeX = 50  -- you can tweak this
-        local staticGlowSizeY = 50
+        -- STATIC size in pixels
+        local staticGlowSizeX, staticGlowSizeY = 50, 50
 
-        -- lock to box center
-        local glowPosX = objects.box.Position.X + (objects.box.Size.X / 2) - (staticGlowSizeX / 2)
-        local glowPosY = objects.box.Position.Y + (objects.box.Size.Y / 2) - (staticGlowSizeY / 2)
+        -- safely get box position and size
+        local boxPosX, boxPosY, boxSizeX, boxSizeY = 0, 0, 0, 0
+        local box = objects.box
 
-        glow.Visible = show and self.options.glowImage
+        if typeof(box.Position) == "Vector2" then
+            boxPosX, boxPosY = box.Position.X, box.Position.Y
+            boxSizeX, boxSizeY = box.Size.X, box.Size.Y
+        elseif typeof(box.Position) == "UDim2" then
+            boxPosX = box.Position.X.Offset
+            boxPosY = box.Position.Y.Offset
+            boxSizeX = box.Size.X.Offset
+            boxSizeY = box.Size.Y.Offset
+        end
+
+        -- center the glow on the box
+        local glowPosX = boxPosX + (boxSizeX / 2) - (staticGlowSizeX / 2)
+        local glowPosY = boxPosY + (boxSizeY / 2) - (staticGlowSizeY / 2)
+
+        glow.Visible = show and espLibrary.options.glowImage
 
         if typeof(glow) == "Instance" and glow:IsA("ImageLabel") then
             glow.Size = UDim2.new(0, staticGlowSizeX, 0, staticGlowSizeY)
@@ -699,7 +713,7 @@ if playerCache then
             glow.Size = vector2New(staticGlowSizeX, staticGlowSizeY)
             glow.Position = vector2New(glowPosX, glowPosY)
             glow.Color = glowColor
-            glow.Transparency = 1 - glowTransparency
+            glow.Transparency = 1 - glowTransparency -- Drawing.Image uses 1 = opaque
         end
     end
 end
