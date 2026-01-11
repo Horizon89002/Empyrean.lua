@@ -1,5 +1,5 @@
 
-
+-- main module
 
 local espLibrary = {
     instances = {},
@@ -373,6 +373,7 @@ end)() or create("Square", {
         box = create("Square", {
             Thickness = 1
         }),
+
         healthBarOutline = create("Square", {
             Thickness = 1,
             Color = color3New(),
@@ -388,6 +389,21 @@ end)() or create("Square", {
     espLibrary.espCache[player] = objects;
 end
 
+
+objects.glow = Instance.new("ImageLabel", objects.box)
+objects.glow.Name = "GlowEffect"
+objects.glow.BackgroundTransparency = 1
+objects.glow.Image = "http://www.roblox.com/asset/?id=18245826428"
+objects.glow.ImageColor3 = Color3.fromRGB(255, 255, 255)
+objects.glow.ImageTransparency = 0.8
+objects.glow.ScaleType = Enum.ScaleType.Slice
+objects.glow.SliceCenter = Rect.new(21, 21, 79, 79)
+objects.glow.Size = UDim2.new(1, 0, 1, 0)     -- SAME SIZE AS BOX
+objects.glow.Position = UDim2.new(0, 0, 0, 0) -- align with box
+objects.glow.ZIndex = 2
+objects.glow.Visible = false
+
+
 function espLibrary.removeEsp(player)
     local espCache = espLibrary.espCache[player];
 
@@ -402,6 +418,8 @@ function espLibrary.removeEsp(player)
         end
     end
 end
+
+
 
 function espLibrary.addChams(player)
     if (player == localPlayer) then
@@ -646,16 +664,12 @@ else
     end
 end
 
+                objects.glow.Visible = show and self.options.boxesGlow  -- toggle with a new boolean
+objects.glow.ImageColor3 = color or self.options.boxesColor
+objects.glow.Size = UDim2.new(1, 0, 1, 0)     -- same as box
+objects.glow.Position = UDim2.new(0, 0, 0, 0)
 
-                if espLibrary.objects.glowImage then
-    local absSize = Vector2.new(size.X, size.Y)
-    local absPos = Vector2.new(position.X, position.Y)
-
-    objects.glowImage.Visible = show and self.options.boxes
-    objects.glowImage.Size = UDim2.new(0, absSize.X + 40, 0, absSize.Y + 40) -- glow expands beyond box
-    objects.glowImage.Position = UDim2.new(0, absPos.X - 20, 0, absPos.Y - 20) -- offset outward
-    objects.glowImage.ImageTransparency = self.options.boxesTransparency + 0.2
-end
+               
                 objects.healthBar.Visible = show and self.options.healthBars;
                 objects.healthBar.Color = color or self.options.healthBarsColor;
                 objects.healthBar.Transparency = self.options.healthBarsTransparency;
