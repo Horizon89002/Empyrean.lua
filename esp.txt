@@ -1,4 +1,6 @@
 
+--  n
+
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -272,129 +274,81 @@ boxFillGui.Image = espLibrary.options.imageAssetPath or ""
 boxFillGui.Parent = espGui
 
 
-
 function espLibrary.addEsp(player)
-    if (player == localPlayer) then
+    if player == localPlayer then
         return
     end
 
-
-
     local objects = {
-        arrow = create("Triangle", {
-            Thickness = 1,
-        }),
+        arrow = create("Triangle", { Thickness = 1 }),
+        arrowOutline = create("Triangle", { Thickness = 1 }),
+        top = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
+        side = create("Text", { Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
+        bottom = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
 
-        
-        arrowOutline = create("Triangle", {
-            Thickness = 1,
-        }),
-        top = create("Text", {
-            Center = true,
-            Size = 13,
-            Outline = true,
-            OutlineColor = color3New(),
-            Font = 2,
-        }),
-        side = create("Text", {
-            Size = 13,
-            Outline = true,
-            OutlineColor = color3New(),
-            Font = 2,
-        }),
-        bottom = create("Text", {
-            Center = true,
-            Size = 13,
-            Outline = true,
-            OutlineColor = color3New(),
-            Font = 2,
-        }),
-        
-       boxFill = espLibrary.options.image and (function()
-    local img = Instance.new("ImageLabel")
-    img.Name = "boxFill"
-    img.BackgroundTransparency = 1
-    img.Visible = false
-    img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
-    img.ImageColor3 = Color3.new(1, 1, 1)
-    img.ScaleType = Enum.ScaleType.Stretch
-    img.Size = UDim2.new(1, 0, 1, 0)
-    img.Position = UDim2.new(0, 0, 0, 0)
+        boxFill = espLibrary.options.image and (function()
+            local img = Instance.new("ImageLabel")
+            img.Name = "boxFill"
+            img.BackgroundTransparency = 1
+            img.Visible = false
+            img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+            img.ImageColor3 = Color3.new(1, 1, 1)
+            img.ScaleType = Enum.ScaleType.Stretch
+            img.Size = UDim2.new(1, 0, 1, 0)
+            img.Position = UDim2.new(0, 0, 0, 0)
 
-    local flipped = Instance.new("ImageLabel")
-    flipped.Name = "boxFillFlipped"
-    flipped.BackgroundTransparency = 1
-    flipped.Visible = false
-    flipped.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
-    flipped.ImageColor3 = espLibrary.options.flippedBoxFillColor or Color3.new(1, 0, 0)
-    flipped.ScaleType = Enum.ScaleType.Stretch
-    flipped.Size = UDim2.new(1, 0, 1, 0)
-    flipped.Position = UDim2.new(0, 0, 0, 0)
-    flipped.Rotation = 180
-    flipped.ZIndex = img.ZIndex + 1
-    flipped.Parent = img
+            local flipped = Instance.new("ImageLabel")
+            flipped.Name = "boxFillFlipped"
+            flipped.BackgroundTransparency = 1
+            flipped.Visible = false
+            flipped.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+            flipped.ImageColor3 = espLibrary.options.flippedBoxFillColor or Color3.new(1, 0, 0)
+            flipped.ScaleType = Enum.ScaleType.Stretch
+            flipped.Size = UDim2.new(1, 0, 1, 0)
+            flipped.Position = UDim2.new(0, 0, 0, 0)
+            flipped.Rotation = 180
+            flipped.ZIndex = img.ZIndex + 1
+            flipped.Parent = img
 
-    local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
-    if not container then
-        container = Instance.new("ScreenGui")
-        container.Name = "espContainerGui"
-        container.ResetOnSpawn = false
-        container.IgnoreGuiInset = true
-        container.Parent = game:GetService("CoreGui")
-    end
-    
+            local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
+            if not container then
+                container = Instance.new("ScreenGui")
+                container.Name = "espContainerGui"
+                container.ResetOnSpawn = false
+                container.IgnoreGuiInset = true
+                container.Parent = game:GetService("CoreGui")
+            end
 
-    img.Parent = container
+            img.Parent = container
+            return img
+        end)() or create("Square", { Thickness = 1, Filled = true, Visible = false, Color = Color3.new(1, 1, 1) }),
 
-    return img
-end)() or create("Square", {
-    Thickness = 1,
-    Filled = true,
-    Visible = false,
-    Color = Color3.new(1, 1, 1)
-}),
-
-        boxOutline = create("Square", {
-            Thickness = 3,
-            Color = color3New()
-        }),
-        box = create("Square", {
-            Thickness = 1
-        }),
-
-        healthBarOutline = create("Square", {
-            Thickness = 1,
-            Color = color3New(),
-            Filled = true
-        }),
-        healthBar = create("Square", {
-            Thickness = 1,
-            Filled = true
-        }),
+        boxOutline = create("Square", { Thickness = 3, Color = color3New() }),
+        box = create("Square", { Thickness = 1 }),
+        healthBarOutline = create("Square", { Thickness = 1, Color = color3New(), Filled = true }),
+        healthBar = create("Square", { Thickness = 1, Filled = true }),
         line = create("Line")
-    };
-
-
-
-if espLibrary.options.glowImage and boxFill then
-    local glow = Instance.new("ImageLabel", boxFill)
-    glow.Name = "Glow"
-    glow.BackgroundTransparency = 1
-    glow.Image = "http://www.roblox.com/asset/?id=18245826428"
-    glow.ImageColor3 = Color3.new(1, 1, 1) 
-    glow.ImageTransparency = 0.8
-    glow.ScaleType = Enum.ScaleType.Slice
-    glow.SliceCenter = Rect.new(21, 21, 79, 79)
-    glow.Size = UDim2.new(1, 40, 1, 40) 
-    glow.Position = UDim2.new(0, -20, 0, -20) 
-    glow.ZIndex = 2
-    glow.Visible = false
+    }
 
   
+    if espLibrary.options.glowImage and objects.boxFill then
+        local glow = Instance.new("ImageLabel")
+        glow.Name = "Glow"
+        glow.BackgroundTransparency = 1
+        glow.Image = "http://www.roblox.com/asset/?id=18245826428"
+        glow.ImageColor3 = Color3.new(1, 1, 1)
+        glow.ImageTransparency = 0.8
+        glow.ScaleType = Enum.ScaleType.Slice
+        glow.SliceCenter = Rect.new(21, 21, 79, 79)
+        glow.Size = UDim2.new(1, 40, 1, 40)
+        glow.Position = UDim2.new(0, -20, 0, -20)
+        glow.ZIndex = 2
+        glow.Visible = false
+        glow.Parent = objects.boxFill 
+        objects.glow = glow 
+    end
 
-
-
-    espLibrary.espCache[player] = objects;
+    espLibrary.espCache[player] = objects
 end
 
 
