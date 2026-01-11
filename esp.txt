@@ -1,6 +1,6 @@
 
 
--- 
+
 
 local espLibrary = {
     instances = {},
@@ -686,10 +686,15 @@ if playerCache then
 
 
 
-local glowSizeX = size.X + glowPadding * 2
-local glowSizeY = size.Y + glowPadding * 2
+local glowScaleMultiplier = 1.5 -- scale factor for overall glow size
+
+local glowSizeX = (size.X + glowPadding * 2) * glowScaleMultiplier
+local glowSizeY = (size.Y + glowPadding * 2) * glowScaleMultiplier
+
+-- keep glow centered on the box
 local glowPosX = position.X + size.X/2 - glowSizeX/2
 local glowPosY = position.Y + size.Y/2 - glowSizeY/2
+
 
         glow.Visible = show and self.options.glowImage
 
