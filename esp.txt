@@ -685,19 +685,19 @@ if playerCache then
         local glowTransparency = self.options.glowTransparency or 0.5
 
 
-local glowLeft   = 8   -- pushes left outward
-local glowRight  = 8   -- pushes right outward
-local glowTop    = 8   -- pushes up
-local glowBottom = 8   -- pushes down
+-- per-side pixel expansion (screen space, FOV-proof)
+local glowLeft   = 9.1
+local glowRight  = 9.1
+local glowTop    = 9.1
+local glowBottom = 9.1
 
+-- LOCK glow to the box rectangle
+local glowPosX = objects.box.Position.X - glowLeft
+local glowPosY = objects.box.Position.Y - glowTop
 
-local glowPosX = position.X - glowLeft
-local glowPosY = position.Y - glowTop
+local glowSizeX = objects.box.Size.X + glowLeft + glowRight
+local glowSizeY = objects.box.Size.Y + glowTop + glowBottom
 
-local glowSizeX = size.X + glowLeft + glowRight
-local glowSizeY = size.Y + glowTop + glowBottom
-
-       
 
         glow.Visible = show and self.options.glowImage
 
