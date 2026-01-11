@@ -1,6 +1,6 @@
 
 
--- main module
+-- main modul
 
 local espLibrary = {
     instances = {},
