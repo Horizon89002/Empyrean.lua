@@ -1,5 +1,5 @@
 
---  n
+--  EEE
 
 local espLibrary = {
     instances = {},
@@ -10,7 +10,7 @@ local espLibrary = {
     whitelist = {}, -- insert string that is the player's name you want to whitelist (turns esp color to whitelistColor in options)
     blacklist = {}, -- insert string that is the player's name you want to blacklist (removes player from esp)
     options = {
-        enabled = true,
+        enabled = false,
         minScaleFactorX = 3,
         maxScaleFactorX = 3,
         minScaleFactorY = 5,
@@ -286,7 +286,7 @@ function espLibrary.addEsp(player)
         side = create("Text", { Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         bottom = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
 
-        boxFill = espLibrary.options.image and (function()
+        boxFill = espLibrary.options.image and espLibrary.options.boxes and (function()
             local img = Instance.new("ImageLabel")
             img.Name = "boxFill"
             img.BackgroundTransparency = 1
@@ -331,7 +331,7 @@ function espLibrary.addEsp(player)
     }
 
   
-    if espLibrary.options.glowImage and objects.boxFill then
+    if espLibrary.options.glowImage and objects.boxes then
         local glow = Instance.new("ImageLabel")
         glow.Name = "Glow"
         glow.BackgroundTransparency = 1
@@ -617,9 +617,12 @@ else
     end
 end
 
-if objects.glow then
-    objects.glow.Visible = objects.boxFill.Visible
+for player, objects in pairs(espLibrary.espCache) do
+    if objects.glow then
+        objects.glow.Visible = espLibrary.options.glowImage
+    end
 end
+
 
 
                 objects.healthBar.Visible = show and self.options.healthBars;
