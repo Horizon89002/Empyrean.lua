@@ -1,5 +1,5 @@
 
--- e
+-- 
 
 
 
@@ -684,13 +684,13 @@ if playerCache then
         local glowColor = color or self.options.boxesColor
         local glowTransparency = self.options.glowTransparency or 0.5
 
--- per-side glow expansion (SCREEN PIXELS, stable at all zoom levels)
-local glowLeft   = 6   -- pushes left outward
-local glowRight  = 6   -- pushes right outward
-local glowTop    = 6   -- pushes up
-local glowBottom = 6   -- pushes down
 
--- position = top-left of ESP box (already screen space)
+local glowLeft   = 8   -- pushes left outward
+local glowRight  = 8   -- pushes right outward
+local glowTop    = 8   -- pushes up
+local glowBottom = 8   -- pushes down
+
+
 local glowPosX = position.X - glowLeft
 local glowPosY = position.Y - glowTop
 
