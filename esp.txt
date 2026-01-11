@@ -1,5 +1,5 @@
 
---E
+--d
 
 local espLibrary = {
     instances = {},
@@ -283,6 +283,57 @@ if not glowContainer then
     glowContainer.Parent = CoreGui
 end
 
+local GlowManager = {}
+GlowManager.glows = {} 
+
+
+function GlowManager:AddGlow(player)
+    if self.glows[player] then return end
+
+    local glow = Instance.new("ImageLabel")
+    glow.Name = "GlowEffect"
+    glow.BackgroundTransparency = 1
+    glow.Image = "http://www.roblox.com/asset/?id=18245826428"
+    glow.ImageColor3 = Color3.new(1,1,1)
+    glow.ImageTransparency = espLibrary.options.glowTransparency or 0.5
+    glow.ScaleType = Enum.ScaleType.Slice
+    glow.SliceCenter = Rect.new(21, 21, 79, 79)
+    glow.Size = UDim2.new(0, 70, 0, 70) 
+    glow.Position = UDim2.new(0, 0, 0, 0)
+    glow.Visible = false
+    glow.ZIndex = 1
+    glow.Parent = glowContainer
+
+    self.glows[player] = glow
+end
+
+function GlowManager:RemoveGlow(player)
+    local glow = self.glows[player]
+    if glow then
+        glow:Destroy()
+        self.glows[player] = nil
+    end
+end
+
+
+function GlowManager:UpdateGlow(player, boxPosition, show, color)
+    local glow = self.glows[player]
+    if not glow then
+        self:AddGlow(player)
+        glow = self.glows[player]
+    end
+
+    local glowWidth = 70 
+    local glowHeight = 70 
+    local glowPosX = boxPosition.X + (5/2) - (glowWidth / 2) 
+    local glowPosY = boxPosition.Y + (6/2) - (glowHeight / 2)
+
+    glow.Visible = show and espLibrary.options.glowImage
+    glow.Size = UDim2.new(0, glowWidth, 0, glowHeight)
+    glow.Position = UDim2.new(0, glowPosX, 0, glowPosY)
+    glow.ImageColor3 = color
+end
+
 
 function espLibrary.addEsp(player)
     if (player == localPlayer) then
@@ -295,7 +346,7 @@ function espLibrary.addEsp(player)
         arrow = create("Triangle", {
             Thickness = 1,
         }),
-        glowImage = glowImage,
+        
         
         arrowOutline = create("Triangle", {
             Thickness = 1,
@@ -386,22 +437,10 @@ end)() or create("Square", {
     };
 
 
-
 if espLibrary.options.glowImage then
-    objects.glow = Instance.new("ImageLabel")
-    objects.glow.Name = "GlowEffect"
-    objects.glow.BackgroundTransparency = 1
-    objects.glow.Image = "http://www.roblox.com/asset/?id=18245826428"
-    objects.glow.ImageColor3 = Color3.fromRGB(255, 255, 255)
-    objects.glow.ImageTransparency = 0.8
-    objects.glow.ScaleType = Enum.ScaleType.Slice
-    objects.glow.SliceCenter = Rect.new(21, 21, 79, 79)
-    objects.glow.Size = UDim2.new(0, 50, 0, 50) -- temporary, updated each frame
-    objects.glow.Position = UDim2.new(0, 0, 0, 0)
-    objects.glow.ZIndex = 2
-    objects.glow.Visible = false
-    objects.glow.Parent = glowContainer
+    GlowManager:AddGlow(player) 
 end
+
 
     espLibrary.espCache[player] = objects;
 end
@@ -672,46 +711,14 @@ else
     end
 end
 
-local playerCache = espLibrary.espCache[player]
-if playerCache then
-    local glow = playerCache.glow
-    local box = objects.box
 
-    -- only continue if both glow and box exist
-    if glow and box then
-        local glowColor = color or espLibrary.options.boxesColor
-        local glowTransparency = espLibrary.options.glowTransparency or 0.5
-
-        -- STATIC glow size in pixels
-        local staticGlowWidth = 70
-        local staticGlowHeight = 70
-
-        -- Center glow on box
-        local glowPosX = box.Position.X + (box.Size.X / 2) - (staticGlowWidth / 2)
-        local glowPosY = box.Position.Y + (box.Size.Y / 2) - (staticGlowHeight / 2)
-
-        glow.Visible = show and espLibrary.options.glowImage
-
-        -- Update ImageLabel glow
-        if typeof(glow) == "Instance" and glow:IsA("ImageLabel") then
-            pcall(function()
-                glow.Size = UDim2.new(0, staticGlowWidth, 0, staticGlowHeight)
-                glow.Position = UDim2.new(0, glowPosX, 0, glowPosY)
-                glow.ImageColor3 = glowColor
-                glow.ImageTransparency = glowTransparency
-            end)
-        -- Update Drawing glow
-        elseif typeof(glow) == "userdata" then
-            pcall(function()
-                glow.Size = vector2New(staticGlowWidth, staticGlowHeight)
-                glow.Position = vector2New(glowPosX, glowPosY)
-                glow.Color = glowColor
-                glow.Transparency = 1 - glowTransparency
-            end)
-        end
-    end
+               if espLibrary.options.glowImage then
+    GlowManager:UpdateGlow(player, position, show, color or espLibrary.options.boxesColor)
 end
 
+
+
+ 
                 objects.healthBar.Visible = show and self.options.healthBars;
                 objects.healthBar.Color = color or self.options.healthBarsColor;
                 objects.healthBar.Transparency = self.options.healthBarsTransparency;
