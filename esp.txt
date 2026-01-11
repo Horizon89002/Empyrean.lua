@@ -1,6 +1,6 @@
 
 
--- main modu
+-- main mod
 
 local espLibrary = {
     instances = {},
@@ -274,6 +274,17 @@ boxFillGui.Visible = false
 boxFillGui.Image = espLibrary.options.imageAssetPath or "" 
 boxFillGui.Parent = espGui
 
+
+local glowContainer = CoreGui:FindFirstChild("espGlowContainer")
+if not glowContainer then
+    glowContainer = Instance.new("ScreenGui")
+    glowContainer.Name = "espGlowContainer"
+    glowContainer.ResetOnSpawn = false
+    glowContainer.IgnoreGuiInset = true
+    glowContainer.Parent = CoreGui
+end
+
+
 function espLibrary.addEsp(player)
     if (player == localPlayer) then
         return
@@ -375,20 +386,23 @@ end)() or create("Square", {
         line = create("Line")
     };
 
-objects.glow = Instance.new("ImageLabel")
-objects.glow.Name = "GlowEffect"
-objects.glow.BackgroundTransparency = 1
-objects.glow.Image = "http://www.roblox.com/asset/?id=18245826428"
-objects.glow.ImageColor3 = Color3.fromRGB(255, 255, 255)
-objects.glow.ImageTransparency = 0.8
-objects.glow.ScaleType = Enum.ScaleType.Slice
-objects.glow.SliceCenter = Rect.new(21, 21, 79, 79)
-objects.glow.Size = UDim2.new(1, 0, 1, 0)
-objects.glow.Position = UDim2.new(0, 0, 0, 0)
-objects.glow.ZIndex = 2
-objects.glow.Visible = false
-objects.glow.Parent = objects.box  
+espLibrary.options.glowImage = false
 
+if espLibrary.options.glowImage then
+    objects.glow = Instance.new("ImageLabel")
+    objects.glow.Name = "GlowEffect"
+    objects.glow.BackgroundTransparency = 1
+    objects.glow.Image = "http://www.roblox.com/asset/?id=18245826428"
+    objects.glow.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    objects.glow.ImageTransparency = 0.8
+    objects.glow.ScaleType = Enum.ScaleType.Slice
+    objects.glow.SliceCenter = Rect.new(21, 21, 79, 79)
+    objects.glow.Size = UDim2.new(0, 50, 0, 50) -- temporary, updated each frame
+    objects.glow.Position = UDim2.new(0, 0, 0, 0)
+    objects.glow.ZIndex = 2
+    objects.glow.Visible = false
+    objects.glow.Parent = glowContainer
+end
 
     espLibrary.espCache[player] = objects;
 end
@@ -515,6 +529,10 @@ function espLibrary:Load(renderValue)
         self.addEsp(player);
         self.addChams(player);
     end
+
+local boxFill = espLibrary.espCache[player].boxFill
+local glow = espLibrary.espCache[player].glow
+
 
     runService:BindToRenderStep("esp_rendering", renderValue or (Enum.RenderPriority.Camera.Value + 1), function()
         for player, objects in next, self.espCache do
@@ -654,10 +672,14 @@ else
     end
 end
 
-                objects.glow.Visible = show and self.options.boxesGlow  -- toggle with a new boolean
-objects.glow.ImageColor3 = color or self.options.boxesColor
-objects.glow.Size = UDim2.new(1, 0, 1, 0)     -- same as box
-objects.glow.Position = UDim2.new(0, 0, 0, 0)
+                
+
+if glow then
+    glow.Visible = show and espLibrary.options.glowImage
+    glow.Position = UDim2.new(0, position.X, 0, position.Y)
+    glow.Size = UDim2.new(0, size.X, 0, size.Y)
+    glow.ImageColor3 = color or espLibrary.options.boxesColor
+end
 
                
                 objects.healthBar.Visible = show and self.options.healthBars;
