@@ -1,6 +1,4 @@
 
---FINALL
-
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -286,7 +284,7 @@ function espLibrary.addEsp(player)
         arrow = create("Triangle", {
             Thickness = 1,
         }),
-        glowImage = glowImage,
+
         
         arrowOutline = create("Triangle", {
             Thickness = 1,
@@ -665,6 +663,9 @@ else
     end
 end
 
+if objects.glow then
+    objects.glow.Visible = objects.boxFill.Visible
+end
 
 
                 objects.healthBar.Visible = show and self.options.healthBars;
