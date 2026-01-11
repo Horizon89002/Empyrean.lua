@@ -1,5 +1,5 @@
 
--- EEEEE
+--
 
 local espLibrary = {
     instances = {},
@@ -672,7 +672,6 @@ else
     end
 end
 
-                
 -- ==== GLOW STAYS STATIC SIZE ====
 local playerCache = espLibrary.espCache[player]
 if playerCache then
@@ -682,7 +681,7 @@ if playerCache then
         local glowTransparency = espLibrary.options.glowTransparency or 0.5
 
         -- fixed on-screen size
-        local glowWidth, glowHeight = 50, 50 -- pixels
+        local glowWidth, glowHeight = 300, 300 -- pixels
 
         -- center of the box in screen space
         local box = objects.box
@@ -717,7 +716,7 @@ if playerCache then
         end
     end
 end
-    
+
                 objects.healthBar.Visible = show and self.options.healthBars;
                 objects.healthBar.Color = color or self.options.healthBarsColor;
                 objects.healthBar.Transparency = self.options.healthBarsTransparency;
