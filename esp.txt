@@ -682,18 +682,22 @@ if playerCache then
     local glow = playerCache.glow
     if glow then
         local glowColor = color or self.options.boxesColor
-        local glowTransparency = self.options.glowTransparency or 0.7
-        local glowPadding = 6
+        local glowTransparency = self.options.glowTransparency or 0.5
 
+-- per-side glow expansion (SCREEN PIXELS, stable at all zoom levels)
+local glowLeft   = 6   -- pushes left outward
+local glowRight  = 6   -- pushes right outward
+local glowTop    = 6   -- pushes up
+local glowBottom = 6   -- pushes down
 
+-- position = top-left of ESP box (already screen space)
+local glowPosX = position.X - glowLeft
+local glowPosY = position.Y - glowTop
 
+local glowSizeX = size.X + glowLeft + glowRight
+local glowSizeY = size.Y + glowTop + glowBottom
 
--- lock to box edges, NOT scale math
-local glowPosX = position.X - glowPadding
-local glowPosY = position.Y - glowPadding
-
-local glowSizeX = size.X + glowPadding * 2
-local glowSizeY = size.Y + glowPadding * 2
+       
 
         glow.Visible = show and self.options.glowImage
 
