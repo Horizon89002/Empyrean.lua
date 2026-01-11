@@ -1,5 +1,5 @@
 
---
+--ee
 
 
 local espLibrary = {
@@ -686,8 +686,8 @@ if playerCache then
 
 
 
-local verticalScale = 0.8 -- <1 shrinks top & bottom, >1 expands
-local horizontalScale = 1 -- keep left & right the same
+local verticalScale = 1.1 -- <1 shrinks top & bottom, >1 expands
+local horizontalScale = 2 -- keep left & right the same
 
 local glowSizeX = (size.X + glowPadding * 2) * horizontalScale
 local glowSizeY = (size.Y + glowPadding * 2) * verticalScale
