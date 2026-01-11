@@ -1,6 +1,6 @@
 
 
--- ma
+-- m
 
 local espLibrary = {
     instances = {},
@@ -525,6 +525,9 @@ function espLibrary:Load(renderValue)
         self.removeChams(player);
     end));
 
+    espLibrary.options.glowImage = true
+
+
     for _, player in next, players:GetPlayers() do
         self.addEsp(player);
         self.addChams(player);
@@ -679,13 +682,15 @@ if playerCache then
     if glow then
         local glowColor = color or self.options.boxesColor
         local glowTransparency = self.options.glowTransparency or 0.3 
-        local glowPadding = 6 -- pixels outside the box
+        local glowPadding = 12 -- pixels outside the box
 
 
-        local glowSizeX = size.X + glowPadding
-        local glowSizeY = size.Y + glowPadding
-        local glowPosX = position.X - glowPadding / 2
-        local glowPosY = position.Y - glowPadding / 2
+     
+local glowSizeX = size.X + glowPadding
+local glowSizeY = size.Y + glowPadding
+local glowPosX = position.X - (glowPadding / 2)
+local glowPosY = position.Y - (glowPadding / 2)
+
 
         glow.Visible = show and self.options.glowImage
 
