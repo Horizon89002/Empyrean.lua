@@ -378,7 +378,7 @@ end)() or create("Square", {
     espLibrary.espCache[player] = objects;
 end
 
-objects.glow = Instance.new("ImageLabel", objects.box)
+objects.glow = Instance.new("ImageLabel")
 objects.glow.Name = "GlowEffect"
 objects.glow.BackgroundTransparency = 1
 objects.glow.Image = "http://www.roblox.com/asset/?id=18245826428"
@@ -386,11 +386,11 @@ objects.glow.ImageColor3 = Color3.fromRGB(255, 255, 255)
 objects.glow.ImageTransparency = 0.8
 objects.glow.ScaleType = Enum.ScaleType.Slice
 objects.glow.SliceCenter = Rect.new(21, 21, 79, 79)
-objects.glow.Size = UDim2.new(1, 0, 1, 0)     -- SAME SIZE AS BOX
+objects.glow.Size = UDim2.new(1, 0, 1, 0)
 objects.glow.Position = UDim2.new(0, 0, 0, 0)
 objects.glow.ZIndex = 2
 objects.glow.Visible = false
-
+objects.glow.Parent = objects.box  
 
 function espLibrary.removeEsp(player)
     local espCache = espLibrary.espCache[player];
