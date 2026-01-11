@@ -1,5 +1,5 @@
 
-
+--e
 
 local espLibrary = {
     instances = {},
@@ -673,8 +673,6 @@ else
 end
 
                 
-
-
 local playerCache = espLibrary.espCache[player]
 if playerCache then
     local glow = playerCache.glow
@@ -682,35 +680,26 @@ if playerCache then
         local glowColor = color or self.options.boxesColor
         local glowTransparency = self.options.glowTransparency or 0.5
 
-local scaleFactor = espLibrary.getScaleFactor(currentCamera.FieldOfView, depth)
+        -- STATIC glow size (screen-space)
+        local staticGlowSizeX = 50  -- you can tweak this
+        local staticGlowSizeY = 50
 
-local staticGlowPixels = 10
-
-local glowLeft   = staticGlowPixels / scaleFactor
-local glowRight  = staticGlowPixels / scaleFactor
-local glowTop    = staticGlowPixels / scaleFactor
-local glowBottom = staticGlowPixels / scaleFactor
-
-local glowPosX = objects.box.Position.X - glowLeft
-local glowPosY = objects.box.Position.Y - glowTop
-
-local glowSizeX = objects.box.Size.X + glowLeft + glowRight
-local glowSizeY = objects.box.Size.Y + glowTop + glowBottom
-
+        -- lock to box center
+        local glowPosX = objects.box.Position.X + (objects.box.Size.X / 2) - (staticGlowSizeX / 2)
+        local glowPosY = objects.box.Position.Y + (objects.box.Size.Y / 2) - (staticGlowSizeY / 2)
 
         glow.Visible = show and self.options.glowImage
 
-
         if typeof(glow) == "Instance" and glow:IsA("ImageLabel") then
-            glow.Size = UDim2.new(0, glowSizeX, 0, glowSizeY)
+            glow.Size = UDim2.new(0, staticGlowSizeX, 0, staticGlowSizeY)
             glow.Position = UDim2.new(0, glowPosX, 0, glowPosY)
             glow.ImageColor3 = glowColor
             glow.ImageTransparency = glowTransparency
         elseif typeof(glow) == "userdata" then -- Drawing.Image
-            glow.Size = vector2New(glowSizeX, glowSizeY)
+            glow.Size = vector2New(staticGlowSizeX, staticGlowSizeY)
             glow.Position = vector2New(glowPosX, glowPosY)
             glow.Color = glowColor
-            glow.Transparency = 1 - glowTransparency -- Drawing uses 0 = invisible, 1 = opaque
+            glow.Transparency = 1 - glowTransparency
         end
     end
 end
