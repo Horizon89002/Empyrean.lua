@@ -283,7 +283,7 @@ _G.ESP_Gradient1 = Color3.fromRGB(255,0,0)
 _G.ESP_Gradient2 = Color3.fromRGB(255,255,255)
 _G.ESP_Gradient3 = Color3.fromRGB(0,0,255)
 _G.ESP_GradientSpin = false
-_G.ESP_GradientSpeed = 180
+_G.ESP_GradientSpeed = 90
 
 
 function espLibrary.addEsp(player)
@@ -680,14 +680,13 @@ if objects.boxFrame then
         })
     end
 
-    if _G.GradientSpin then
+     if objects.boxGradient and _G.GradientSpin then
         local delta = runService.RenderStepped:Wait()
         objects.boxGradient.Rotation = (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 90) * delta) % 360
-    else
-        objects.boxGradient.Rotation = 180
+    elseif objects.boxGradient then
+        objects.boxGradient.Rotation = 90
     end
 end
-
 
 
 
