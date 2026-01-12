@@ -1,5 +1,5 @@
 
---  R
+--  Y
 
 local espLibrary = {
     instances = {},
@@ -659,30 +659,29 @@ if objects.boxFill then
 end
 
 if object.boxFill then
-     if not objects.boxGradient then
-            local grad = Instance.new("UIGradient")
-            grad.Name = "BoxGradient"
-            grad.Rotation = 90
-            grad.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, espLibrary.objects.gradientColor1),
-                ColorSequenceKeypoint.new(0.5, espLibrary.objects.gradientColor2),
-                ColorSequenceKeypoint.new(1, espLibrary.objects.gradientColor3),
-            })
-            grad.Parent = objects.boxFrame
-            objects.boxGradient = grad
-        else
-            objects.boxGradient.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, espLibrary.objects.gradientColor1),
-                ColorSequenceKeypoint.new(0.5, espLibrary.objects.gradientColor2),
-                ColorSequenceKeypoint.new(1, espLibrary.objects.gradientColor3),
-            })
-            objects.boxGradient.Rotation = 90
-        end
+    if not objects.boxGradient then
+        local grad = Instance.new("UIGradient")
+        grad.Name = "BoxGradient"
+        grad.Rotation = 90
+        grad.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, espLibrary.objects.gradientColor1),
+            ColorSequenceKeypoint.new(0.5, espLibrary.objects.gradientColor2),
+            ColorSequenceKeypoint.new(1, espLibrary.objects.gradientColor3),
+        })
+        grad.Parent = objects.boxFrame
+        objects.boxGradient = grad
     else
-        if objects.boxGradient then
-            objects.boxGradient:Destroy()
-            objects.boxGradient = nil
-        end
+        objects.boxGradient.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, espLibrary.objects.gradientColor1),
+            ColorSequenceKeypoint.new(0.5, espLibrary.objects.gradientColor2),
+            ColorSequenceKeypoint.new(1, espLibrary.objects.gradientColor3),
+        })
+        objects.boxGradient.Rotation = 90
+    end
+else
+    if objects.boxGradient then
+        objects.boxGradient:Destroy()
+        objects.boxGradient = nil
     end
 end
 
