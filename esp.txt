@@ -1,5 +1,5 @@
 
---  n
+--  E
 
 local espLibrary = {
     instances = {},
@@ -73,12 +73,6 @@ local espLibrary = {
         flippedBoxFillColor = Color3.new(1, 1, 1),
         glowImage = false,
         FILLbox = false,
-        GradientColor1 = Color3.fromRGB(255,0,0),
-        GradientColor2 = Color3.fromRGB(255,255,255),
-        GradientColor3 = Color3.fromRGB(0,0,255),
-        GradientSpin = false,
-        GradientSpinSpeed = 90,
-
     },
 };
 
@@ -285,6 +279,12 @@ boxFillGui.Parent = espGui
 
 
 
+_G.Gradient1 = Color3.fromRGB(255,0,0)
+_G.Gradient2 = Color3.fromRGB(255,255,255)
+_G.Gradient3 = Color3.fromRGB(0,0,255)
+_G.GradientSpin = false
+_G.GradientSpeed = 90
+
 
 function espLibrary.addEsp(player)
     if player == localPlayer then
@@ -363,6 +363,7 @@ function espLibrary.addEsp(player)
     end
 
 if objects.boxFill and (not objects.boxFrame or not objects.boxFrame.Parent) then
+    -- Create the frame
     local frame = Instance.new("Frame")
     frame.Name = "BoxFrame"
     frame.BackgroundTransparency = 0.6
@@ -375,18 +376,23 @@ if objects.boxFill and (not objects.boxFrame or not objects.boxFrame.Parent) the
     frame.Parent = objects.boxFill
     objects.boxFrame = frame
 
+    -- Ensure _G defaults exist
+    _G.GradientColor1 = _G.GradientColor1 or Color3.new(1,0,0)
+    _G.GradientColor2 = _G.GradientColor2 or Color3.new(1,1,1)
+    _G.GradientColor3 = _G.GradientColor3 or Color3.new(0,0,1)
+
+    -- Create the gradient
     local grad = Instance.new("UIGradient")
     grad.Name = "BoxGradient"
     grad.Rotation = 90
     grad.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, espLibrary.objects.GradientColor1 or Color3.new(1,0,0)),
-        ColorSequenceKeypoint.new(0.5, espLibrary.objects.GradientColor2 or Color3.new(1,1,1)),
-        ColorSequenceKeypoint.new(1, espLibrary.objects.GradientColor3 or Color3.new(0,0,1)),
+        ColorSequenceKeypoint.new(0, _G.GradientColor1),
+        ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
+        ColorSequenceKeypoint.new(1, _G.GradientColor3),
     })
     grad.Parent = frame
     objects.boxGradient = grad
 end
-
 
     espLibrary.espCache[player] = objects
 end
@@ -664,27 +670,32 @@ for player, objects in pairs(espLibrary.espCache) do
 end
 
 
+-- Inside RenderStepped
 for player, objects in pairs(espLibrary.espCache) do
     if objects.boxFrame and objects.boxFrame.Parent then
+        -- Update visibility
         objects.boxFrame.Visible = show and self.options.boxFill
 
+        -- Update gradient colors in case they changed
         if objects.boxGradient then
             objects.boxGradient.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, espLibrary.objects.GradientColor1 or Color3.new(1,0,0)),
-                ColorSequenceKeypoint.new(0.5, espLibrary.objects.GradientColor2 or Color3.new(1,1,1)),
-                ColorSequenceKeypoint.new(1, espLibrary.objects.GradientColor3 or Color3.new(0,0,1)),
+                ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
+                ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
+                ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
             })
 
-        
-            if espLibrary.objects.GradientSpin then
-                objects.boxGradient.Rotation = (objects.boxGradient.Rotation + (espLibrary.objects.GradientSpinSpeed or 90) * delta) % 360
+            -- Spin gradient safely
+            if _G.GradientSpin then
+                local delta = game:GetService("RunService").RenderStepped:Wait()
+                if objects.boxGradient then -- double-check exists
+                    objects.boxGradient.Rotation = (objects.boxGradient.Rotation + (_G.GradientSpeed or 90) * delta) % 360
+                end
             else
                 objects.boxGradient.Rotation = 90
             end
         end
     end
 end
-
 
 
                 objects.healthBar.Visible = show and self.options.healthBars;
