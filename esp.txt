@@ -1,4 +1,5 @@
 
+--  
 
 local espLibrary = {
     instances = {},
@@ -681,9 +682,9 @@ for player, objects in pairs(espLibrary.espCache) do
     end
 end
 
-game:GetService("RunService").RenderStepped:Connect(function()
+
     updateBoxGradient()
-end)
+
 
 
 
