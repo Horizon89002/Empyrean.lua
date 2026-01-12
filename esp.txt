@@ -1,5 +1,5 @@
 
-
+--  R
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -663,23 +663,28 @@ for player, objects in pairs(espLibrary.espCache) do
     end
 end
 
-if objects.boxFrame and objects.boxFrame.Parent then
-    objects.boxFrame.Visible = show and self.options.boxFill
-end
-
 if objects.boxFrame and objects.boxFrame.Visible then
-    -- update size + position
     objects.boxFrame.Size = UDim2.new(0, size.X, 0, size.Y)
     objects.boxFrame.Position = UDim2.new(0, position.X, 0, position.Y)
 
-    -- rotate gradient if spinning
-    if _G.GradientSpin then
-        local delta = runService.RenderStepped:Wait()
-        objects.boxGradient.Rotation = (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 90) * delta) % 360
-    else
-        objects.boxGradient.Rotation = 90
+    if objects.boxGradient then
+        objects.boxGradient.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, _G.Gradient1 or Color3.new(1,0,0)),
+            ColorSequenceKeypoint.new(0.5, _G.Gradient2 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(1, _G.Gradient3 or Color3.new(0,0,1)),
+        })
+
+
+        if _G.ESP_GradientSpin then
+            local delta = runService.RenderStepped:Wait()
+            objects.boxGradient.Rotation = (objects.boxGradient.Rotation + (_G.ESP_GradientSpeed or 90) * delta) % 360
+        else
+            objects.boxGradient.Rotation = 90
+        end
     end
 end
+
+
 
 
                 objects.healthBar.Visible = show and self.options.healthBars;
