@@ -1,4 +1,6 @@
 
+--  nee
+
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -667,12 +669,12 @@ if objects.boxFrame and objects.boxFrame.Parent then
         })
 
         if _G.GradientSpin then
-            objects.boxGradient.Rotation =
-               (objects.boxGradient.Rotation + 180 * (dt or 0.0166667)) % 360
+    objects.boxGradient.Rotation =
+        (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 1)) % 360
+else
+    objects.boxGradient.Rotation = 90
+end
 
-        else
-            objects.boxGradient.Rotation = 90
-        end
     end
 end
 
