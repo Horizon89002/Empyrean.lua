@@ -1,5 +1,5 @@
 
---  n
+-- ee
 
 local espLibrary = {
     instances = {},
@@ -73,10 +73,6 @@ local espLibrary = {
         flippedBoxFillColor = Color3.new(1, 1, 1),
         glowImage = false,
         FILLbox = false,
-        gradients = true,
-        gradientColor1 = Color3.new(1, 0, 0),
-        gradientColor2 = Color3.new(1, 1, 1),
-        gradientColor3 = Color3.new(0, 0, 1),
     },
 };
 
@@ -281,6 +277,10 @@ boxFillGui.Image = espLibrary.options.imageAssetPath or ""
 boxFillGui.Parent = espGui
 
 
+
+espLibrary.gradientColor1 = Color3.new(1, 0, 0)
+espLibrary.gradientColor2 = Color3.new(1, 1, 1)
+espLibrary.gradientColor3 = Color3.new(0, 0, 1)
 
 
 
@@ -658,23 +658,24 @@ if objects.boxFill then
     objects.boxFrame.Visible = show and self.options.boxFill
 end
 
+
 if objects.boxFrame then
     if not objects.boxGradient then
         local grad = Instance.new("UIGradient")
         grad.Name = "BoxGradient"
         grad.Rotation = 90
         grad.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, espLibrary.objects.gradientColor1 or Color3.new(1,1,1)),
-            ColorSequenceKeypoint.new(0.5, espLibrary.objects.gradientColor2 or Color3.new(1,1,1)),
-            ColorSequenceKeypoint.new(1, espLibrary.objects.gradientColor3 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(0, espLibrary.gradientColor1 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(0.5, espLibrary.gradientColor2 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(1, espLibrary.gradientColor3 or Color3.new(1,1,1)),
         })
         grad.Parent = objects.boxFrame
         objects.boxGradient = grad
     else
         objects.boxGradient.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, espLibrary.objects.gradientColor1 or Color3.new(1,1,1)),
-            ColorSequenceKeypoint.new(0.5, espLibrary.objects.gradientColor2 or Color3.new(1,1,1)),
-            ColorSequenceKeypoint.new(1, espLibrary.objects.gradientColor3 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(0, espLibrary.gradientColor1 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(0.5, espLibrary.gradientColor2 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(1, espLibrary.gradientColor3 or Color3.new(1,1,1)),
         })
         objects.boxGradient.Rotation = 90
     end
