@@ -1,6 +1,4 @@
 
---  ne
-
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -351,20 +349,7 @@ function espLibrary.addEsp(player)
         objects.glow = glow 
     end
 
-    if espLibrary.options.FILLbox and espLibrary.options.boxFill then
-    local frame = Instance.new("Frame")
-    frame.Name = "BoxFrame"
-    frame.BackgroundTransparency = 0
-    frame.BackgroundColor3 = Color3.new(1, 0, 0) 
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.Position = UDim2.new(0, 0, 0, 0)
-    frame.BorderSizePixel = 0
-    frame.ZIndex = 3
-    frame.Visible = false
-    frame.Parent = objects.boxFill
-
-    objects.boxFrame = frame
-end
+    
 
 
     espLibrary.espCache[player] = objects
@@ -642,10 +627,23 @@ for player, objects in pairs(espLibrary.espCache) do
     end
 end
 
-for player, objects in pairs(espLibrary.espCache) do
-    if objects.boxFrame then
-        objects.boxFrame.Visible = espLibrary.options.boxFill
+if objects.boxFill and espLibrary.objects.FILLbox then
+    if not objects.boxFrame then
+        local frame = Instance.new("Frame")
+        frame.Name = "BoxFrame"
+        frame.BackgroundTransparency = 0.5
+        frame.BackgroundColor3 = Color3.new(1, 0, 0)
+        frame.Size = UDim2.new(1, 0, 1, 0)
+        frame.Position = UDim2.new(0, 0, 0, 0)
+        frame.BorderSizePixel = 0
+        frame.ZIndex = 3
+        frame.Visible = false
+        frame.Parent = objects.boxFill
+
+        objects.boxFrame = frame
     end
+
+    objects.boxFrame.Visible = show and self.options.boxFill
 end
 
 
