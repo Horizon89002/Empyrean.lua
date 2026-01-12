@@ -1,4 +1,5 @@
 
+--  n
 
 local espLibrary = {
     instances = {},
@@ -640,6 +641,7 @@ for player, objects in pairs(espLibrary.espCache) do
 end
 
 if objects.boxFill then
+
     if not objects.boxFrame or not objects.boxFrame.Parent then
         local frame = Instance.new("Frame")
         frame.Name = "BoxFrame"
@@ -649,13 +651,17 @@ if objects.boxFill then
         frame.Position = UDim2.new(0, 0, 0, 0)
         frame.BorderSizePixel = 0
         frame.ZIndex = 3
+        frame.Parent = objects.boxFill  
+
         frame.Visible = false
-        frame.Parent = objects.boxFill
 
         objects.boxFrame = frame
     end
-end
 
+    if objects.boxFrame and objects.boxFrame.Parent then
+        objects.boxFrame.Visible = show and self.options.boxFill
+    end
+end
 
 if objects.boxFrame and objects.boxFrame.Parent and objects.boxFrame.Visible then
     if not objects.boxGradient then
