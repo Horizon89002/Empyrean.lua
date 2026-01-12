@@ -1,4 +1,6 @@
 
+--  neeRR
+
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -276,12 +278,12 @@ boxFillGui.Parent = espGui
 
 
 
+_G.GradientColor1 =  Color3.new(1,1,1)
+_G.GradientColor2 =  Color3.new(1,1,1)
+_G.GradientColor3 =  Color3.new(1,1,1)
 
-_G.ESP_Gradient1 = Color3.fromRGB(255,0,0)
-_G.ESP_Gradient2 = Color3.fromRGB(255,255,255)
-_G.ESP_Gradient3 = Color3.fromRGB(0,0,255)
-_G.ESP_GradientSpin = false
-_G.ESP_GradientSpeed = 90
+_G.GradientSpin = false
+_G.GradientSpinSpeed =  180
 
 
 function espLibrary.addEsp(player)
