@@ -1,5 +1,5 @@
 
---  e
+--  final
 
 local espLibrary = {
     instances = {},
@@ -74,8 +74,13 @@ local espLibrary = {
         glowImage = false,
         FILLbox = false,
         gradients = true,
+        gradientColor1 = Color3.new(1, 0, 0)
+        gradientColor2 = Color3.new(1, 1, 1)
+        gradientColor3 = Color3.new(0, 0, 1)
     },
 };
+
+
 
 espLibrary.__index = espLibrary;
 
@@ -277,9 +282,6 @@ boxFillGui.Parent = espGui
 
 
 
-espLibrary.objects.gradientColor1 = Color3.new(1, 0, 0)
-espLibrary.objects.gradientColor2 = Color3.new(1, 1, 1)
-espLibrary.objects.gradientColor3 = Color3.new(0, 0, 1)
 
 
 
