@@ -1,5 +1,5 @@
 
---  
+--  n
 
 local espLibrary = {
     instances = {},
@@ -661,6 +661,7 @@ end
 
 
 if objects.boxFrame then
+  
     if not objects.boxGradient then
         local grad = Instance.new("UIGradient")
         grad.Name = "BoxGradient"
@@ -673,6 +674,7 @@ if objects.boxFrame then
         grad.Parent = objects.boxFrame
         objects.boxGradient = grad
     else
+      
         objects.boxGradient.Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
             ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
@@ -680,13 +682,16 @@ if objects.boxFrame then
         })
     end
 
-     if objects.boxGradient and _G.GradientSpin then
-        local delta = runService.RenderStepped:Wait()
-        objects.boxGradient.Rotation = (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 90) * delta) % 360
-    elseif objects.boxGradient then
-        objects.boxGradient.Rotation = 90
+    if objects.boxGradient then
+        if _G.GradientSpin then
+            local delta = runService.RenderStepped:Wait()
+            objects.boxGradient.Rotation = (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 90) * delta) % 360
+        else
+            objects.boxGradient.Rotation = 90
+        end
     end
 end
+
 
 
 
