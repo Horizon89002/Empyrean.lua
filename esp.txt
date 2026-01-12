@@ -1,4 +1,5 @@
 
+--  n
 
 local espLibrary = {
     instances = {},
@@ -72,6 +73,12 @@ local espLibrary = {
         flippedBoxFillColor = Color3.new(1, 1, 1),
         glowImage = false,
         FILLbox = false,
+        GradientColor1 = Color3.fromRGB(255,0,0),
+        GradientColor2 = Color3.fromRGB(255,255,255),
+        GradientColor3 = Color3.fromRGB(0,0,255),
+        GradientSpin = false,
+        GradientSpinSpeed = 90,
+
     },
 };
 
@@ -278,12 +285,6 @@ boxFillGui.Parent = espGui
 
 
 
-_G.ESP_Gradient1 = Color3.fromRGB(255,0,0)
-_G.ESP_Gradient2 = Color3.fromRGB(255,255,255)
-_G.ESP_Gradient3 = Color3.fromRGB(0,0,255)
-_G.ESP_GradientSpin = false
-_G.ESP_GradientSpeed = 90
-
 
 function espLibrary.addEsp(player)
     if player == localPlayer then
@@ -378,9 +379,9 @@ if objects.boxFill and (not objects.boxFrame or not objects.boxFrame.Parent) the
     grad.Name = "BoxGradient"
     grad.Rotation = 90
     grad.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
-        ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
-        ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
+        ColorSequenceKeypoint.new(0, espLibrary.objects.GradientColor1 or Color3.new(1,0,0)),
+        ColorSequenceKeypoint.new(0.5, espLibrary.objects.GradientColor2 or Color3.new(1,1,1)),
+        ColorSequenceKeypoint.new(1, espLibrary.objects.GradientColor3 or Color3.new(0,0,1)),
     })
     grad.Parent = frame
     objects.boxGradient = grad
@@ -669,14 +670,14 @@ for player, objects in pairs(espLibrary.espCache) do
 
         if objects.boxGradient then
             objects.boxGradient.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
-                ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
-                ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
+                ColorSequenceKeypoint.new(0, espLibrary.objects.GradientColor1 or Color3.new(1,0,0)),
+                ColorSequenceKeypoint.new(0.5, espLibrary.objects.GradientColor2 or Color3.new(1,1,1)),
+                ColorSequenceKeypoint.new(1, espLibrary.objects.GradientColor3 or Color3.new(0,0,1)),
             })
 
         
-            if _G.GradientSpin then
-                objects.boxGradient.Rotation = (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 90) * delta) % 360
+            if espLibrary.objects.GradientSpin then
+                objects.boxGradient.Rotation = (objects.boxGradient.Rotation + (espLibrary.objects.GradientSpinSpeed or 90) * delta) % 360
             else
                 objects.boxGradient.Rotation = 90
             end
