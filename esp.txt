@@ -1,4 +1,6 @@
 
+--  n
+
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -332,7 +334,7 @@ function espLibrary.addEsp(player)
     }
 
   
-    if espLibrary.options.glowImage and espLibrary.options.boxFill then
+    if espLibrary.options.glowImage and espLibrary.options.boxes then
         local glow = Instance.new("ImageLabel")
         glow.Name = "Glow"
         glow.BackgroundTransparency = 1
@@ -627,11 +629,11 @@ for player, objects in pairs(espLibrary.espCache) do
     end
 end
 
-if objects.boxFill and espLibrary.objects.FILLbox then
+if objects.boxFill then
     if not objects.boxFrame then
         local frame = Instance.new("Frame")
         frame.Name = "BoxFrame"
-        frame.BackgroundTransparency = 0.5
+        frame.BackgroundTransparency = 0
         frame.BackgroundColor3 = Color3.new(1, 0, 0)
         frame.Size = UDim2.new(1, 0, 1, 0)
         frame.Position = UDim2.new(0, 0, 0, 0)
@@ -645,6 +647,7 @@ if objects.boxFill and espLibrary.objects.FILLbox then
 
     objects.boxFrame.Visible = show and self.options.boxFill
 end
+
 
 
                 objects.healthBar.Visible = show and self.options.healthBars;
