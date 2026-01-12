@@ -1,5 +1,5 @@
 
---  Y
+--  n
 
 local espLibrary = {
     instances = {},
@@ -658,33 +658,27 @@ if objects.boxFill then
     objects.boxFrame.Visible = show and self.options.boxFill
 end
 
-if object.boxFill then
+if objects.boxFrame then
     if not objects.boxGradient then
         local grad = Instance.new("UIGradient")
         grad.Name = "BoxGradient"
         grad.Rotation = 90
         grad.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, espLibrary.objects.gradientColor1),
-            ColorSequenceKeypoint.new(0.5, espLibrary.objects.gradientColor2),
-            ColorSequenceKeypoint.new(1, espLibrary.objects.gradientColor3),
+            ColorSequenceKeypoint.new(0, espLibrary.objects.gradientColor1 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(0.5, espLibrary.objects.gradientColor2 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(1, espLibrary.objects.gradientColor3 or Color3.new(1,1,1)),
         })
         grad.Parent = objects.boxFrame
         objects.boxGradient = grad
     else
         objects.boxGradient.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, espLibrary.objects.gradientColor1),
-            ColorSequenceKeypoint.new(0.5, espLibrary.objects.gradientColor2),
-            ColorSequenceKeypoint.new(1, espLibrary.objects.gradientColor3),
+            ColorSequenceKeypoint.new(0, espLibrary.objects.gradientColor1 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(0.5, espLibrary.objects.gradientColor2 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(1, espLibrary.objects.gradientColor3 or Color3.new(1,1,1)),
         })
         objects.boxGradient.Rotation = 90
     end
-else
-    if objects.boxGradient then
-        objects.boxGradient:Destroy()
-        objects.boxGradient = nil
-    end
 end
-
 
 
 
