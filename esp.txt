@@ -1,5 +1,4 @@
 
---  E
 
 local espLibrary = {
     instances = {},
@@ -279,11 +278,11 @@ boxFillGui.Parent = espGui
 
 
 
-_G.Gradient1 = Color3.fromRGB(255,0,0)
-_G.Gradient2 = Color3.fromRGB(255,255,255)
-_G.Gradient3 = Color3.fromRGB(0,0,255)
-_G.GradientSpin = false
-_G.GradientSpeed = 90
+_G.ESP_Gradient1 = Color3.fromRGB(255,0,0)
+_G.ESP_Gradient2 = Color3.fromRGB(255,255,255)
+_G.ESP_Gradient3 = Color3.fromRGB(0,0,255)
+_G.ESP_GradientSpin = false
+_G.ESP_GradientSpeed = 90
 
 
 function espLibrary.addEsp(player)
@@ -362,37 +361,32 @@ function espLibrary.addEsp(player)
         objects.glow = glow 
     end
 
-if objects.boxFill and (not objects.boxFrame or not objects.boxFrame.Parent) then
-    -- Create the frame
+    
+if espLibrary.options.boxFill and objects.boxFill then
     local frame = Instance.new("Frame")
     frame.Name = "BoxFrame"
     frame.BackgroundTransparency = 0.6
-    frame.BackgroundColor3 = Color3.new(1, 1, 1)
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.Position = UDim2.new(0, 0, 0, 0)
+    frame.BackgroundColor3 = Color3.new(1,1,1)
+    frame.Size = UDim2.new(1,0,1,0)
+    frame.Position = UDim2.new(0,0,0,0)
     frame.BorderSizePixel = 0
     frame.ZIndex = 3
-    frame.Visible = false
     frame.Parent = objects.boxFill
     objects.boxFrame = frame
 
-    -- Ensure _G defaults exist
-    _G.GradientColor1 = _G.GradientColor1 or Color3.new(1,0,0)
-    _G.GradientColor2 = _G.GradientColor2 or Color3.new(1,1,1)
-    _G.GradientColor3 = _G.GradientColor3 or Color3.new(0,0,1)
 
-    -- Create the gradient
     local grad = Instance.new("UIGradient")
     grad.Name = "BoxGradient"
     grad.Rotation = 90
     grad.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, _G.GradientColor1),
-        ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
-        ColorSequenceKeypoint.new(1, _G.GradientColor3),
+        ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
+        ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
+        ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
     })
     grad.Parent = frame
     objects.boxGradient = grad
 end
+
 
     espLibrary.espCache[player] = objects
 end
@@ -669,31 +663,21 @@ for player, objects in pairs(espLibrary.espCache) do
     end
 end
 
+if objects.boxFrame and objects.boxFrame.Parent then
+    objects.boxFrame.Visible = show and self.options.boxFill
+end
 
--- Inside RenderStepped
-for player, objects in pairs(espLibrary.espCache) do
-    if objects.boxFrame and objects.boxFrame.Parent then
-        -- Update visibility
-        objects.boxFrame.Visible = show and self.options.boxFill
+if objects.boxFrame and objects.boxFrame.Visible then
+    -- update size + position
+    objects.boxFrame.Size = UDim2.new(0, size.X, 0, size.Y)
+    objects.boxFrame.Position = UDim2.new(0, position.X, 0, position.Y)
 
-        -- Update gradient colors in case they changed
-        if objects.boxGradient then
-            objects.boxGradient.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
-                ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
-                ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
-            })
-
-            -- Spin gradient safely
-            if _G.GradientSpin then
-                local delta = game:GetService("RunService").RenderStepped:Wait()
-                if objects.boxGradient then -- double-check exists
-                    objects.boxGradient.Rotation = (objects.boxGradient.Rotation + (_G.GradientSpeed or 90) * delta) % 360
-                end
-            else
-                objects.boxGradient.Rotation = 90
-            end
-        end
+    -- rotate gradient if spinning
+    if _G.GradientSpin then
+        local delta = runService.RenderStepped:Wait()
+        objects.boxGradient.Rotation = (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 90) * delta) % 360
+    else
+        objects.boxGradient.Rotation = 90
     end
 end
 
