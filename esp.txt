@@ -1,5 +1,4 @@
 
---  nee
 
 local espLibrary = {
     instances = {},
@@ -661,7 +660,10 @@ end
 if objects.boxFrame and objects.boxFrame.Parent then
     objects.boxFrame.Visible = show and self.options.boxFill
 
-    if objects.boxFrame.Visible then
+    if objects.boxFrame.Visible
+        and objects.boxGradient
+        and objects.boxGradient.Parent == objects.boxFrame then
+
         objects.boxGradient.Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
             ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
@@ -669,14 +671,14 @@ if objects.boxFrame and objects.boxFrame.Parent then
         })
 
         if _G.GradientSpin then
-    objects.boxGradient.Rotation =
-        (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 1)) % 360
-else
-    objects.boxGradient.Rotation = 90
-end
-
+            objects.boxGradient.Rotation =
+                (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 1)) % 360
+        else
+            objects.boxGradient.Rotation = 90
+        end
     end
 end
+
 
 
                 objects.healthBar.Visible = show and self.options.healthBars;
