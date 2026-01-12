@@ -1,5 +1,4 @@
 
---  nee
 
 local espLibrary = {
     instances = {},
@@ -756,23 +755,20 @@ end
     end);
 end
 
-game:GetService("RunService").RenderStepped:Connect(function()
 
-    if objects.boxFrame
-        and objects.boxFrame.Parent
-        and objects.boxFrame.ClassName == "Frame" then
+
+game:GetService("RunService").RenderStepped:Connect(function()
+ 
+    if objects.boxFrame and objects.boxFrame.ClassName == "Frame" and objects.boxFrame.Parent then
+
 
         objects.boxFrame.Visible = show and self.options.boxFill
 
-      
-        if objects.boxGradient
-            and objects.boxGradient.ClassName == "UIGradient"
-            and objects.boxGradient.Parent ~= objects.boxFrame then
+        if objects.boxGradient and objects.boxGradient.ClassName == "UIGradient" and objects.boxGradient.Parent ~= objects.boxFrame then
             objects.boxGradient.Parent = objects.boxFrame
         end
 
-        if objects.boxGradient
-            and objects.boxGradient.ClassName == "UIGradient" then
+        if objects.boxGradient and objects.boxGradient.ClassName == "UIGradient" then
 
             objects.boxGradient.Color = ColorSequence.new({
                 ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
@@ -788,6 +784,5 @@ game:GetService("RunService").RenderStepped:Connect(function()
         end
     end
 end)
-
 
 return espLibrary;
