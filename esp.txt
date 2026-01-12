@@ -1,4 +1,5 @@
 
+--  n
 
 local espLibrary = {
     instances = {},
@@ -640,7 +641,7 @@ for player, objects in pairs(espLibrary.espCache) do
 end
 
 if objects.boxFill then
-    if not objects.boxFrame then
+    if not objects.boxFrame or not objects.boxFrame.Parent then
         local frame = Instance.new("Frame")
         frame.Name = "BoxFrame"
         frame.BackgroundTransparency = 0.6
@@ -654,9 +655,6 @@ if objects.boxFill then
 
         objects.boxFrame = frame
     end
-
-    objects.boxFrame.Visible = show and self.options.boxFill
-end
 
 
 if objects.boxFrame and objects.boxFrame.Parent and objects.boxFrame.Visible then
