@@ -1,6 +1,4 @@
 
---  nee
-
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -741,7 +739,10 @@ end
 
 
 game:GetService("RunService").RenderStepped:Connect(function()
+    
+    if not objects then return end
 
+ 
     if not objects.boxFrame or objects.boxFrame.ClassName ~= "Frame" then
         if objects.boxFill then
             local frame = Instance.new("Frame")
@@ -764,7 +765,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
         end
     end
 
-  
+ 
     if objects.boxFrame and objects.boxFrame.ClassName == "Frame" and objects.boxFrame.Parent then
         objects.boxFrame.Visible = show and self.options.boxFill
 
