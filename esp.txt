@@ -1,4 +1,5 @@
 
+--  ne
 
 local espLibrary = {
     instances = {},
@@ -71,6 +72,7 @@ local espLibrary = {
         image = true,
         flippedBoxFillColor = Color3.new(1, 1, 1),
         glowImage = false,
+        FILLbox = false,
     },
 };
 
@@ -292,6 +294,7 @@ function espLibrary.addEsp(player)
             img.Visible = false
             img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
             img.ImageColor3 = Color3.new(1, 1, 1)
+            img.ImageTransparency = 1
             img.ScaleType = Enum.ScaleType.Stretch
             img.Size = UDim2.new(1, 0, 1, 0)
             img.Position = UDim2.new(0, 0, 0, 0)
@@ -302,6 +305,7 @@ function espLibrary.addEsp(player)
             flipped.Visible = false
             flipped.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
             flipped.ImageColor3 = espLibrary.options.flippedBoxFillColor or Color3.new(1, 0, 0)
+            flipped.ImageTransparency = 1
             flipped.ScaleType = Enum.ScaleType.Stretch
             flipped.Size = UDim2.new(1, 0, 1, 0)
             flipped.Position = UDim2.new(0, 0, 0, 0)
@@ -330,7 +334,7 @@ function espLibrary.addEsp(player)
     }
 
   
-    if espLibrary.options.glowImage and espLibrary.options.boxes then
+    if espLibrary.options.glowImage and espLibrary.options.boxFill then
         local glow = Instance.new("ImageLabel")
         glow.Name = "Glow"
         glow.BackgroundTransparency = 1
@@ -346,6 +350,22 @@ function espLibrary.addEsp(player)
         glow.Parent = objects.boxFill 
         objects.glow = glow 
     end
+
+    if espLibrary.options.FILLbox and espLibrary.options.boxFill then
+    local frame = Instance.new("Frame")
+    frame.Name = "BoxFrame"
+    frame.BackgroundTransparency = 0
+    frame.BackgroundColor3 = Color3.new(1, 0, 0) 
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.Position = UDim2.new(0, 0, 0, 0)
+    frame.BorderSizePixel = 0
+    frame.ZIndex = 3
+    frame.Visible = false
+    frame.Parent = objects.boxFill
+
+    objects.boxFrame = frame
+end
+
 
     espLibrary.espCache[player] = objects
 end
@@ -592,7 +612,7 @@ if boxFill and show and self.options.boxFill then
         boxFill.Visible = true
         boxFill.Size = UDim2.new(0, size.X, 0, size.Y)
         boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
-        boxFill.ImageTransparency = self.options.boxFillTransparency
+        boxFill.ImageTransparency = 1
         boxFill.ImageColor3 = color or self.options.boxFillColor
 
         local flipped = boxFill:FindFirstChild("boxFillFlipped")
@@ -600,7 +620,7 @@ if boxFill and show and self.options.boxFill then
             flipped.Visible = true
             flipped.Size = UDim2.new(1, 0, 1, 0)
             flipped.Position = UDim2.new(0, 0, 0, 0)
-            flipped.ImageTransparency = self.options.boxFillTransparency
+            flipped.ImageTransparency = 1
             flipped.ImageColor3 = self.options.flippedBoxFillColor or Color3.new(1, 0, 0)
         end
     end
@@ -622,6 +642,11 @@ for player, objects in pairs(espLibrary.espCache) do
     end
 end
 
+for player, objects in pairs(espLibrary.espCache) do
+    if objects.boxFrame then
+        objects.boxFrame.Visible = espLibrary.options.boxFill
+    end
+end
 
 
                 objects.healthBar.Visible = show and self.options.healthBars;
