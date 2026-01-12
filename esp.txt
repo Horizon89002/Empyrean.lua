@@ -1,5 +1,5 @@
 
---  n
+--  e
 
 local espLibrary = {
     instances = {},
@@ -73,6 +73,7 @@ local espLibrary = {
         flippedBoxFillColor = Color3.new(1, 1, 1),
         glowImage = false,
         FILLbox = false,
+        gradients = true,
     },
 };
 
@@ -273,6 +274,13 @@ boxFillGui.BackgroundTransparency = 1
 boxFillGui.Visible = false
 boxFillGui.Image = espLibrary.options.imageAssetPath or "" 
 boxFillGui.Parent = espGui
+
+
+
+espLibrary.objects.gradientColor1 = Color3.new(1, 0, 0)
+espLibrary.objects.gradientColor2 = Color3.new(1, 1, 1)
+espLibrary.objects.gradientColor3 = Color3.new(0, 0, 1)
+
 
 
 function espLibrary.addEsp(player)
@@ -647,6 +655,38 @@ if objects.boxFill then
 
     objects.boxFrame.Visible = show and self.options.boxFill
 end
+
+if objects.boxFrame then
+    if espLibrary.objects.gradients then
+        if not objects.boxGradient then
+            local grad = Instance.new("UIGradient")
+            grad.Name = "BoxGradient"
+            grad.Rotation = 90
+            grad.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, espLibrary.objects.gradientColor1),
+                ColorSequenceKeypoint.new(0.5, espLibrary.objects.gradientColor2),
+                ColorSequenceKeypoint.new(1, espLibrary.objects.gradientColor3),
+            })
+            grad.Parent = objects.boxFrame
+
+            objects.boxGradient = grad
+        else
+      
+            objects.boxGradient.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, espLibrary.objects.gradientColor1),
+                ColorSequenceKeypoint.new(0.5, espLibrary.objects.gradientColor2),
+                ColorSequenceKeypoint.new(1, espLibrary.objects.gradientColor3),
+            })
+            objects.boxGradient.Rotation = 90
+        end
+    else
+        if objects.boxGradient then
+            objects.boxGradient:Destroy()
+            objects.boxGradient = nil
+        end
+    end
+end
+
 
 
 
