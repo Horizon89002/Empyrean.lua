@@ -1,4 +1,4 @@
-
+-- NIIIII
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -361,6 +361,25 @@ function espLibrary.addEsp(player)
     end
 
     
+if objects.boxFill and not objects.boxFrame then
+    local frame = Instance.new("Frame")
+    frame.Name = "BoxFrame"
+            frame.BackgroundTransparency = 0.6
+            frame.BackgroundColor3 = Color3.new(1, 1, 1)
+            frame.Size = UDim2.new(1, 0, 1, 0)
+            frame.Position = UDim2.new(0, 0, 0, 0)
+            frame.BorderSizePixel = 0
+            frame.ZIndex = 3
+            frame.Visible = false 
+    frame.Parent = objects.boxFill
+    objects.boxFrame = frame
+
+     local grad = Instance.new("UIGradient")
+            grad.Name = "BoxGradient"
+            grad.Rotation = 90
+            grad.Parent = frame
+            objects.boxGradient = grad
+end
 
 
     espLibrary.espCache[player] = objects
@@ -740,9 +759,10 @@ end
 
 game:GetService("RunService").RenderStepped:Connect(function()
     
+
     if not objects then return end
 
- 
+
     if not objects.boxFrame or objects.boxFrame.ClassName ~= "Frame" then
         if objects.boxFill then
             local frame = Instance.new("Frame")
@@ -753,7 +773,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
             frame.Position = UDim2.new(0, 0, 0, 0)
             frame.BorderSizePixel = 0
             frame.ZIndex = 3
-            frame.Visible = false
+            frame.Visible = false 
             frame.Parent = objects.boxFill
             objects.boxFrame = frame
 
@@ -765,21 +785,25 @@ game:GetService("RunService").RenderStepped:Connect(function()
         end
     end
 
- 
     if objects.boxFrame and objects.boxFrame.ClassName == "Frame" and objects.boxFrame.Parent then
-        objects.boxFrame.Visible = show and self.options.boxFill
+     
+        objects.boxFrame.Visible = self.options.boxFill and (show ~= false)
+
 
         if objects.boxGradient and objects.boxGradient.ClassName == "UIGradient" then
+    
             if objects.boxGradient.Parent ~= objects.boxFrame then
                 objects.boxGradient.Parent = objects.boxFrame
             end
 
+        
             objects.boxGradient.Color = ColorSequence.new({
                 ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
                 ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
                 ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
             })
 
+      
             if _G.GradientSpin then
                 objects.boxGradient.Rotation = (objects.boxGradient.Rotation + 0.2) % 360
             else
@@ -788,6 +812,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
         end
     end
 end)
+
 
 
 return espLibrary;
