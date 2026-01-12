@@ -1,5 +1,5 @@
 
---  n
+--  R
 
 local espLibrary = {
     instances = {},
@@ -643,7 +643,7 @@ if objects.boxFill then
     if not objects.boxFrame then
         local frame = Instance.new("Frame")
         frame.Name = "BoxFrame"
-        frame.BackgroundTransparency = 0
+        frame.BackgroundTransparency = 0.6
         frame.BackgroundColor3 = Color3.new(1, 1, 1)
         frame.Size = UDim2.new(1, 0, 1, 0)
         frame.Position = UDim2.new(0, 0, 0, 0)
@@ -658,9 +658,8 @@ if objects.boxFill then
     objects.boxFrame.Visible = show and self.options.boxFill
 end
 
-if objects.boxFrame then
-    if espLibrary.objects.gradients then
-        if not objects.boxGradient then
+if object.boxFill then
+     if not objects.boxGradient then
             local grad = Instance.new("UIGradient")
             grad.Name = "BoxGradient"
             grad.Rotation = 90
@@ -670,10 +669,8 @@ if objects.boxFrame then
                 ColorSequenceKeypoint.new(1, espLibrary.objects.gradientColor3),
             })
             grad.Parent = objects.boxFrame
-
             objects.boxGradient = grad
         else
-      
             objects.boxGradient.Color = ColorSequence.new({
                 ColorSequenceKeypoint.new(0, espLibrary.objects.gradientColor1),
                 ColorSequenceKeypoint.new(0.5, espLibrary.objects.gradientColor2),
