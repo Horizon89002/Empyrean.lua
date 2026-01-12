@@ -1,5 +1,5 @@
 
-
+--  n
 
 local espLibrary = {
     instances = {},
@@ -278,12 +278,13 @@ boxFillGui.Parent = espGui
 
 
 
-espLibrary.gradientColor1 = Color3.new(1, 0, 0)
-espLibrary.gradientColor2 = Color3.new(1, 1, 1)
-espLibrary.gradientColor3 = Color3.new(0, 0, 1)
 
-espLibrary.gradientSpin = true                 
-espLibrary.gradientSpinSpeed = 90 
+_G.ESP_Gradient1 = Color3.fromRGB(255,0,0)
+_G.ESP_Gradient2 = Color3.fromRGB(255,255,255)
+_G.ESP_Gradient3 = Color3.fromRGB(0,0,255)
+_G.ESP_GradientSpin = false
+_G.ESP_GradientSpeed = 180
+
 
 function espLibrary.addEsp(player)
     if player == localPlayer then
@@ -665,25 +666,25 @@ if objects.boxFrame then
         grad.Name = "BoxGradient"
         grad.Rotation = 90
         grad.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, espLibrary.gradientColor1),
-            ColorSequenceKeypoint.new(0.5, espLibrary.gradientColor2),
-            ColorSequenceKeypoint.new(1, espLibrary.gradientColor3),
+            ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
+            ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
         })
         grad.Parent = objects.boxFrame
         objects.boxGradient = grad
     else
         objects.boxGradient.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, espLibrary.gradientColor1),
-            ColorSequenceKeypoint.new(0.5, espLibrary.gradientColor2),
-            ColorSequenceKeypoint.new(1, espLibrary.gradientColor3),
+            ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
+            ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
         })
     end
 
-    if espLibrary.gradientSpin then
+    if _G.GradientSpin then
         local delta = runService.RenderStepped:Wait()
-        objects.boxGradient.Rotation = (objects.boxGradient.Rotation + espLibrary.gradientSpinSpeed * delta) % 360
+        objects.boxGradient.Rotation = (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 90) * delta) % 360
     else
-        objects.boxGradient.Rotation = 90
+        objects.boxGradient.Rotation = 180
     end
 end
 
