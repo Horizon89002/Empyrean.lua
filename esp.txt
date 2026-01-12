@@ -1,5 +1,4 @@
-
---  
+-----------------
 
 local espLibrary = {
     instances = {},
@@ -512,31 +511,7 @@ function espLibrary:Load(renderValue)
     end
 
 
-    local function updateBoxGradient()
-    if not objects or not objects.boxFrame or not objects.boxFrame.Parent then
-        return
-    end
-
-
-    objects.boxFrame.Visible = show and self.options.boxFill
-
-    
-    if objects.boxFrame.Visible and objects.boxGradient then
-        objects.boxGradient.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
-            ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
-            ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1))
-        })
-
-        if _G.GradientSpin then
-            objects.boxGradient.Rotation = (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 0.1)) % 360
-        else
-            objects.boxGradient.Rotation = 90
-        end
-    end
-end
-
-
+ 
 
     runService:BindToRenderStep("esp_rendering", renderValue or (Enum.RenderPriority.Camera.Value + 1), function()
         for player, objects in next, self.espCache do
@@ -683,8 +658,25 @@ for player, objects in pairs(espLibrary.espCache) do
 end
 
 
-    updateBoxGradient()
+if objects.boxFrame and objects.boxFrame.Parent then
+    objects.boxFrame.Visible = show and self.options.boxFill
 
+    if objects.boxFrame.Visible then
+        objects.boxGradient.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
+            ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
+        })
+
+        if _G.GradientSpin then
+    objects.boxGradient.Rotation =
+        (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 1)) % 360
+else
+    objects.boxGradient.Rotation = 90
+end
+
+    end
+end
 
 
 
