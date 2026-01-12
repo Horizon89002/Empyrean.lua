@@ -1,5 +1,4 @@
 
---  n
 
 local espLibrary = {
     instances = {},
@@ -655,6 +654,7 @@ if objects.boxFill then
 
         objects.boxFrame = frame
     end
+end
 
 
 if objects.boxFrame and objects.boxFrame.Parent and objects.boxFrame.Visible then
