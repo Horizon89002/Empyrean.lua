@@ -1,4 +1,4 @@
--- ITS DONE YESS
+----------------- eee
 
 local espLibrary = {
     instances = {},
@@ -254,13 +254,6 @@ boxFillGui.Parent = espGui
 
 
 
-_G.GradientColor1 =  Color3.new(1,1,1)
-_G.GradientColor2 =  Color3.new(1,1,1)
-_G.GradientColor3 =  Color3.new(1,1,1)
-
-_G.GradientSpin = false
-_G.GradientSpinSpeed =  180
-
 
 function espLibrary.addEsp(player)
     if player == localPlayer then
@@ -312,11 +305,6 @@ function espLibrary.addEsp(player)
     local gradient = Instance.new("UIGradient")
 gradient.Name = "BoxGradient"
 gradient.Rotation = 90
-gradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, _G.GradientColor1),
-    ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
-    ColorSequenceKeypoint.new(1, _G.GradientColor3),
-})
 gradient.Parent = objects.boxFill
   
 
@@ -473,6 +461,40 @@ function espLibrary:Load(renderValue)
 
  
 
+_G.GradientColor1 =  Color3.new(1,1,1)
+_G.GradientColor2 =  Color3.new(1,1,1)
+_G.GradientColor3 =  Color3.new(1,1,1)
+
+_G.GradientSpin = false
+_G.GradientSpinSpeed =  180
+
+
+function updcolor()
+    if objects.boxFill
+        and typeof(objects.boxFill) == "Instance"
+        and objects.boxFill:IsA("ImageLabel") then
+
+        objects.boxFill.Visible = show and self.options.boxFill
+
+        local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
+        if gradient then
+            gradient.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, _G.GradientColor1),
+                ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
+                ColorSequenceKeypoint.new(1, _G.GradientColor3),
+            })
+
+            if _G.GradientSpin then
+                gradient.Rotation =
+                    (gradient.Rotation + (_G.GradientSpinSpeed or 0.001)) % 360
+            else
+                gradient.Rotation = 90
+            end
+        end
+    end
+end
+
+
     runService:BindToRenderStep("esp_rendering", renderValue or (Enum.RenderPriority.Camera.Value + 1), function()
         for player, objects in next, self.espCache do
             local character, torso = self.getCharacter(player);
@@ -605,18 +627,6 @@ for player, objects in pairs(espLibrary.espCache) do
     end
 end
 
-if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
-    objects.boxFill.Visible = show and self.options.boxFill
-
-    local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
-    if gradient then
-        if _G.GradientSpin then
-            gradient.Rotation = (gradient.Rotation + (_G.GradientSpinSpeed or 0.1)) % 360
-        else
-            gradient.Rotation = 90
-        end
-    end
-end
 
 
 
