@@ -1,4 +1,4 @@
------------------ eee
+
 
 local espLibrary = {
     instances = {},
@@ -310,9 +310,16 @@ function espLibrary.addEsp(player)
     }
 
     local gradient = Instance.new("UIGradient")
-gradient.Name = "BoxFillGradient"
+gradient.Name = "BoxGradient"
 gradient.Rotation = 90
-gradient.Parent = objects.boxFill 
+gradient.Parent = objetcs.boxFill
+
+
+gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
+    ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
+    ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
+})
 
 
   
@@ -602,18 +609,12 @@ end
 if objects.boxFill and objects.boxFill.Parent then
     objects.boxFill.Visible = show and self.options.boxFill
 
-    if objects.boxFill.Visible then
-        objects.boxGradient.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
-            ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
-            ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
-        })
-
+    local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
+    if objects.boxFill.Visible and gradient then
         if _G.GradientSpin then
-            objects.boxGradient.Rotation =
-                (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 0.1)) % 360
+            gradient.Rotation = (gradient.Rotation + (_G.GradientSpinSpeed or 0.1)) % 360
         else
-            objects.boxGradient.Rotation = 90
+            gradient.Rotation = 90
         end
     end
 end
