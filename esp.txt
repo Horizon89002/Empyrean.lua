@@ -286,6 +286,8 @@ function espLibrary.addEsp(player)
             img.Size = UDim2.new(1, 0, 1, 0)
             img.Position = UDim2.new(0, 0, 0, 0)
 
+            
+
 
             local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
             if not container then
@@ -306,6 +308,12 @@ function espLibrary.addEsp(player)
         healthBar = create("Square", { Thickness = 1, Filled = true }),
         line = create("Line")
     }
+
+    local gradient = Instance.new("UIGradient")
+gradient.Name = "BoxFillGradient"
+gradient.Rotation = 90
+gradient.Parent = objects.boxFill 
+
 
   
     if espLibrary.options.glowImage and espLibrary.options.boxes then
@@ -581,10 +589,6 @@ else
     if boxFill then
         if typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
             boxFill.Visible = false
-            local flipped = boxFill:FindFirstChild("boxFillFlipped")
-            if flipped then
-                flipped.Visible = false
-            end
         end
     end
 end
@@ -595,6 +599,24 @@ for player, objects in pairs(espLibrary.espCache) do
     end
 end
 
+if objects.boxFill and objects.boxFill.Parent then
+    objects.boxFill.Visible = show and self.options.boxFill
+
+    if objects.boxFill.Visible then
+        objects.boxGradient.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
+            ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
+            ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
+        })
+
+        if _G.GradientSpin then
+            objects.boxGradient.Rotation =
+                (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 0.1)) % 360
+        else
+            objects.boxGradient.Rotation = 90
+        end
+    end
+end
 
 
 
