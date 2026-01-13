@@ -1,5 +1,4 @@
------------------
-
+--e
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -262,9 +261,7 @@ _G.GradientSpinSpeed =  180
 
 
 function espLibrary.addEsp(player)
-    if player == localPlayer then
-        return
-    end
+    if player == localPlayer then return end
 
     local objects = {
         arrow = create("Triangle", { Thickness = 1 }),
@@ -272,56 +269,52 @@ function espLibrary.addEsp(player)
         top = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         side = create("Text", { Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         bottom = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
-
         box = create("Square", { Thickness = 1 }),
         boxOutline = create("Square", { Thickness = 3, Color = color3New() }),
         healthBarOutline = create("Square", { Thickness = 1, Color = color3New(), Filled = true }),
         healthBar = create("Square", { Thickness = 1, Filled = true }),
         line = create("Line")
-
-
-        if espLibrary.options.boxes then
-        local image = Instance.new("ImageLabel")
-        image.Name = "boxFill"
-        image.BackgroundTransparency = 1
-        image.BorderSizePixel = 0
-        image.Visible = false
-        image.Size = UDim2.new(1, 0, 1, 0)
-        image.Position = UDim2.new(0, 0, 0, 0)
-        image.ZIndex = 2
-        image.Parent = objects.box  
-
-       
-        local grad = Instance.new("UIGradient")
-        grad.Name = "BoxGradient"
-        grad.Rotation = 90
-        grad.Parent = image
-        objects.boxFill = image
-        objects.boxGradient = grad
-    end
-
-
-
     }
 
- 
-    
+    -- boxFill using the inline function style
+    objects.boxFill = espLibrary.options.boxes and (function()
+        local img = Instance.new("ImageLabel")
+        img.Name = "boxFill"
+        img.BackgroundTransparency = 1
+        img.BorderSizePixel = 0
+        img.Visible = false
+        img.Size = UDim2.new(1, 0, 1, 0)
+        img.Position = UDim2.new(0, 0, 0, 0)
+        img.ZIndex = 2
+        img.Parent = objects.box
 
-    if espLibrary.options.glowImage and espLibrary.options.boxes then
-        local glow = Instance.new("ImageLabel")
-        glow.Name = "Glow"
-        glow.BackgroundTransparency = 1
-        glow.Image = "http://www.roblox.com/asset/?id=18245826428"
-        glow.ImageColor3 = Color3.new(1, 1, 1)
-        glow.ImageTransparency = 0.8
-        glow.ScaleType = Enum.ScaleType.Slice
-        glow.SliceCenter = Rect.new(21, 21, 79, 79)
-        glow.Size = UDim2.new(1, 40, 1, 40)
-        glow.Position = UDim2.new(0, -20, 0, -20)
-        glow.ZIndex = 2
-        glow.Visible = false
-        glow.Parent = objects.boxFill
-        objects.glow = glow
+        -- gradient inside boxFill
+        objects.boxGradient = Instance.new("UIGradient")
+        objects.boxGradient.Name = "BoxGradient"
+        objects.boxGradient.Rotation = 90
+        objects.boxGradient.Parent = img
+
+        return img
+    end)()
+
+
+    if espLibrary.options.glowImage and espLibrary.options.boxes and objects.boxFill then
+        objects.glow = (function()
+            local glow = Instance.new("ImageLabel")
+            glow.Name = "Glow"
+            glow.BackgroundTransparency = 1
+            glow.Image = "http://www.roblox.com/asset/?id=18245826428"
+            glow.ImageColor3 = Color3.new(1, 1, 1)
+            glow.ImageTransparency = 0.8
+            glow.ScaleType = Enum.ScaleType.Slice
+            glow.SliceCenter = Rect.new(21, 21, 79, 79)
+            glow.Size = UDim2.new(1, 40, 1, 40)
+            glow.Position = UDim2.new(0, -20, 0, -20)
+            glow.ZIndex = 2
+            glow.Visible = false
+            glow.Parent = objects.boxFill
+            return glow
+        end)()
     end
 
     espLibrary.espCache[player] = objects
