@@ -1,4 +1,4 @@
-
+-- ee
 
 local espLibrary = {
     instances = {},
@@ -253,6 +253,12 @@ boxFillGui.Image = espLibrary.options.imageAssetPath or ""
 boxFillGui.Parent = espGui
 
 
+local EspRootGui = Instance.new("ScreenGui")
+EspRootGui.Name = "EspRootGui"
+EspRootGui.ResetOnSpawn = false
+EspRootGui.IgnoreGuiInset = true
+EspRootGui.Parent = CoreGui
+
 
 
 function espLibrary.addEsp(player)
@@ -295,6 +301,28 @@ function espLibrary.addEsp(player)
             return img
         end)() or create("Square", { Thickness = 1, Filled = true, Visible = false, Color = Color3.new(1, 1, 1) }),
 
+        
+        vitalBarGui = (function()
+    local img = Instance.new("ImageLabel")
+    img.Name = "Esp_VitalBar"
+    img.BackgroundTransparency = 1
+    img.Visible = false
+    img.Image = "rbxassetid://0"
+    img.ImageColor3 = Color3.new(1,1,1)
+    img.ScaleType = Enum.ScaleType.Stretch
+    img.ZIndex = 4
+    img.Parent = EspRootGui
+
+    local grad = Instance.new("UIGradient")
+    grad.Name = "Esp_VitalGradient"
+    grad.Rotation = 90
+    grad.Parent = img
+
+    return img
+end)(),
+
+        
+
         boxOutline = create("Square", { Thickness = 3, Color = color3New() }),
         box = create("Square", { Thickness = 1 }),
         healthBarOutline = create("Square", { Thickness = 1, Color = color3New(), Filled = true }),
@@ -334,20 +362,19 @@ end
 
 
 function espLibrary.removeEsp(player)
-    local espCache = espLibrary.espCache[player];
+    local espCache = espLibrary.espCache[player]
+    if not espCache then return end
 
-    if (espCache) then
-        espLibrary.espCache[player] = nil;
+    espLibrary.espCache[player] = nil
 
-        for index, object in next, espCache do
-            espCache[index] = nil;
-            object:Remove();
-
-        
+    for _, object in pairs(espCache) do
+        if typeof(object) == "Instance" then
+            object:Destroy()
+        else
+            object:Remove()
         end
     end
 end
-
 
 
 function espLibrary.addChams(player)
@@ -518,8 +545,32 @@ _G.GradientSpinSpeed =  180
                 local pointA, pointB, pointC = arrowPosition, screenCenter + arrowDirection * (arrowRadius - arrowSize) + rightVector * arrowSize, screenCenter + arrowDirection * (arrowRadius - arrowSize) + -rightVector * arrowSize;
 
                 local health, maxHealth = self.getHealth(player, character);
-                local healthBarSize = round(vector2New(self.options.healthBarsSize, -(size.Y * (health / maxHealth))));
-                local healthBarPosition = round(vector2New(position.X - (3 + healthBarSize.X), position.Y + size.Y));
+                local vitalGui = objects.vitalBarGui
+if vitalGui then
+    if show and self.options.healthBars then
+        local frac = math.clamp(health / maxHealth, 0, 1)
+        local barH = size.Y * frac
+
+        vitalGui.Visible = true
+        vitalGui.Size = UDim2.new(0, 4, 0, barH)
+        vitalGui.Position = UDim2.new(
+            0, position.X - 6,
+            0, position.Y + (size.Y - barH)
+        )
+
+        local grad = vitalGui:FindFirstChild("Esp_VitalGradient")
+        if grad then
+            grad.Rotation = 90
+            grad.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0,   _G.VitalColorA),
+                ColorSequenceKeypoint.new(0.5, _G.VitalColorB),
+                ColorSequenceKeypoint.new(1,   _G.VitalColorC),
+            })
+        end
+    else
+        vitalGui.Visible = false
+    end
+end
 
                 local origin = self.options.tracerOrigin;
                 local show = canShow and enabled;
@@ -621,21 +672,11 @@ if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill
     end
 end
 
+if objects.vitalBarGui then
+    objects.vitalBarGui.Visible = false
+end
 
 
-
-
-
-                objects.healthBar.Visible = show and self.options.healthBars;
-                objects.healthBar.Color = color or self.options.healthBarsColor;
-                objects.healthBar.Transparency = self.options.healthBarsTransparency;
-                objects.healthBar.Size = healthBarSize;
-                objects.healthBar.Position = healthBarPosition;
-
-                objects.healthBarOutline.Visible = show and self.options.healthBars;
-                objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
-                objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
-                objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1);
 
                 objects.line.Visible = show and self.options.tracers;
                 objects.line.Color = color or self.options.tracerColor;
