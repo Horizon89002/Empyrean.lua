@@ -1,4 +1,4 @@
------------------ eee
+
 
 local espLibrary = {
     instances = {},
@@ -460,30 +460,25 @@ function espLibrary:Load(renderValue)
 
 
  
-getgenv().GradientColor1 = Color3.new(1,1,1)
-getgenv().GradientColor2 = Color3.new(1,1,1)
-getgenv().GradientColor3 = Color3.new(1,1,1)
-getgenv().GradientSpin = false
-getgenv().GradientSpinSpeed = 180
+
+_G.GradientColor1 =  Color3.new(1,1,1)
+_G.GradientColor2 =  Color3.new(1,1,1)
+_G.GradientColor3 =  Color3.new(1,1,1)
+
+_G.GradientSpin = false
+_G.GradientSpinSpeed =  180
 
 
-function UpdateGradientColor(objects)
+function UpdateGradientColors(objects)
     if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
-     objects.boxFill.Visible = show and espLibrary.options.boxFill
-
+        objects.boxFill.Visible = show and self.options.boxFill
         local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
         if gradient then
             gradient.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, getgenv().GradientColor1),
-                ColorSequenceKeypoint.new(0.5, getgenv().GradientColor2),
-                ColorSequenceKeypoint.new(1, getgenv().GradientColor3),
+                ColorSequenceKeypoint.new(0, _G.GradientColor1),
+                ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
+                ColorSequenceKeypoint.new(1, _G.GradientColor3),
             })
-
-            if getgenv().GradientSpin then
-                gradient.Rotation = (gradient.Rotation + (getgenv().GradientSpinSpeed or 0.1)) % 360
-            else
-                gradient.Rotation = 90
-            end
         end
     end
 end
@@ -621,9 +616,50 @@ for player, objects in pairs(espLibrary.espCache) do
     end
 end
 
+if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
+    objects.boxFill.Visible = show and self.options.boxFill
+
+    local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
+    if gradient then
+        
+    gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, _G.GradientColor1),
+    ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
+    ColorSequenceKeypoint.new(1, _G.GradientColor3),
+})
+        if _G.GradientSpin then
+            gradient.Rotation = (gradient.Rotation + (_G.GradientSpinSpeed or 0.1)) % 360
+        else
+            gradient.Rotation = 90
+        end
+    end
+end
 
 
-UpdateGradientColor(objects)
+
+
+
+
+for player, objects in pairs(espLibrary.espCache) do
+
+    UpdateGradientColors(objects)
+    
+
+     if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
+        objects.boxFill.Visible = show and self.options.boxFill
+        local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
+        if gradient then
+            if _G.GradientSpin then
+                gradient.Rotation = (gradient.Rotation + (_G.GradientSpinSpeed or 0.1)) % 360
+            else
+                gradient.Rotation = 90
+            end
+        end
+    end
+end
+
+
+
 
 
 
