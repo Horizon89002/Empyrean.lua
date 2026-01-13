@@ -1,4 +1,4 @@
-
+-----------------
 
 local espLibrary = {
     instances = {},
@@ -294,6 +294,7 @@ end)()
 
   
     if espLibrary.options.glowImage and espLibrary.options.boxes then
+    if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
         local glow = Instance.new("ImageLabel")
         glow.Name = "Glow"
         glow.BackgroundTransparency = 1
@@ -307,8 +308,9 @@ end)()
         glow.ZIndex = 2
         glow.Visible = false
         glow.Parent = objects.boxFill 
-        objects.glow = glow 
+        objects.glow = glow
     end
+end
 
 
 
