@@ -1,4 +1,5 @@
---e
+-----------------
+
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -276,26 +277,25 @@ function espLibrary.addEsp(player)
         line = create("Line")
     }
 
-    -- boxFill using the inline function style
-    objects.boxFill = espLibrary.options.boxes and (function()
-        local img = Instance.new("ImageLabel")
-        img.Name = "boxFill"
-        img.BackgroundTransparency = 1
-        img.BorderSizePixel = 0
-        img.Visible = false
-        img.Size = UDim2.new(1, 0, 1, 0)
-        img.Position = UDim2.new(0, 0, 0, 0)
-        img.ZIndex = 2
-        img.Parent = objects.box
+    
+   objects.boxFill = espLibrary.options.boxes and (function()
+    local img = Instance.new("ImageLabel")
+    img.Name = "boxFill"
+    img.BackgroundTransparency = 1
+    img.BorderSizePixel = 0
+    img.Visible = false
+    img.Size = UDim2.new(1, 0, 1, 0)
+    img.Position = UDim2.new(0, 0, 0, 0)
+    img.ZIndex = 2
+    img.Parent = espContainerGui  
 
-        -- gradient inside boxFill
-        objects.boxGradient = Instance.new("UIGradient")
-        objects.boxGradient.Name = "BoxGradient"
-        objects.boxGradient.Rotation = 90
-        objects.boxGradient.Parent = img
+    objects.boxGradient = Instance.new("UIGradient")
+    objects.boxGradient.Name = "BoxGradient"
+    objects.boxGradient.Rotation = 90
+    objects.boxGradient.Parent = img
 
-        return img
-    end)()
+    return img
+end)()
 
 
     if espLibrary.options.glowImage and espLibrary.options.boxes and objects.boxFill then
@@ -565,6 +565,12 @@ for _, objs in next, espLibrary.espCache do
         glow.Visible = espLibrary.options.glowImage
     end
 end
+
+if objects.boxFill then
+    objects.boxFill.Position = UDim2.new(0, objects.box.Position.X, 0, objects.box.Position.Y)
+    objects.boxFill.Size = UDim2.new(0, objects.box.Size.X, 0, objects.box.Size.Y)
+end
+
 
 
 if objects.boxFill and objects.boxGradient then
