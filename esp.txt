@@ -1,4 +1,4 @@
------------------ eee
+
 
 local espLibrary = {
     instances = {},
@@ -312,11 +312,12 @@ function espLibrary.addEsp(player)
     local gradient = Instance.new("UIGradient")
 gradient.Name = "BoxGradient"
 gradient.Rotation = 90
+gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, _G.GradientColor1),
+    ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
+    ColorSequenceKeypoint.new(1, _G.GradientColor3),
+})
 gradient.Parent = img
-
-
-
-
   
 
 
@@ -609,14 +610,6 @@ if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill
 
     local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
     if gradient then
-
-        gradient.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
-            ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
-            ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
-        })
-
-   
         if _G.GradientSpin then
             gradient.Rotation = (gradient.Rotation + (_G.GradientSpinSpeed or 0.1)) % 360
         else
