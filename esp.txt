@@ -1,5 +1,4 @@
-
-
+-- E
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -313,7 +312,7 @@ function espLibrary.addEsp(player)
 gradient.Name = "BoxGradient"
 gradient.Rotation = 90
 gradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, _G.GradientColor1),
+    ColorSequenceKeypoint.new(0, Color3.new(1,0,0)),
     ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
     ColorSequenceKeypoint.new(1, _G.GradientColor3),
 })
@@ -612,7 +611,7 @@ if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill
     if gradient then
 
         gradient.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, _G.GradientColor1),
+            ColorSequenceKeypoint.new(0, Color3.new(1,0,0)),
             ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
             ColorSequenceKeypoint.new(1, _G.GradientColor3),
         })
