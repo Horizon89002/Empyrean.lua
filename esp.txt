@@ -1,4 +1,4 @@
------------------ eee
+
 
 local espLibrary = {
     instances = {},
@@ -613,7 +613,8 @@ if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill
     ColorSequenceKeypoint.new(1, _G.GradientColor3),
 })
         if _G.GradientSpin then
-            gradient.Rotation = (gradient.Rotation + (_G.GradientSpinSpeed or 0.1)) % 360
+            gradient.Rotation = (gradient.Rotation + ((_G.GradientSpinSpeed or 0.1) * 0.2)) % 360
+
         else
             gradient.Rotation = 90
         end
