@@ -1,4 +1,4 @@
-
+-----------------
 
 local espLibrary = {
     instances = {},
@@ -273,43 +273,40 @@ function espLibrary.addEsp(player)
         side = create("Text", { Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         bottom = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
 
-        
-
-        boxFill = espLibrary.options.boxes and (function()
-    local frame = Instance.new("Frame")
-    frame.Name = "boxFill"
-    frame.BackgroundColor3 = Color3.new(1, 1, 1)
-    frame.BackgroundTransparency = 0.6
-    frame.BorderSizePixel = 0
-    frame.Visible = false
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.Position = UDim2.new(0, 0, 0, 0)
-    frame.ZIndex = 2
-    frame.Parent = espContainerGui
-    return frame
-end)(),
-
-
-
-
-
-        boxOutline = create("Square", { Thickness = 3, Color = color3New() }),
         box = create("Square", { Thickness = 1 }),
+        boxOutline = create("Square", { Thickness = 3, Color = color3New() }),
         healthBarOutline = create("Square", { Thickness = 1, Color = color3New(), Filled = true }),
         healthBar = create("Square", { Thickness = 1, Filled = true }),
         line = create("Line")
+
+
+        if espLibrary.options.boxes then
+        local image = Instance.new("ImageLabel")
+        image.Name = "boxFill"
+        image.BackgroundTransparency = 1
+        image.BorderSizePixel = 0
+        image.Visible = false
+        image.Size = UDim2.new(1, 0, 1, 0)
+        image.Position = UDim2.new(0, 0, 0, 0)
+        image.ZIndex = 2
+        image.Parent = objects.box  
+
+       
+        local grad = Instance.new("UIGradient")
+        grad.Name = "BoxGradient"
+        grad.Rotation = 90
+        grad.Parent = image
+        objects.boxFill = image
+        objects.boxGradient = grad
+    end
+
+
+
     }
 
-    if objects.boxFill then
-    local grad = Instance.new("UIGradient")
-    grad.Name = "BoxGradient"
-    grad.Rotation = 90
-    grad.Parent = objects.boxFill
-    objects.boxGradient = grad
-end
+ 
+    
 
-
-  
     if espLibrary.options.glowImage and espLibrary.options.boxes then
         local glow = Instance.new("ImageLabel")
         glow.Name = "Glow"
@@ -323,35 +320,33 @@ end
         glow.Position = UDim2.new(0, -20, 0, -20)
         glow.ZIndex = 2
         glow.Visible = false
-        glow.Parent = objects.boxFill 
-        objects.glow = glow 
+        glow.Parent = objects.boxFill
+        objects.glow = glow
     end
-
-    
 
     espLibrary.espCache[player] = objects
 end
 
 
 function espLibrary.removeEsp(player)
-    local espCache = espLibrary.espCache[player]
+    local objects = espLibrary.espCache[player]
 
-    if espCache then
+    if objects then
         espLibrary.espCache[player] = nil
 
-        for index, object in next, espCache do
-            espCache[index] = nil
-
+        for _, object in next, objects do
             if typeof(object) == "Instance" then
-                object:Destroy()
-            else
-                object:Remove()
+                if object:IsA("GuiObject") then
+                    object.Visible = false
+                end
+            elseif typeof(object) == "table" or typeof(object) == "userdata" then
+                pcall(function()
+                    object.Visible = false
+                end)
             end
         end
     end
 end
-
-
 
 function espLibrary.addChams(player)
     if (player == localPlayer) then
@@ -571,15 +566,15 @@ function espLibrary:Load(renderValue)
                 objects.boxOutline.Position = position;
 
               
-
-for player, objects in pairs(espLibrary.espCache) do
-    if objects.glow then
-        objects.glow.Visible = espLibrary.options.glowImage
+for _, objs in next, espLibrary.espCache do
+    local glow = objs.glow
+    if glow and glow.Parent then
+        glow.Visible = espLibrary.options.glowImage
     end
 end
 
 
-if objects.boxFill and objects.boxFill.Visible and objects.boxGradient then
+if objects.boxFill and objects.boxGradient then
     objects.boxGradient.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, _G.GradientColor1),
         ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
