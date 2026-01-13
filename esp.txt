@@ -1,4 +1,4 @@
------------------ eee
+
 
 local espLibrary = {
     instances = {},
@@ -316,7 +316,7 @@ gradient.Parent = objects.boxFill
 
 
 gradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
+    ColorSequenceKeypoint.new(0,  Color3.new(1,0,0)),
     ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
     ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
 })
