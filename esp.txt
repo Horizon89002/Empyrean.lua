@@ -567,10 +567,10 @@ for _, objs in next, espLibrary.espCache do
 end
 
 if objects.boxFill then
+    objects.boxFill.Visible = show and espLibrary.options.boxFill  
     objects.boxFill.Position = UDim2.new(0, objects.box.Position.X, 0, objects.box.Position.Y)
     objects.boxFill.Size = UDim2.new(0, objects.box.Size.X, 0, objects.box.Size.Y)
 end
-
 
 
 if objects.boxFill and objects.boxGradient then
