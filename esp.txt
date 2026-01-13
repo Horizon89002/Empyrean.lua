@@ -1,4 +1,5 @@
--- E
+----------------- eee
+
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -311,11 +312,6 @@ function espLibrary.addEsp(player)
     local gradient = Instance.new("UIGradient")
 gradient.Name = "BoxGradient"
 gradient.Rotation = 90
-gradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.new(1,0,0)),
-    ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
-    ColorSequenceKeypoint.new(1, _G.GradientColor3),
-})
 gradient.Parent = img
   
 
