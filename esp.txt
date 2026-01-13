@@ -1,4 +1,4 @@
------------------ eee
+-- ITS DONE YESS
 
 local espLibrary = {
     instances = {},
@@ -254,8 +254,8 @@ boxFillGui.Parent = espGui
 
 
 
-_G.GradientColor1 =  Color3.new(1,0,0)
-_G.GradientColor2 =  Color3.new(1,0,1)
+_G.GradientColor1 =  Color3.new(1,1,1)
+_G.GradientColor2 =  Color3.new(1,1,1)
 _G.GradientColor3 =  Color3.new(1,1,1)
 
 _G.GradientSpin = false
