@@ -1,4 +1,4 @@
------------------
+----------------- eee
 
 local espLibrary = {
     instances = {},
@@ -69,7 +69,6 @@ local espLibrary = {
         chamsOutlineColor = Color3.new(),
         chamsOutlineTransparency = 0,
         image = true,
-        flippedBoxFillColor = Color3.new(1, 1, 1),
         glowImage = false,
         FILLbox = false,
     },
@@ -239,29 +238,7 @@ function espLibrary.visibleCheck(character, position)
 end
 
 
-espLibrary.options = espLibrary.options or {}
-espLibrary.options.imageURL = "https://github.com/Horizon89002/Empyrean.lua/blob/main/saturation.png?raw=true"
-espLibrary.options.imageLocalPath = "R_assets/esp_fill.png"
 
-if not isfolder("R_assets") then
-    makefolder("R_assets")
-end
-
-if not isfile(espLibrary.options.imageLocalPath) then
-    local success, imageData = pcall(function()
-        return game:HttpGet(espLibrary.options.imageURL)
-    end)
-    if success and imageData then
-        writefile(espLibrary.options.imageLocalPath, imageData)
-    end
-end
-
-local success, result = pcall(function()
-    return getcustomasset(espLibrary.options.imageLocalPath)
-end)
-if success then
-    espLibrary.options.imageAssetPath = result
-end
 
 local CoreGui = game:GetService("CoreGui")
 local espGui = Instance.new("ScreenGui")
@@ -277,8 +254,8 @@ boxFillGui.Parent = espGui
 
 
 
-_G.GradientColor1 =  Color3.new(1,1,1)
-_G.GradientColor2 =  Color3.new(1,1,1)
+_G.GradientColor1 =  Color3.new(1,0,0)
+_G.GradientColor2 =  Color3.new(1,0,1)
 _G.GradientColor3 =  Color3.new(1,1,1)
 
 _G.GradientSpin = false
@@ -300,28 +277,17 @@ function espLibrary.addEsp(player)
         boxFill = espLibrary.options.image and espLibrary.options.boxes and (function()
             local img = Instance.new("ImageLabel")
             img.Name = "boxFill"
-            img.BackgroundTransparency = 1
+            img.BackgroundTransparency = 0.6
             img.Visible = false
-            img.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
+            img.Image = "rbxassetid://0"
             img.ImageColor3 = Color3.new(1, 1, 1)
             img.ImageTransparency = 1
             img.ScaleType = Enum.ScaleType.Stretch
             img.Size = UDim2.new(1, 0, 1, 0)
             img.Position = UDim2.new(0, 0, 0, 0)
 
-            local flipped = Instance.new("ImageLabel")
-            flipped.Name = "boxFillFlipped"
-            flipped.BackgroundTransparency = 1
-            flipped.Visible = false
-            flipped.Image = espLibrary.options.imageAssetPath or "rbxassetid://0"
-            flipped.ImageColor3 = espLibrary.options.flippedBoxFillColor or Color3.new(1, 0, 0)
-            flipped.ImageTransparency = 1
-            flipped.ScaleType = Enum.ScaleType.Stretch
-            flipped.Size = UDim2.new(1, 0, 1, 0)
-            flipped.Position = UDim2.new(0, 0, 0, 0)
-            flipped.Rotation = 180
-            flipped.ZIndex = img.ZIndex + 1
-            flipped.Parent = img
+            
+
 
             local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
             if not container then
@@ -343,7 +309,19 @@ function espLibrary.addEsp(player)
         line = create("Line")
     }
 
+    local gradient = Instance.new("UIGradient")
+gradient.Name = "BoxGradient"
+gradient.Rotation = 90
+gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, _G.GradientColor1),
+    ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
+    ColorSequenceKeypoint.new(1, _G.GradientColor3),
+})
+gradient.Parent = img
   
+
+
+
     if espLibrary.options.glowImage and espLibrary.options.boxes then
         local glow = Instance.new("ImageLabel")
         glow.Name = "Glow"
@@ -361,24 +339,6 @@ function espLibrary.addEsp(player)
         objects.glow = glow 
     end
 
-    
-if objects.boxFill and not objects.boxFrame then
-    objects.boxFrame = Instance.new("Frame")
-    objects.boxFrame.Name = "BoxFrame"
-    objects.boxFrame.BackgroundTransparency = 0.6
-    objects.boxFrame.BackgroundColor3 = Color3.new(1, 1, 1)
-    objects.boxFrame.Size = UDim2.new(1, 0, 1, 0)
-    objects.boxFrame.Position = UDim2.new(0, 0, 0, 0)
-    objects.boxFrame.BorderSizePixel = 0
-    objects.boxFrame.ZIndex = 3
-    objects.boxFrame.Visible = false
-    objects.boxFrame.Parent = objects.boxFill
-
-    objects.boxGradient = Instance.new("UIGradient")
-    objects.boxGradient.Name = "BoxGradient"
-    objects.boxGradient.Rotation = 90
-    objects.boxGradient.Parent = objects.boxFrame
-end
 
 
     espLibrary.espCache[player] = objects
@@ -630,23 +590,11 @@ if boxFill and show and self.options.boxFill then
         boxFill.ImageTransparency = 1
         boxFill.ImageColor3 = color or self.options.boxFillColor
 
-        local flipped = boxFill:FindFirstChild("boxFillFlipped")
-        if flipped then
-            flipped.Visible = true
-            flipped.Size = UDim2.new(1, 0, 1, 0)
-            flipped.Position = UDim2.new(0, 0, 0, 0)
-            flipped.ImageTransparency = 1
-            flipped.ImageColor3 = self.options.flippedBoxFillColor or Color3.new(1, 0, 0)
-        end
     end
 else
     if boxFill then
         if typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
             boxFill.Visible = false
-            local flipped = boxFill:FindFirstChild("boxFillFlipped")
-            if flipped then
-                flipped.Visible = false
-            end
         end
     end
 end
@@ -657,26 +605,27 @@ for player, objects in pairs(espLibrary.espCache) do
     end
 end
 
+if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
+    objects.boxFill.Visible = show and self.options.boxFill
 
-if objects.boxFrame and objects.boxFrame.Parent then
-    objects.boxFrame.Visible = show and self.options.boxFill
+    local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
+    if gradient then
 
-    if objects.boxFrame.Visible then
-        objects.boxGradient.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, _G.GradientColor1 or Color3.new(1,0,0)),
-            ColorSequenceKeypoint.new(0.5, _G.GradientColor2 or Color3.new(1,1,1)),
-            ColorSequenceKeypoint.new(1, _G.GradientColor3 or Color3.new(0,0,1)),
+        gradient.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, _G.GradientColor1),
+            ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
+            ColorSequenceKeypoint.new(1, _G.GradientColor3),
         })
-
         if _G.GradientSpin then
-    objects.boxGradient.Rotation =
-        (objects.boxGradient.Rotation + (_G.GradientSpinSpeed or 1)) % 360
-else
-    objects.boxGradient.Rotation = 90
-end
-
+            gradient.Rotation = (gradient.Rotation + (_G.GradientSpinSpeed or 0.1)) % 360
+        else
+            gradient.Rotation = 90
+        end
     end
 end
+
+
+
 
 
 
