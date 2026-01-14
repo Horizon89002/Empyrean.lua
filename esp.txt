@@ -1,4 +1,4 @@
-
+--E
 
 local espLibrary = {
     instances = {},
@@ -343,6 +343,20 @@ gradient.Parent = objects.boxFill
         objects.glow = glow 
     end
 
+
+local healthBarOverlay = Instance.new("ImageLabel")
+healthBarOverlay.Name = "HealthBarOverlay"
+healthBarOverlay.BackgroundTransparency = 1
+healthBarOverlay.Visible = false
+healthBarOverlay.Image = ""
+healthBarOverlay.ImageTransparency = 0
+healthBarOverlay.Size = UDim2.new(0, 0, 0, 0)
+healthBarOverlay.Position = UDim2.new(0, 0, 0, 0)
+healthBarOverlay.ScaleType = Enum.ScaleType.Stretch
+healthBarOverlay.ZIndex = 10
+healthBarOverlay.Parent = screenGui
+
+objects.healthBarOverlay = healthBarOverlay
 
 
     espLibrary.espCache[player] = objects
