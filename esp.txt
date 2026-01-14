@@ -1,4 +1,4 @@
-
+--------
 
 local espLibrary = {
     instances = {},
@@ -578,16 +578,8 @@ _G.GradientSpinSpeed =  180
                 objects.top.Text = player.Name;
                 objects.top.Position = round(position + vector2New(size.X * 0.5, -(objects.top.TextBounds.Y + 2)));
 
-                objects.side.Visible = show and self.options.healthText;
-                objects.side.Font = self.options.font;
-                objects.side.Size = self.options.fontSize;
-                objects.side.Transparency = self.options.healthTextTransparency;
-                objects.side.Color = color or self.options.healthTextColor;
-                objects.side.Text = tostring(floor(health)) .. (self.options.healthTextSuffix or "")
 
-                objects.side.Position = round(position + vector2New(size.X + 3, -3));
 
-                
                 objects.bottom.Visible = show and self.options.distance;
                 objects.bottom.Font = self.options.font;
                 objects.bottom.Size = self.options.fontSize;
