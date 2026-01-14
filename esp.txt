@@ -1,4 +1,4 @@
-
+-- HEALTHBARR
 
 local espLibrary = {
     instances = {},
@@ -12,7 +12,7 @@ local espLibrary = {
         enabled = false,
         minScaleFactorX = 3,
         maxScaleFactorX = 3,
-        minScaleFactorY = 5,
+        minScaleFactorY = 4,
         maxScaleFactorY = 5,
         scaleFactorX = 5,
         scaleFactorY = 6,
@@ -71,6 +71,11 @@ local espLibrary = {
         image = true,
         glowImage = false,
         FILLbox = false,
+        healthBarImage = true,
+healthBarGradient = true,
+healthBarGradientSpin = false,
+healthBarGradientSpinSpeed = 180,
+
     },
 };
 
@@ -252,6 +257,11 @@ boxFillGui.Visible = false
 boxFillGui.Image = espLibrary.options.imageAssetPath or "" 
 boxFillGui.Parent = espGui
 
+local healthBarGui = Instance.new("ScreenGui")
+healthBarGui.Name = "espHealthBarGui"
+healthBarGui.ResetOnSpawn = false
+healthBarGui.IgnoreGuiInset = true
+healthBarGui.Parent = CoreGui
 
 
 
@@ -295,10 +305,32 @@ function espLibrary.addEsp(player)
             return img
         end)() or create("Square", { Thickness = 1, Filled = true, Visible = false, Color = Color3.new(1, 1, 1) }),
 
+
+        healthBarImage = (function()
+    local img = Instance.new("ImageLabel")
+    img.Name = "HealthBarImage"
+    img.BackgroundTransparency = 1
+    img.Visible = false
+    img.Image = "rbxassetid://0"
+    img.ImageColor3 = Color3.new(1, 1, 1)
+    img.ImageTransparency = 1
+    img.ScaleType = Enum.ScaleType.Stretch
+    img.AnchorPoint = Vector2.new(0, 1) 
+    img.Parent = healthBarGui
+
+    local gradient = Instance.new("UIGradient")
+    gradient.Name = "HealthGradient"
+    gradient.Rotation = 90
+    gradient.Parent = img
+
+    return img
+end)(),
+
+
         boxOutline = create("Square", { Thickness = 3, Color = color3New() }),
         box = create("Square", { Thickness = 1 }),
-        healthBarOutline = create("Square", { Thickness = 1, Color = color3New(), Filled = true }),
-        healthBar = create("Square", { Thickness = 1, Filled = true }),
+      --  healthBarOutline = create("Square", { Thickness = 1, Color = color3New(), Filled = true }),
+      --  healthBar = create("Square", { Thickness = 1, Filled = true }),
         line = create("Line")
     }
 
@@ -334,20 +366,21 @@ end
 
 
 function espLibrary.removeEsp(player)
-    local espCache = espLibrary.espCache[player];
+    local espCache = espLibrary.espCache[player]
+    if not espCache then return end
 
-    if (espCache) then
-        espLibrary.espCache[player] = nil;
+    espLibrary.espCache[player] = nil
 
-        for index, object in next, espCache do
-            espCache[index] = nil;
-            object:Remove();
+    for index, object in next, espCache do
+        espCache[index] = nil
 
-        
+        if typeof(object) == "Instance" then
+            object:Destroy()
+        else
+            object:Remove()
         end
     end
 end
-
 
 
 function espLibrary.addChams(player)
@@ -517,9 +550,6 @@ _G.GradientSpinSpeed =  180
 
                 local pointA, pointB, pointC = arrowPosition, screenCenter + arrowDirection * (arrowRadius - arrowSize) + rightVector * arrowSize, screenCenter + arrowDirection * (arrowRadius - arrowSize) + -rightVector * arrowSize;
 
-                local health, maxHealth = self.getHealth(player, character);
-                local healthBarSize = round(vector2New(self.options.healthBarsSize, -(size.Y * (health / maxHealth))));
-                local healthBarPosition = round(vector2New(position.X - (3 + healthBarSize.X), position.Y + size.Y));
 
                 local origin = self.options.tracerOrigin;
                 local show = canShow and enabled;
@@ -626,16 +656,45 @@ end
 
 
 
-                objects.healthBar.Visible = show and self.options.healthBars;
-                objects.healthBar.Color = color or self.options.healthBarsColor;
-                objects.healthBar.Transparency = self.options.healthBarsTransparency;
-                objects.healthBar.Size = healthBarSize;
-                objects.healthBar.Position = healthBarPosition;
+local hb = objects.healthBarImage
 
-                objects.healthBarOutline.Visible = show and self.options.healthBars;
-                objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
-                objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
-                objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1);
+if hb and show and self.options.healthBars and self.options.healthBarImage then
+    local healthPercent = clamp(health / maxHealth, 0, 1)
+
+    hb.Visible = true
+    hb.Size = UDim2.new(
+        0, self.options.healthBarsSize * 2,
+        0, size.Y * healthPercent
+    )
+
+    hb.Position = UDim2.new(
+        0, position.X - (6 + hb.Size.X.Offset),
+        0, position.Y + size.Y
+    )
+
+    hb.ImageColor3 = color or self.options.healthBarsColor
+
+    local gradient = hb:FindFirstChild("HealthGradient")
+    if gradient and self.options.healthBarGradient then
+        gradient.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, _G.GradientColor1),
+            ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
+            ColorSequenceKeypoint.new(1, _G.GradientColor3),
+        })
+
+        if self.options.healthBarGradientSpin then
+            gradient.Rotation =
+                (gradient.Rotation + ((_G.GradientSpinSpeed or 0.1) * 0.2)) % 360
+        else
+            gradient.Rotation = 90
+        end
+    end
+else
+    if hb then
+        hb.Visible = false
+    end
+end
+
 
                 objects.line.Visible = show and self.options.tracers;
                 objects.line.Color = color or self.options.tracerColor;
