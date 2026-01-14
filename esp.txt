@@ -1,4 +1,4 @@
------------------------------------------------
+
 
 local espLibrary = {
     instances = {},
@@ -253,27 +253,6 @@ boxFillGui.Image = espLibrary.options.imageAssetPath or ""
 boxFillGui.Parent = espGui
 
 
-local CoreGui = game:GetService("CoreGui")
-
-
-local healthGui = Instance.new("ScreenGui")
-healthGui.Name = "HealthBarGui"
-healthGui.ResetOnSpawn = false
-healthGui.Parent = CoreGui
-
-
-local healthBarImage = Instance.new("ImageLabel")
-healthBarImage.BackgroundTransparency = 1
-healthBarImage.Visible = false
-healthBarImage.Image = espLibrary.options.imageAssetPath or "" -- replace with your test image if you want
-healthBarImage.ImageColor3 = Color3.new(0, 1, 0)
-healthBarImage.ImageTransparency = 0.5
-healthBarImage.Size = UDim2.new(0, 0, 0, 0) -- will update dynamically
-healthBarImage.Position = UDim2.new(0, 0, 0, 0)
-healthBarImage.ScaleType = Enum.ScaleType.Stretch
-healthBarImage.Parent = healthGui
-
-
 
 
 function espLibrary.addEsp(player)
@@ -316,20 +295,20 @@ function espLibrary.addEsp(player)
             return img
         end)() or create("Square", { Thickness = 1, Filled = true, Visible = false, Color = Color3.new(1, 1, 1) }),
 
-        -- HealthBar ImageLabel
-local healthBarImage = Instance.new("ImageLabel")
-healthBarImage.Name = "HealthBarImage"
-healthBarImage.BackgroundTransparency = 1
-healthBarImage.Visible = false
-healthBarImage.Image = "rbxassetid://0" -- replace with your test image
-healthBarImage.ImageColor3 = Color3.new(0, 1, 0)
-healthBarImage.ImageTransparency = 0.5
-healthBarImage.Size = UDim2.new(0, 0, 0, 0) -- will update dynamically
-healthBarImage.Position = UDim2.new(0, 0, 0, 0)
-healthBarImage.ScaleType = Enum.ScaleType.Stretch
-healthBarImage.Parent = screenGui
+local healthBarOverlay = Instance.new("ImageLabel")
+healthBarOverlay.Name = "HealthBarOverlay"
+healthBarOverlay.BackgroundTransparency = 1
+healthBarOverlay.Visible = false
+healthBarOverlay.Image = "" -- intentionally empty
+healthBarOverlay.ImageTransparency = 0
+healthBarOverlay.Size = UDim2.new(0, 0, 0, 0)
+healthBarOverlay.Position = UDim2.new(0, 0, 0, 0)
+healthBarOverlay.ScaleType = Enum.ScaleType.Stretch
+healthBarOverlay.ZIndex = 10 -- above the health bar
+healthBarOverlay.Parent = screenGui
 
-objects.healthBarImage = healthBarImage
+objects.healthBarOverlay = healthBarOverlay
+
 
 
         boxOutline = create("Square", { Thickness = 3, Color = color3New() }),
@@ -661,12 +640,6 @@ end
 
 
 
-if objects.healthBarImage then
-    objects.healthBarImage.Visible = show and self.options.healthBars
-    objects.healthBarImage.Size = UDim2.new(0, healthBarSize.X, 0, -healthBarSize.Y)
-    objects.healthBarImage.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y)
-    objects.healthBarImage.ImageColor3 = color or self.options.healthBarsColor
-end
 
 
                 objects.healthBar.Visible = show and self.options.healthBars;
@@ -679,6 +652,20 @@ end
                 objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
                 objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
                 objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1);
+
+                if objects.healthBarImage then
+    objects.healthBarImage.Visible = show and self.options.healthBars
+    objects.healthBarImage.Size = UDim2.new(0, healthBarSize.X, 0, -healthBarSize.Y)
+    objects.healthBarImage.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y)
+    objects.healthBarImage.ImageColor3 = color or self.options.healthBarsColor
+end
+
+if objects.healthBarOverlay then
+    objects.healthBarOverlay.Visible = objects.healthBarImage.Visible
+    objects.healthBarOverlay.Size = objects.healthBarImage.Size
+    objects.healthBarOverlay.Position = objects.healthBarImage.Position
+end
+
 
                 objects.line.Visible = show and self.options.tracers;
                 objects.line.Color = color or self.options.tracerColor;
