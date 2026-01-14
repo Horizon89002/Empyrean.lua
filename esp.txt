@@ -1,4 +1,4 @@
-
+--ee
 
 local espLibrary = {
     instances = {},
@@ -261,7 +261,8 @@ local healthBarGui = Instance.new("ScreenGui")
 healthBarGui.Name = "espHealthBarGui"
 healthBarGui.ResetOnSpawn = false
 healthBarGui.IgnoreGuiInset = true
-healthBarGui.Parent = CoreGui
+healthBarGui.DisplayOrder = 999
+healthBarGui.Parent = game:GetService("CoreGui")
 
 
 
@@ -315,7 +316,8 @@ function espLibrary.addEsp(player)
     img.ImageColor3 = Color3.new(1, 1, 1)
     img.ImageTransparency = 1
     img.ScaleType = Enum.ScaleType.Stretch
-    img.AnchorPoint = Vector2.new(0, 1) 
+    img.AnchorPoint = Vector2.new(0, 1)
+    img.ZIndex = 50
     img.Parent = healthBarGui
 
     local gradient = Instance.new("UIGradient")
@@ -325,6 +327,7 @@ function espLibrary.addEsp(player)
 
     return img
 end)(),
+
 
 
         boxOutline = create("Square", { Thickness = 3, Color = color3New() }),
@@ -371,9 +374,8 @@ function espLibrary.removeEsp(player)
 
     espLibrary.espCache[player] = nil
 
-    for index, object in next, espCache do
-        espCache[index] = nil
-
+    for k, object in next, espCache do
+        espCache[k] = nil
         if typeof(object) == "Instance" then
             object:Destroy()
         else
@@ -652,45 +654,43 @@ end
 
 local hb = objects.healthBarImage
 
-if hb and show and self.options.healthBars and self.options.healthBarImage then
-    local safeHealth = tonumber(health) or 0
-local safeMaxHealth = tonumber(maxHealth) or 1
-local healthPercent = clamp(safeHealth / safeMaxHealth, 0, 1)
-
+if hb and show and self.options.enabled and self.options.healthBars then
+    local barHeight = math.max(2, size.Y * healthPercent)
 
     hb.Visible = true
-    hb.Size = UDim2.new(
-        0, self.options.healthBarsSize * 2,
-        0, size.Y * healthPercent
-    )
-
+    hb.Size = UDim2.new(0, 6, 0, barHeight)
     hb.Position = UDim2.new(
-        0, position.X - (6 + hb.Size.X.Offset),
+        0, position.X - 6,
         0, position.Y + size.Y
     )
 
     hb.ImageColor3 = color or self.options.healthBarsColor
 
     local gradient = hb:FindFirstChild("HealthGradient")
-    if gradient and self.options.healthBarGradient then
+    if gradient then
         gradient.Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, _G.GradientColor1),
             ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
             ColorSequenceKeypoint.new(1, _G.GradientColor3),
         })
-
-        if self.options.healthBarGradientSpin then
-            gradient.Rotation =
-                (gradient.Rotation + ((_G.GradientSpinSpeed or 0.1) * 0.2)) % 360
-        else
-            gradient.Rotation = 90
-        end
+        gradient.Rotation = 90
     end
 else
     if hb then
         hb.Visible = false
     end
 end
+
+do
+    local hb = objects.healthBarImage
+    if hb then
+        hb.Visible = true
+        hb.Size = UDim2.new(0, 6, 0, 50)
+        hb.Position = UDim2.new(0, 100, 0, 100)
+        hb.ImageColor3 = Color3.new(0, 1, 0)
+    end
+end
+
 
 
                 objects.line.Visible = show and self.options.tracers;
