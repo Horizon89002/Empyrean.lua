@@ -1,4 +1,4 @@
---------
+
 
 local espLibrary = {
     instances = {},
@@ -653,7 +653,10 @@ end
 local hb = objects.healthBarImage
 
 if hb and show and self.options.healthBars and self.options.healthBarImage then
-    local healthPercent = clamp(health / maxHealth, 0, 1)
+    local safeHealth = tonumber(health) or 0
+local safeMaxHealth = tonumber(maxHealth) or 1
+local healthPercent = clamp(safeHealth / safeMaxHealth, 0, 1)
+
 
     hb.Visible = true
     hb.Size = UDim2.new(
