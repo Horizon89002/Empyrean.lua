@@ -1,4 +1,4 @@
---ee
+
 
 local espLibrary = {
     instances = {},
@@ -655,7 +655,9 @@ end
 local hb = objects.healthBarImage
 
 if hb and show and self.options.enabled and self.options.healthBars then
-    local barHeight = math.max(2, size.Y * healthPercent)
+    local boxHeight = (size and size.Y) or 0
+local barHeight = math.max(2, boxHeight * healthPercent)
+
 
     hb.Visible = true
     hb.Size = UDim2.new(0, 6, 0, barHeight)
