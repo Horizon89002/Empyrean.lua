@@ -1,4 +1,4 @@
--- EE
+
 
 local espLibrary = {
     instances = {},
@@ -599,6 +599,7 @@ end
 for player, objects in pairs(espLibrary.espCache) do
     if objects.glow then
         objects.glow.Visible = espLibrary.options.glowImage
+        objects.glow.ImageColor3 = _G.glowcolor 
     end
 end
 
