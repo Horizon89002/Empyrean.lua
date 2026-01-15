@@ -1,4 +1,4 @@
-
+-- e
 
 local espLibrary = {
     instances = {},
@@ -305,7 +305,12 @@ function espLibrary.addEsp(player)
     local gradient = Instance.new("UIGradient")
 gradient.Name = "BoxGradient"
 gradient.Rotation = 90
-gradient.Parent = objects.boxFill
+
+
+if typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
+    gradient.Parent = objects.boxFill
+end
+
   
 
 
