@@ -1,4 +1,4 @@
--- e
+-- EE
 
 local espLibrary = {
     instances = {},
@@ -253,7 +253,7 @@ boxFillGui.Image = espLibrary.options.imageAssetPath or ""
 boxFillGui.Parent = espGui
 
 
-
+_G.glowcolor =  Color3.new(1,1,1)
 
 function espLibrary.addEsp(player)
     if player == localPlayer then
@@ -306,13 +306,9 @@ function espLibrary.addEsp(player)
 gradient.Name = "BoxGradient"
 gradient.Rotation = 90
 
-
 if typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
     gradient.Parent = objects.boxFill
 end
-
-  
-
 
 
     if espLibrary.options.glowImage and espLibrary.options.boxes then
@@ -320,7 +316,7 @@ end
         glow.Name = "Glow"
         glow.BackgroundTransparency = 1
         glow.Image = "http://www.roblox.com/asset/?id=18245826428"
-        glow.ImageColor3 = Color3.new(1, 1, 1)
+        glow.ImageColor3 = _G.glowcolor
         glow.ImageTransparency = 0.8
         glow.ScaleType = Enum.ScaleType.Slice
         glow.SliceCenter = Rect.new(21, 21, 79, 79)
