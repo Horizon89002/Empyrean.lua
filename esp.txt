@@ -597,23 +597,9 @@ else
 end
 
 for player, objects in pairs(espLibrary.espCache) do
-    if objects.glow and objects.boxFill then
+    if objects.glow then
         objects.glow.Visible = espLibrary.options.glowImage
-        objects.glow.ImageColor3 = _G.glowcolor
-
-        local absSize = objects.boxFill.AbsoluteSize
-        local boxPixel = math.min(absSize.X, absSize.Y)
-
-        local MIN_GLOW_PAD = 6
-        local MAX_GLOW_PAD = 26
-
-        local glowPad = math.clamp(boxPixel * 0.45, MIN_GLOW_PAD, MAX_GLOW_PAD)
-
-       
-        objects.glow.Size = UDim2.new(
-            1, glowPad * 2,
-            1, glowPad * 2
-        )
+        objects.glow.ImageColor3 = _G.glowcolor 
     end
 end
 
