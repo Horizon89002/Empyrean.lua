@@ -1,4 +1,4 @@
-
+-- e
 
 local espLibrary = {
     instances = {},
@@ -597,9 +597,22 @@ else
 end
 
 for player, objects in pairs(espLibrary.espCache) do
-    if objects.glow then
+    if objects.glow and objects.boxFill then
         objects.glow.Visible = espLibrary.options.glowImage
-        objects.glow.ImageColor3 = _G.glowcolor 
+        objects.glow.ImageColor3 = _G.glowcolor
+
+  
+        local absSize = objects.boxFill.AbsoluteSize
+        local boxPixel = math.min(absSize.X, absSize.Y)
+
+
+        local MIN_GLOW_PAD = 4
+        local MAX_GLOW_PAD = 18
+
+        local glowPad = math.clamp(boxPixel * 0.35, MIN_GLOW_PAD, MAX_GLOW_PAD)
+
+        objects.glow.Size = UDim2.new(1, glowPad * 2, 1, glowPad * 2)
+        objects.glow.Position = UDim2.new(0, -glowPad, 0, -glowPad)
     end
 end
 
