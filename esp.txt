@@ -1,4 +1,4 @@
---eee
+
 
 local espLibrary = {
     instances = {},
@@ -159,16 +159,29 @@ local function round(number)
     return typeof(number) == "Vector2" and vector2New(round(number.X), round(number.Y)) or floor(number);
 end
 
--- Main Functions
+
 function espLibrary.getTeam(player)
     local team = player.Team;
     return team, player.TeamColor.Color;
 end
 
 function espLibrary.getCharacter(player)
-    local character = player.Character;
-    return character, character and findFirstChild(character, "HumanoidRootPart");
+    local character = player.Character
+    if not character or not character:IsDescendantOf(workspace) then
+        return nil, nil, nil  
+    end
+
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+
+    if not hrp or not humanoid then
+        return nil, nil, nil
+    end
+
+    return character, hrp, humanoid
 end
+
 
 function espLibrary.getBoundingBox(character, torso)
     if (espLibrary.options.boundingBox) then
@@ -495,323 +508,355 @@ _G.GradientColor3 =  Color3.new(1,1,1)
 _G.GradientSpin = false
 _G.GradientSpinSpeed =  180
 
-local function safeSetVisible(obj, value)
-    if obj and obj.Visible ~= nil then
-        obj.Visible = value
-    end
-end
 
-local function safeSet(obj, properties)
-    if not obj then return end
-    for k,v in pairs(properties) do
-        if obj[k] ~= nil then
-            obj[k] = v
+    runService:BindToRenderStep("esp_rendering", renderValue or (Enum.RenderPriority.Camera.Value + 1), function()
+        for player, objects in next, self.espCache do
+    local character, torso, humanoid = self.getCharacter(player)
+    if not character or not torso or not humanoid then
+        for _, object in next, objects do
+            if typeof(object) == "Instance" and object.Visible ~= nil then
+                object.Visible = false
+            elseif typeof(object) == "table" and object.boxFill then
+                object.boxFill.Visible = false
+            end
+        end
+        continue
+    end
+
+
+        
+                local onScreen, size, position, torsoPosition = self.getBoxData(torso.Position, Vector3.new(5, 6));
+                local distance = (currentCamera.CFrame.Position - torso.Position).Magnitude;
+                local canShow, enabled = onScreen and (size and position), self.options.enabled;
+                local team, teamColor = self.getTeam(player);
+                local color = self.options.teamColor and teamColor or nil;
+
+                if (self.options.fillColor ~= nil) then
+                    color = self.options.fillColor;
+                end
+
+                if (find(self.whitelist, player.Name)) then
+                    color = self.options.whitelistColor;
+                end
+
+                if (find(self.blacklist, player.Name)) then
+                    enabled = false;
+                end
+
+                if (self.options.limitDistance and distance > self.options.maxDistance) then
+                    enabled = false;
+                end
+
+                if (self.options.visibleOnly and not self.visibleCheck(character, torso.Position)) then
+                    enabled = false;
+                end
+
+                if (self.options.teamCheck and (team == self.getTeam(localPlayer))) then
+                    enabled = false;
+                end
+
+                local viewportSize = currentCamera.ViewportSize;
+
+                local screenCenter = vector2New(viewportSize.X / 2, viewportSize.Y / 2);
+                local objectSpacePoint = (pointToObjectSpace(currentCamera.CFrame, torso.Position) * vector3New(1, 0, 1)).Unit;
+                local crossVector = cross(objectSpacePoint, vector3New(0, 1, 1));
+                local rightVector = vector2New(crossVector.X, crossVector.Z);
+
+                local arrowRadius, arrowSize = self.options.outOfViewArrowsRadius, self.options.outOfViewArrowsSize;
+                local arrowPosition = screenCenter + vector2New(objectSpacePoint.X, objectSpacePoint.Z) * arrowRadius;
+                local arrowDirection = (arrowPosition - screenCenter).Unit;
+
+                local pointA, pointB, pointC = arrowPosition, screenCenter + arrowDirection * (arrowRadius - arrowSize) + rightVector * arrowSize, screenCenter + arrowDirection * (arrowRadius - arrowSize) + -rightVector * arrowSize;
+
+                local health, maxHealth = self.getHealth(player, character);
+                local healthBarSize = round(vector2New(self.options.healthBarsSize, -(size.Y * (health / maxHealth))));
+                local healthBarPosition = round(vector2New(position.X - (3 + healthBarSize.X), position.Y + size.Y));
+
+                local origin = self.options.tracerOrigin;
+                local show = canShow and enabled;
+
+                objects.arrow.Visible = (not canShow and enabled) and self.options.outOfViewArrows;
+                objects.arrow.Filled = self.options.outOfViewArrowsFilled;
+                objects.arrow.Transparency = self.options.outOfViewArrowsTransparency;
+                objects.arrow.Color = color or self.options.outOfViewArrowsColor;
+                objects.arrow.PointA = pointA;
+                objects.arrow.PointB = pointB;
+                objects.arrow.PointC = pointC;
+
+                objects.arrowOutline.Visible = (not canShow and enabled) and self.options.outOfViewArrowsOutline;
+                objects.arrowOutline.Filled = self.options.outOfViewArrowsOutlineFilled;
+                objects.arrowOutline.Transparency = self.options.outOfViewArrowsOutlineTransparency;
+                objects.arrowOutline.Color = color or self.options.outOfViewArrowsOutlineColor;
+                objects.arrowOutline.PointA = pointA;
+                objects.arrowOutline.PointB = pointB;
+                objects.arrowOutline.PointC = pointC;
+
+                objects.top.Visible = show and self.options.names;
+                objects.top.Font = tonumber(self.options.font) or 2
+                objects.top.Size = self.options.fontSize;
+                objects.top.Transparency = self.options.nameTransparency;
+                objects.top.Color = color or self.options.nameColor;
+                objects.top.Text = player.Name;
+                objects.top.Position = round(position + vector2New(size.X * 0.5, -(objects.top.TextBounds.Y + 2)));
+
+                objects.side.Visible = show and self.options.healthText;
+                objects.side.Font = tonumber(self.options.font) or 2
+                objects.side.Size = self.options.fontSize;
+                objects.side.Transparency = self.options.healthTextTransparency;
+                objects.side.Color = color or self.options.healthTextColor;
+                objects.side.Text = math.round(health) .. self.options.healthTextSuffix;
+                objects.side.Position = round(position + vector2New(size.X + 3, -3));
+
+                objects.bottom.Visible = show and self.options.distance;
+                objects.bottom.Font = tonumber(self.options.font) or 2
+                objects.bottom.Size = self.options.fontSize;
+                objects.bottom.Transparency = self.options.distanceTransparency;
+                objects.bottom.Color = color or self.options.nameColor;
+                objects.bottom.Text = "[" .. tostring(round(distance)) .. self.options.distanceSuffix .. "]";
+                objects.bottom.Position = round(position + vector2New(size.X * 0.5, size.Y + 1));
+
+                objects.box.Visible = show and self.options.boxes;
+                objects.box.Color = color or self.options.boxesColor;
+                objects.box.Transparency = self.options.boxesTransparency;
+                objects.box.Size = size;
+                objects.box.Position = position;
+
+                objects.boxOutline.Visible = show and self.options.boxes;
+                objects.boxOutline.Transparency = self.options.boxesTransparency;
+                objects.boxOutline.Size = size;
+                objects.boxOutline.Position = position;
+
+                local boxFill = espLibrary.espCache[player] and espLibrary.espCache[player].boxFill
+
+
+if boxFill and show and self.options.boxFill then
+    if self.options.image and typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
+        boxFill.Visible = true
+        boxFill.Size = UDim2.new(0, size.X, 0, size.Y)
+        boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
+        boxFill.ImageTransparency = 1
+        boxFill.ImageColor3 = color or self.options.boxFillColor
+
+    end
+else
+    if boxFill then
+        if typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
+            boxFill.Visible = false
         end
     end
 end
 
+for player, objects in pairs(espLibrary.espCache) do
+    if objects.glow then
+        objects.glow.Visible = espLibrary.options.glowImage
+        objects.glow.ImageColor3 = _G.glowcolor 
+    end
+end
 
+if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
+    objects.boxFill.Visible = show and self.options.boxFill
 
-runService:BindToRenderStep("esp_rendering", renderValue or (Enum.RenderPriority.Camera.Value + 1), function()
-    for player, objects in next, espLibrary.espCache do
-        local character, torso = espLibrary.getCharacter(player);
-
-        if (character and torso) then
-            local onScreen, size, position, torsoPosition = espLibrary.getBoxData(torso.Position, Vector3.new(5, 6));
-            local distance = (currentCamera.CFrame.Position - torso.Position).Magnitude;
-            local canShow, enabled = onScreen and (size and position), espLibrary.options.enabled;
-            local team, teamColor = espLibrary.getTeam(player);
-            local color = espLibrary.options.teamColor and teamColor or nil;
-
-            if (espLibrary.options.fillColor ~= nil) then
-                color = espLibrary.options.fillColor;
-            end
-
-            if (find(espLibrary.whitelist, player.Name)) then
-                color = espLibrary.options.whitelistColor;
-            end
-
-            if (find(espLibrary.blacklist, player.Name)) then
-                enabled = false;
-            end
-
-            if (espLibrary.options.limitDistance and distance > espLibrary.options.maxDistance) then
-                enabled = false;
-            end
-
-            if (espLibrary.options.visibleOnly and not espLibrary.visibleCheck(character, torso.Position)) then
-                enabled = false;
-            end
-
-            if (espLibrary.options.teamCheck and (team == espLibrary.getTeam(localPlayer))) then
-                enabled = false;
-            end
-
-            local viewportSize = currentCamera.ViewportSize;
-
-            local screenCenter = vector2New(viewportSize.X / 2, viewportSize.Y / 2);
-            local objectSpacePoint = (pointToObjectSpace(currentCamera.CFrame, torso.Position) * vector3New(1, 0, 1)).Unit;
-            local crossVector = cross(objectSpacePoint, vector3New(0, 1, 1));
-            local rightVector = vector2New(crossVector.X, crossVector.Z);
-
-            local arrowRadius, arrowSize = espLibrary.options.outOfViewArrowsRadius, espLibrary.options.outOfViewArrowsSize;
-            local arrowPosition = screenCenter + vector2New(objectSpacePoint.X, objectSpacePoint.Z) * arrowRadius;
-            local arrowDirection = (arrowPosition - screenCenter).Unit;
-
-            local pointA, pointB, pointC = arrowPosition, screenCenter + arrowDirection * (arrowRadius - arrowSize) + rightVector * arrowSize, screenCenter + arrowDirection * (arrowRadius - arrowSize) + -rightVector * arrowSize;
-
-            local health, maxHealth = espLibrary.getHealth(player, character);
-            local healthBarSize = round(vector2New(espLibrary.options.healthBarsSize, -(size.Y * (health / maxHealth))));
-            local healthBarPosition = round(vector2New(position.X - (3 + healthBarSize.X), position.Y + size.Y));
-
-            local origin = espLibrary.options.tracerOrigin;
-            local show = canShow and enabled;
-
-            safeSetVisible(objects.arrow, (not canShow and enabled) and espLibrary.options.outOfViewArrows)
-            objects.arrow.Filled = espLibrary.options.outOfViewArrowsFilled;
-            objects.arrow.Transparency = espLibrary.options.outOfViewArrowsTransparency;
-            objects.arrow.Color = color or espLibrary.options.outOfViewArrowsColor;
-            objects.arrow.PointA = pointA;
-            objects.arrow.PointB = pointB;
-            objects.arrow.PointC = pointC;
-
-            safeSetVisible(objects.arrowOutline, (not canShow and enabled) and espLibrary.options.outOfViewArrowsOutline)
-            objects.arrowOutline.Filled = espLibrary.options.outOfViewArrowsOutlineFilled;
-            objects.arrowOutline.Transparency = espLibrary.options.outOfViewArrowsOutlineTransparency;
-            objects.arrowOutline.Color = color or espLibrary.options.outOfViewArrowsOutlineColor;
-            objects.arrowOutline.PointA = pointA;
-            objects.arrowOutline.PointB = pointB;
-            objects.arrowOutline.PointC = pointC;
-
-            safeSetVisible(objects.top, show and espLibrary.options.names)
-            objects.top.Font = tonumber(espLibrary.options.font) or 2
-            objects.top.Size = espLibrary.options.fontSize;
-            objects.top.Transparency = espLibrary.options.nameTransparency;
-            objects.top.Color = color or espLibrary.options.nameColor;
-            objects.top.Text = player.Name;
-            objects.top.Position = round(position + vector2New(size.X * 0.5, -(objects.top.TextBounds.Y + 2)));
-
-            safeSetVisible(objects.side, show and espLibrary.options.healthText)
-            objects.side.Font = tonumber(espLibrary.options.font) or 2
-            objects.side.Size = espLibrary.options.fontSize;
-            objects.side.Transparency = espLibrary.options.healthTextTransparency;
-            objects.side.Color = color or espLibrary.options.healthTextColor;
-            objects.side.Text = math.round(health) .. espLibrary.options.healthTextSuffix;
-            objects.side.Position = round(position + vector2New(size.X + 3, -3));
-
-            safeSetVisible(objects.bottom, show and espLibrary.options.distance)
-            objects.bottom.Font = tonumber(espLibrary.options.font) or 2
-            objects.bottom.Size = espLibrary.options.fontSize;
-            objects.bottom.Transparency = espLibrary.options.distanceTransparency;
-            objects.bottom.Color = color or espLibrary.options.nameColor;
-            objects.bottom.Text = "[" .. tostring(round(distance)) .. espLibrary.options.distanceSuffix .. "]";
-            objects.bottom.Position = round(position + vector2New(size.X * 0.5, size.Y + 1));
-
-            safeSetVisible(objects.box, show and espLibrary.options.boxes)
-            objects.box.Color = color or espLibrary.options.boxesColor;
-            objects.box.Transparency = espLibrary.options.boxesTransparency;
-            objects.box.Size = size;
-            objects.box.Position = position;
-
-            safeSetVisible(objects.boxOutline, show and espLibrary.options.boxes)
-            objects.boxOutline.Transparency = espLibrary.options.boxesTransparency;
-            objects.boxOutline.Size = size;
-            objects.boxOutline.Position = position;
-
-            local boxFill = espLibrary.espCache[player] and espLibrary.espCache[player].boxFill
-            if boxFill and show and espLibrary.options.boxFill then
-                if espLibrary.options.image and typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
-                    safeSetVisible(boxFill, true)
-                    boxFill.Size = UDim2.new(0, size.X, 0, size.Y)
-                    boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
-                    boxFill.ImageTransparency = 1
-                    boxFill.ImageColor3 = color or espLibrary.options.boxFillColor
-                end
-            else
-                if boxFill then
-                    safeSetVisible(boxFill, false)
-                end
-            end
-
-            if objects.glow then
-                safeSetVisible(objects.glow, espLibrary.options.glowImage)
-                objects.glow.ImageColor3 = _G.glowcolor
-            end
-
-            if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
-                safeSetVisible(objects.boxFill, show and espLibrary.options.boxFill)
-                local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
-                if gradient then
-                    gradient.Color = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, _G.GradientColor1),
-                        ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
-                        ColorSequenceKeypoint.new(1, _G.GradientColor3),
-                    })
-                    gradient.Rotation = _G.GradientSpin and (gradient.Rotation + ((_G.GradientSpinSpeed or 0.1) * 0.2)) % 360 or 90
-                end
-            end
-
-            if objects.stateText then
-                if character and torso then
-                    safeSetVisible(objects.stateText, show and espLibrary.options.statesEnabled)
-                    objects.stateText.Font = espLibrary.options.font
-                    objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
-                    objects.stateText.Position = round(position + Vector2.new(size.X + 3, 10))
-
-                    local humanoid = findFirstChild(character, "Humanoid")
-                    if humanoid then
-                        local state = humanoid:GetState()
-                        local horizontalVel = Vector3.new(torso.AssemblyLinearVelocity.X, 0, torso.AssemblyLinearVelocity.Z).Magnitude
-
-                        local finalState = ""
-                        local lastCF = espLibrary.lastCFs[player]
-                        if lastCF and (torso.Position - lastCF.Position).Magnitude > 25 then
-                            finalState = "Desync"
-                        else
-                            local lastY = espLibrary.lastY[player] or torso.Position.Y
-                            local verticalDrop = lastY - torso.Position.Y
-
-                            if state == Enum.HumanoidStateType.Freefall and verticalDrop > 20 then
-                                finalState = "Air"
-                            elseif state == Enum.HumanoidStateType.Jumping then
-                                finalState = "Jumping"
-                            elseif state == Enum.HumanoidStateType.Running then
-                                if horizontalVel <= 0.1 then
-                                    finalState = "Idle"
-                                else
-                                    finalState = "Running"
-                                end
-                            else
-                                local rename = {
-                                    FallingDown = "Falling",
-                                    RunningNoPhysics = "Running",
-                                    StrafingNoPhysics = "Strafing",
-                                    PlatformStanding = "Platform",
-                                    GettingUp = "GetUp",
-                                    Running = "Moving",
-                                }
-                                finalState = rename[state.Name] or state.Name
-                            end
-                        end
-
-                        espLibrary.lastCFs[player] = torso.CFrame
-                        espLibrary.lastY[player] = torso.Position.Y
-
-                        objects.stateText.Text = finalState
-                        objects.stateText.Color = espLibrary.options.statesColor
-                    else
-                        safeSetVisible(objects.stateText, false)
-                    end
-                else
-                    safeSetVisible(objects.stateText, false)
-                end
-            end
-
-            safeSetVisible(objects.healthBar, show and espLibrary.options.healthBars)
-            objects.healthBar.Color = color or espLibrary.options.healthBarsColor;
-            objects.healthBar.Transparency = espLibrary.options.healthBarsTransparency;
-            objects.healthBar.Size = healthBarSize;
-            objects.healthBar.Position = healthBarPosition;
-
-            safeSetVisible(objects.healthBarOutline, show and espLibrary.options.healthBars)
-            objects.healthBarOutline.Transparency = espLibrary.options.healthBarsTransparency;
-            objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
-            objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1);
-
-            safeSetVisible(objects.line, show and espLibrary.options.tracers)
-            objects.line.Color = color or espLibrary.options.tracerColor;
-            objects.line.Transparency = espLibrary.options.tracerTransparency;
-            objects.line.From =
-                origin == "Mouse" and userInputService:GetMouseLocation() or
-                origin == "Top" and vector2New(viewportSize.X * 0.5, 0) or
-                origin == "Bottom" and vector2New(viewportSize.X * 0.5, viewportSize.Y);
-            objects.line.To = torsoPosition;
+    local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
+    if gradient then
+        
+    gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, _G.GradientColor1),
+    ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
+    ColorSequenceKeypoint.new(1, _G.GradientColor3),
+})
+        if _G.GradientSpin then
+            gradient.Rotation = (gradient.Rotation + ((_G.GradientSpinSpeed or 0.1) * 0.2)) % 360
 
         else
+            gradient.Rotation = 90
+        end
+    end
+end
+
+
+
+
+
+
+if objects.stateText then
+    if character and torso then
+        objects.stateText.Visible = show and espLibrary.options.statesEnabled
+        objects.stateText.Font = espLibrary.options.font
+        objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
+        objects.stateText.Position = round(position + Vector2.new(size.X + 3, 10))
+
+        local humanoid = findFirstChild(character, "Humanoid")
+        if humanoid then
+            local state = humanoid:GetState()
+            local horizontalVel = Vector3.new(torso.AssemblyLinearVelocity.X, 0, torso.AssemblyLinearVelocity.Z).Magnitude
+
+            local finalState = ""
+
             
-            for _, object in next, objects do
-                if typeof(object) == "table" then
-                    for _, nested in pairs(object) do
-                        if typeof(nested) == "userdata" or typeof(nested) == "Instance" then
-                            safeSetVisible(nested, false)
-                        end
+            local lastCF = espLibrary.lastCFs[player]
+            if lastCF and (torso.Position - lastCF.Position).Magnitude > 25 then
+                finalState = "Desync"
+            else
+               
+                local lastY = espLibrary.lastY[player] or torso.Position.Y
+                local verticalDrop = lastY - torso.Position.Y
+
+                if state == Enum.HumanoidStateType.Freefall and verticalDrop > 20 then
+                    finalState = "Air"
+                elseif state == Enum.HumanoidStateType.Jumping then
+                    finalState = "Jumping"
+                elseif state == Enum.HumanoidStateType.Running then
+                    if horizontalVel <= 0.1 then
+                        finalState = "Idle"
+                    else
+                        finalState = "Running"
                     end
-                elseif typeof(object) == "Instance" or typeof(object) == "userdata" then
-                    safeSetVisible(object, false)
+                else
+             
+                    local rename = {
+                        FallingDown = "Falling",
+                        RunningNoPhysics = "Running",
+                        StrafingNoPhysics = "Strafing",
+                        PlatformStanding = "Platform",
+                        GettingUp = "GetUp",
+                        Running = "Moving",
+                    }
+                    finalState = rename[state.Name] or state.Name
+                end
+            end
+
+    
+            espLibrary.lastCFs[player] = torso.CFrame
+            espLibrary.lastY[player] = torso.Position.Y
+
+            objects.stateText.Text = finalState
+            objects.stateText.Color = espLibrary.options.statesColor
+        else
+            objects.stateText.Visible = false
+        end
+    else
+       
+        objects.stateText.Visible = false
+    end
+end
+
+
+
+
+
+
+
+
+                objects.healthBar.Visible = show and self.options.healthBars;
+                objects.healthBar.Color = color or self.options.healthBarsColor;
+                objects.healthBar.Transparency = self.options.healthBarsTransparency;
+                objects.healthBar.Size = healthBarSize;
+                objects.healthBar.Position = healthBarPosition;
+
+                objects.healthBarOutline.Visible = show and self.options.healthBars;
+                objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
+                objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
+                objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1);
+
+                objects.line.Visible = show and self.options.tracers;
+                objects.line.Color = color or self.options.tracerColor;
+                objects.line.Transparency = self.options.tracerTransparency;
+                objects.line.From =
+                    origin == "Mouse" and userInputService:GetMouseLocation() or
+                    origin == "Top" and vector2New(viewportSize.X * 0.5, 0) or
+                    origin == "Bottom" and vector2New(viewportSize.X * 0.5, viewportSize.Y);
+                objects.line.To = torsoPosition;
+            else
+                for _, object in next, objects do
+    if typeof(object) == "table" then
+
+        for _, nested in pairs(object) do
+            if typeof(nested) == "userdata" or typeof(nested) == "Instance" then
+                if nested and nested.Visible ~= nil then
+                    nested.Visible = false
                 end
             end
         end
+    elseif typeof(object) == "Instance" or typeof(object) == "userdata" then
+        if object and object.Visible ~= nil then
+            object.Visible = false
+        end
     end
+end
 
-    
-    for player, highlight in next, espLibrary.chamsCache do
-        local character, torso = espLibrary.getCharacter(player);
-        if (character and torso) then
-            local distance = (currentCamera.CFrame.Position - torso.Position).Magnitude;
-            local canShow = espLibrary.options.enabled and espLibrary.options.chams;
-            local team, teamColor = espLibrary.getTeam(player);
-            local color = espLibrary.options.teamColor and teamColor or nil;
+            end
+        end
 
-            if (espLibrary.options.fillColor ~= nil) then
-                color = espLibrary.options.fillColor;
+        for player, highlight in next, self.chamsCache do
+            local character, torso = self.getCharacter(player);
+
+            if (character and torso) then
+                local distance = (currentCamera.CFrame.Position - torso.Position).Magnitude;
+                local canShow = self.options.enabled and self.options.chams;
+                local team, teamColor = self.getTeam(player);
+                local color = self.options.teamColor and teamColor or nil;
+
+                if (self.options.fillColor ~= nil) then
+                    color = self.options.fillColor;
+                end
+
+                if (find(self.whitelist, player.Name)) then
+                    color = self.options.whitelistColor;
+                end
+
+                if (find(self.blacklist, player.Name)) then
+                    canShow = false;
+                end
+
+                if (self.options.limitDistance and distance > self.options.maxDistance) then
+                    canShow = false;
+                end
+
+                if (self.options.teamCheck and (team == self.getTeam(localPlayer))) then
+                    canShow = false;
+                end
+
+                highlight.Enabled = canShow;
+                highlight.DepthMode = self.options.visibleOnly and Enum.HighlightDepthMode.Occluded or Enum.HighlightDepthMode.AlwaysOnTop;
+                highlight.Adornee = character;
+                highlight.FillColor = color or self.options.chamsFillColor;
+                highlight.FillTransparency = self.options.chamsFillTransparency;
+                highlight.OutlineColor = color or self.options.chamsOutlineColor;
+                highlight.OutlineTransparency = self.options.chamsOutlineTransparency;
+            end
+        end
+
+        for object, cache in next, self.objectCache do
+            local partPosition = vector3New();
+
+            if (object:IsA("BasePart")) then
+                partPosition = object.Position;
+            elseif (object:IsA("Model")) then
+                partPosition = self.getBoundingBox(object);
             end
 
-            if (find(espLibrary.whitelist, player.Name)) then
-                color = espLibrary.options.whitelistColor;
-            end
+            local distance = (currentCamera.CFrame.Position - partPosition).Magnitude;
+            local screenPosition, onScreen = worldToViewportPoint(partPosition);
+            local canShow = cache.options.enabled and onScreen;
 
-            if (find(espLibrary.blacklist, player.Name)) then
+            if (self.options.limitDistance and distance > self.options.maxDistance) then
                 canShow = false;
             end
 
-            if (espLibrary.options.limitDistance and distance > espLibrary.options.maxDistance) then
+            if (self.options.visibleOnly and not self.visibleCheck(object, partPosition)) then
                 canShow = false;
             end
 
-            if (espLibrary.options.teamCheck and (team == espLibrary.getTeam(localPlayer))) then
-                canShow = false;
-            end
-
-            highlight.Enabled = canShow;
-            highlight.DepthMode = espLibrary.options.visibleOnly and Enum.HighlightDepthMode.Occluded or Enum.HighlightDepthMode.AlwaysOnTop;
-            highlight.Adornee = character;
-            highlight.FillColor = color or espLibrary.options.chamsFillColor;
-            highlight.FillTransparency = espLibrary.options.chamsFillTransparency;
-            highlight.OutlineColor = color or espLibrary.options.chamsOutlineColor;
-            highlight.OutlineTransparency = espLibrary.options.chamsOutlineTransparency;
+            cache.text.Visible = canShow;
+            cache.text.Font = cache.options.font;
+            cache.text.Size = cache.options.fontSize;
+            cache.text.Transparency = cache.options.transparency;
+            cache.text.Color = cache.options.color;
+            cache.text.Text = cache.options.text;
+            cache.text.Position = round(screenPosition);
         end
-    end
-
-  
-    for object, cache in next, espLibrary.objectCache do
-        local partPosition = vector3New();
-        if (object:IsA("BasePart")) then
-            partPosition = object.Position;
-        elseif (object:IsA("Model")) then
-            partPosition = espLibrary.getBoundingBox(object);
-        end
-
-        local distance = (currentCamera.CFrame.Position - partPosition).Magnitude;
-        local screenPosition, onScreen = worldToViewportPoint(partPosition);
-        local canShow = cache.options.enabled and onScreen;
-
-        if (espLibrary.options.limitDistance and distance > espLibrary.options.maxDistance) then
-            canShow = false;
-        end
-
-        if (espLibrary.options.visibleOnly and not espLibrary.visibleCheck(object, partPosition)) then
-            canShow = false;
-        end
-
-        safeSetVisible(cache.text, canShow)
-        cache.text.Font = cache.options.font;
-        cache.text.Size = cache.options.fontSize;
-        cache.text.Transparency = cache.options.transparency;
-        cache.text.Color = cache.options.color;
-        cache.text.Text = cache.options.text;
-        cache.text.Position = round(screenPosition);
-    end
-end)
+    end);
+end
 
 
 
