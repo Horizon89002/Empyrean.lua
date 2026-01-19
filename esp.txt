@@ -1,4 +1,4 @@
--- E
+-- FINAL
 
 local espLibrary = {
     instances = {},
@@ -654,10 +654,8 @@ end
 
 
 
-
 if objects.stateText and character and torso and character:FindFirstChild("Humanoid") then
 
- 
     objects.stateText.Visible = show and espLibrary.options.statesEnabled
     objects.stateText.Font = espLibrary.options.font
     objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
@@ -665,12 +663,14 @@ if objects.stateText and character and torso and character:FindFirstChild("Human
 
     local humanoid = character:FindFirstChild("Humanoid")
     local state = humanoid:GetState()
+
     local horizontalVel = Vector3.new(torso.AssemblyLinearVelocity.X, 0, torso.AssemblyLinearVelocity.Z).Magnitude
+    local verticalVel = torso.AssemblyLinearVelocity.Y or 0
 
     local finalState = ""
 
-    local lastCF = espLibrary.lastCFs[player]
-    if lastCF and (torso.Position - lastCF.Position).Magnitude > 25 then
+  
+    if espLibrary.lastCFs[player] and (torso.Position - espLibrary.lastCFs[player].Position).Magnitude > 25 then
         finalState = "Desync"
     else
 
@@ -679,19 +679,21 @@ if objects.stateText and character and torso and character:FindFirstChild("Human
 
         if state == Enum.HumanoidStateType.Freefall and verticalDrop > 20 then
             finalState = "Air"
-        elseif state == Enum.HumanoidStateType.Jumping then
+        elseif state == Enum.HumanoidStateType.Jumping or (state == Enum.HumanoidStateType.Freefall and verticalDrop <= 20) then
             finalState = "Jumping"
         elseif state == Enum.HumanoidStateType.Running then
-            if horizontalVel <= 0.1 then
-                finalState = "Idle"
+          
+            if horizontalVel <= 1 then
+                finalState = "Walking"
             else
                 finalState = "Running"
             end
         else
+
             local rename = {
                 FallingDown = "Falling",
-                RunningNoPhysics = "Running",
-                StrafingNoPhysics = "Strafing",
+                RunningNoPhysics = "Walking",
+                StrafingNoPhysics = "Walking",
                 PlatformStanding = "Platform",
                 GettingUp = "GetUp",
             }
@@ -699,14 +701,13 @@ if objects.stateText and character and torso and character:FindFirstChild("Human
         end
     end
 
-  
+    
     espLibrary.lastCFs[player] = torso.CFrame
     espLibrary.lastY[player] = torso.Position.Y
 
     objects.stateText.Text = finalState
     objects.stateText.Color = espLibrary.options.statesColor
-
-end 
+end
 
 
 
