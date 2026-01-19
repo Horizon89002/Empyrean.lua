@@ -1,4 +1,4 @@
---E
+
 
 local espLibrary = {
     instances = {},
@@ -19,7 +19,7 @@ local espLibrary = {
         boundingBox = false, -- WARNING | Significant Performance Decrease when true
         boundingBoxDescending = true,
         excludedPartNames = {},
-        font = 2,
+        font = 4,
         fontSize = 13,
         limitDistance = false,
         maxDistance = 1000,
@@ -352,21 +352,22 @@ end
 
 
 function espLibrary.removeEsp(player)
-    local objects = espLibrary.espCache[player]
-    if not objects then return end
-
-    espLibrary.espCache[player] = nil
+    local espCache = espLibrary.espCache[player];
 
     objects.lastCF = nil
 
-    for _, obj in pairs(objects) do
-        if typeof(obj) == "Instance" then
-            obj:Destroy()
-        elseif typeof(obj) == "table" and obj.Remove then
-            obj:Remove()
+    if (espCache) then
+        espLibrary.espCache[player] = nil;
+
+        for index, object in next, espCache do
+            espCache[index] = nil;
+            object:Remove();
+
+        
         end
     end
 end
+
 
 
 
