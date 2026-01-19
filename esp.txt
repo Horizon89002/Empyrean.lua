@@ -1,5 +1,5 @@
+--ee
 
-----------
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -763,18 +763,19 @@ end
                     origin == "Bottom" and vector2New(viewportSize.X * 0.5, viewportSize.Y);
                 objects.line.To = torsoPosition;
             else
-    for _, object in next, objects do
-    
-        if typeof(object) == "userdata" or typeof(object) == "Instance" then
-            object.Visible = false
-        elseif typeof(object) == "table" and object.Visible ~= nil then
-         
-            object.Visible = false
-        end)
-    end
-end
-
-            end
+                
+                for _, object in next, objects do
+                   
+                    if typeof(object) == "userdata" or typeof(object) == "Instance" then
+                     
+                        pcall(function()
+                            object.Visible = false
+                        end)
+                    elseif typeof(object) == "table" and object.Visible ~= nil then
+                        object.Visible = false
+                    end
+                end
+            end 
         end
 
         for player, highlight in next, self.chamsCache do
