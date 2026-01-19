@@ -1,4 +1,4 @@
-----eeee
+--FINAL
 
 local espLibrary = {
     instances = {},
@@ -708,33 +708,34 @@ if objects.stateText and character and torso then
 end
 
 
+objects.healthBar.Visible = show and self.options.healthBars
+objects.healthBar.Color = color or self.options.healthBarsColor
+objects.healthBar.Transparency = self.options.healthBarsTransparency
+objects.healthBar.Size = healthBarSize
+objects.healthBar.Position = healthBarPosition
 
-                objects.healthBar.Visible = show and self.options.healthBars;
-                objects.healthBar.Color = color or self.options.healthBarsColor;
-                objects.healthBar.Transparency = self.options.healthBarsTransparency;
-                objects.healthBar.Size = healthBarSize;
-                objects.healthBar.Position = healthBarPosition;
+objects.healthBarOutline.Visible = show and self.options.healthBars
+objects.healthBarOutline.Transparency = self.options.healthBarsTransparency
+objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2))
+objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1)
 
-                objects.healthBarOutline.Visible = show and self.options.healthBars;
-                objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
-                objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
-                objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1);
+objects.line.Visible = show and self.options.tracers
+objects.line.Color = color or self.options.tracerColor
+objects.line.Transparency = self.options.tracerTransparency
+objects.line.From =
+    origin == "Mouse" and userInputService:GetMouseLocation() or
+    origin == "Top" and vector2New(viewportSize.X * 0.5, 0) or
+    origin == "Bottom" and vector2New(viewportSize.X * 0.5, viewportSize.Y)
+objects.line.To = torsoPosition
 
-                objects.line.Visible = show and self.options.tracers;
-                objects.line.Color = color or self.options.tracerColor;
-                objects.line.Transparency = self.options.tracerTransparency;
-                objects.line.From =
-                    origin == "Mouse" and userInputService:GetMouseLocation() or
-                    origin == "Top" and vector2New(viewportSize.X * 0.5, 0) or
-                    origin == "Bottom" and vector2New(viewportSize.X * 0.5, viewportSize.Y);
-                objects.line.To = torsoPosition;
-            else
-                for _, object in next, objects do
-                    object.Visible = false;
-                end
-            end
+if not character or not torso or not humanoid then
+    for _, object in next, objects do
+        object.Visible = false
+    end
+end
+
       
-            
+
 
         for player, highlight in next, self.chamsCache do
             local character, torso = self.getCharacter(player);
