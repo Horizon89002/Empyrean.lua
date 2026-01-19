@@ -1,4 +1,4 @@
-
+----eeee
 
 local espLibrary = {
     instances = {},
@@ -733,7 +733,8 @@ end
                     object.Visible = false;
                 end
             end
-        end
+      
+            
 
         for player, highlight in next, self.chamsCache do
             local character, torso = self.getCharacter(player);
