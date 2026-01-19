@@ -1,4 +1,4 @@
-
+--GGG
 
 local espLibrary = {
     instances = {},
@@ -57,7 +57,7 @@ local espLibrary = {
         healthTextColor = Color3.new(1, 1, 1),
         distance = true,
         distanceTransparency = 1,
-        distanceSuffix = " Studs",
+        distanceSuffix = "M",
         distanceColor = Color3.new(1, 1, 1),
         tracers = false,
         tracerTransparency = 1,
@@ -565,7 +565,7 @@ _G.GradientSpinSpeed =  180
                 objects.bottom.Size = self.options.fontSize;
                 objects.bottom.Transparency = self.options.distanceTransparency;
                 objects.bottom.Color = color or self.options.nameColor;
-                objects.bottom.Text = tostring(round(distance)) .. self.options.distanceSuffix;
+                objects.bottom.Text = "[" .. tostring(round(distance)) .. self.options.distanceSuffix .. "]";
                 objects.bottom.Position = round(position + vector2New(size.X * 0.5, size.Y + 1));
 
                 objects.box.Visible = show and self.options.boxes;
@@ -631,16 +631,27 @@ if objects.stateText and character and torso then
     local humanoid = findFirstChild(character, "Humanoid")
     if humanoid then
         local state = humanoid:GetState()
-        local horizontalVel = Vector3.new(torso.AssemblyLinearVelocity.X, 0, torso.AssemblyLinearVelocity.Z).Magnitude
+        local vel = torso.AssemblyLinearVelocity
+        local horizontalVel = Vector3.new(vel.X, 0, vel.Z).Magnitude
+        local verticalVel = vel.Y
 
         local finalState = ""
 
         if state == Enum.HumanoidStateType.Jumping then
             finalState = "Jumping"
+
         elseif state == Enum.HumanoidStateType.Freefall then
-            finalState = "Falling"
+            if verticalVel < -60 then
+                finalState = "Freefalling"
+            elseif verticalVel < -8 then
+                finalState = "Falling"
+            else
+                finalState = "Jumping"
+            end
+
         elseif state == Enum.HumanoidStateType.Running then
             finalState = horizontalVel <= 0.1 and "Idle" or "Moving"
+
         else
             local rename = {
                 FallingDown = "Falling",
@@ -663,7 +674,6 @@ if objects.stateText and character and torso then
         objects.stateText.Visible = false
     end
 end
-
 
 
 
