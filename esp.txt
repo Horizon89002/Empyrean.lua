@@ -71,6 +71,10 @@ local espLibrary = {
         image = true,
         glowImage = false,
         FILLbox = false,
+        statesEnabled = true,      
+        statesColor = Color3.new(1,1,1), 
+        customStatesEnabled = true,   
+
     },
 };
 
@@ -274,9 +278,10 @@ function espLibrary.addEsp(player)
     Outline = true,
     OutlineColor = color3New(0,0,0),
     Visible = false,
-    Color = color3New(1,1,1),
+    Color = espLibrary.options.statesColor,
     Text = "",
 }),
+
 
 
         boxFill = espLibrary.options.image and espLibrary.options.boxes and (function()
@@ -638,30 +643,30 @@ end
 
 
 
-objects.stateText.Visible = show
+-- STATE ESP
+objects.stateText.Visible = show and espLibrary.options.statesEnabled
 objects.stateText.Font = espLibrary.options.font
 objects.stateText.Size = espLibrary.options.fontSize
-objects.stateText.Position = round(position + vector2New(size.X + 3, 12))
-objects.stateText.Text = ""
-
+objects.stateText.Position = round(position + vector2New(size.X + 3, 12)) -- adjust Y offset if needed
 
 local humanoid = findFirstChild(character, "Humanoid")
-
-
 local states = {}
 
 
 if humanoid then
-    table.insert(states, tostring(humanoid:GetState()))
+    local state = humanoid:GetState()
+    table.insert(states, tostring(state))
 end
 
 
-if humanoid and torso then
-    if humanoid.FloorMaterial == Enum.Material.Air and torso.Velocity.Magnitude > 10 then
+if espLibrary.options.customStatesEnabled and torso and humanoid then
+    local vel = torso.Velocity
+    local onGround = humanoid.FloorMaterial ~= Enum.Material.Air
+
+    if not onGround and vel.Magnitude > 10 then
         table.insert(states, "Flying")
     end
 
-  
     local lastCF = objects.lastCF or torso.CFrame
     if (torso.Position - lastCF.Position).Magnitude > 20 then
         table.insert(states, "Desync")
@@ -670,21 +675,9 @@ if humanoid and torso then
 end
 
 
-local textStrings = {}
-local lastColor = color3New(1,1,1)
-for _, s in ipairs(states) do
-    table.insert(textStrings, s)
-    if s == "Flying" then
-        lastColor = Color3.new(1,1,0)
-    elseif s == "Desync" then
-        lastColor = Color3.new(1,0,0)
-    else
-        lastColor = Color3.new(1,1,1)
-    end
-end
+objects.stateText.Text = table.concat(states, ", ")
+objects.stateText.Color = espLibrary.options.statesColor
 
-objects.stateText.Text = table.concat(textStrings, ", ")
-objects.stateText.Color = lastColor
 
 
 
