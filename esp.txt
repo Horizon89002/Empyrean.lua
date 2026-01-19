@@ -1,4 +1,4 @@
---
+
 
 local espLibrary = {
     instances = {},
@@ -168,7 +168,7 @@ end
 function espLibrary.getCharacter(player)
     local character = player.Character
     if not character or not character:IsDescendantOf(workspace) then
-        return nil, nil, nil  
+        return nil, nil, nil
     end
 
     local hrp = character:FindFirstChild("HumanoidRootPart")
@@ -179,8 +179,23 @@ function espLibrary.getCharacter(player)
         return nil, nil, nil
     end
 
+
+    if typeof(hrp.Position) ~= "Vector3" then
+        return nil, nil, nil
+    end
+
+    if humanoid.Health == nil then
+        return nil, nil, nil
+    end
+
+    local success, state = pcall(function() return humanoid:GetState() end)
+    if not success or state == nil then
+        return nil, nil, nil
+    end
+
     return character, hrp, humanoid
 end
+
 
 
 function espLibrary.getBoundingBox(character, torso)
@@ -709,7 +724,7 @@ if objects.stateText then
                     if horizontalVel <= 0.1 then
                         finalState = "Idle"
                     else
-                        finalState = "Running"
+                        finalState = "Moving"
                     end
                 else
              
