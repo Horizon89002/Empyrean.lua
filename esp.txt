@@ -267,6 +267,18 @@ function espLibrary.addEsp(player)
         side = create("Text", { Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         bottom = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
 
+        stateText = create("Text", {
+    Center = false,
+    Size = espLibrary.options.fontSize,
+    Font = espLibrary.options.font,
+    Outline = true,
+    OutlineColor = color3New(0,0,0),
+    Visible = false,
+    Color = color3New(1,1,1),
+    Text = "",
+}),
+
+
         boxFill = espLibrary.options.image and espLibrary.options.boxes and (function()
             local img = Instance.new("ImageLabel")
             img.Name = "boxFill"
@@ -542,7 +554,7 @@ _G.GradientSpinSpeed =  180
                 objects.arrowOutline.PointC = pointC;
 
                 objects.top.Visible = show and self.options.names;
-                objects.top.Font = self.options.font;
+                objects.top.Font = tonumber(self.options.font) or 2
                 objects.top.Size = self.options.fontSize;
                 objects.top.Transparency = self.options.nameTransparency;
                 objects.top.Color = color or self.options.nameColor;
@@ -550,19 +562,19 @@ _G.GradientSpinSpeed =  180
                 objects.top.Position = round(position + vector2New(size.X * 0.5, -(objects.top.TextBounds.Y + 2)));
 
                 objects.side.Visible = show and self.options.healthText;
-                objects.side.Font = self.options.font;
+                objects.side.Font = tonumber(self.options.font) or 2
                 objects.side.Size = self.options.fontSize;
                 objects.side.Transparency = self.options.healthTextTransparency;
                 objects.side.Color = color or self.options.healthTextColor;
-                objects.side.Text = health .. self.options.healthTextSuffix;
+                objects.side.Text = math.round(health) .. self.options.healthTextSuffix;
                 objects.side.Position = round(position + vector2New(size.X + 3, -3));
 
                 objects.bottom.Visible = show and self.options.distance;
-                objects.bottom.Font = self.options.font;
+                objects.bottom.Font = tonumber(self.options.font) or 2
                 objects.bottom.Size = self.options.fontSize;
                 objects.bottom.Transparency = self.options.distanceTransparency;
                 objects.bottom.Color = color or self.options.nameColor;
-                objects.bottom.Text = tostring(round(distance)) .. self.options.distanceSuffix;
+                objects.bottom.Text = "[" .. tostring(round(distance)) .. self.options.distanceSuffix .. "]";
                 objects.bottom.Position = round(position + vector2New(size.X * 0.5, size.Y + 1));
 
                 objects.box.Visible = show and self.options.boxes;
@@ -625,6 +637,54 @@ end
 
 
 
+
+objects.stateText.Visible = show
+objects.stateText.Font = espLibrary.options.font
+objects.stateText.Size = espLibrary.options.fontSize
+objects.stateText.Position = round(position + vector2New(size.X + 3, 12))
+objects.stateText.Text = ""
+
+
+local humanoid = findFirstChild(character, "Humanoid")
+
+
+local states = {}
+
+
+if humanoid then
+    table.insert(states, tostring(humanoid:GetState()))
+end
+
+
+if humanoid and torso then
+    if humanoid.FloorMaterial == Enum.Material.Air and torso.Velocity.Magnitude > 10 then
+        table.insert(states, "Flying")
+    end
+
+  
+    local lastCF = objects.lastCF or torso.CFrame
+    if (torso.Position - lastCF.Position).Magnitude > 20 then
+        table.insert(states, "Desync")
+    end
+    objects.lastCF = torso.CFrame
+end
+
+
+local textStrings = {}
+local lastColor = color3New(1,1,1)
+for _, s in ipairs(states) do
+    table.insert(textStrings, s)
+    if s == "Flying" then
+        lastColor = Color3.new(1,1,0)
+    elseif s == "Desync" then
+        lastColor = Color3.new(1,0,0)
+    else
+        lastColor = Color3.new(1,1,1)
+    end
+end
+
+objects.stateText.Text = table.concat(textStrings, ", ")
+objects.stateText.Color = lastColor
 
 
 
