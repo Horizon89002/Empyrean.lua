@@ -1,4 +1,4 @@
-
+--
 
 local espLibrary = {
     instances = {},
@@ -730,12 +730,8 @@ if objects.stateText then
             espLibrary.lastY[player] = torso.Position.Y
 
             objects.stateText.Text = finalState
-            objects.stateText.Color = espLibrary.options.statesColor
-        else
-            objects.stateText.Visible = false
-        end
+        objects.stateText.Color = espLibrary.options.statesColor
     else
-       
         objects.stateText.Visible = false
     end
 end
