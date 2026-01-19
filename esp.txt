@@ -1,4 +1,4 @@
----------------------------------------------------------
+
 
 local espLibrary = {
     instances = {},
@@ -287,16 +287,7 @@ function espLibrary.addEsp(player)
         side = create("Text", { Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         bottom = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
 
-        stateText = create("Text", {
-    Center = false,
-    Size = espLibrary.options.fontSize,
-    Font = espLibrary.options.font,
-    Outline = true,
-    OutlineColor = color3New(0,0,0),
-    Visible = false,
-    Color = espLibrary.options.statesColor,
-    Text = "",
-})
+        
 
 
 
@@ -334,6 +325,17 @@ function espLibrary.addEsp(player)
         healthBar = create("Square", { Thickness = 1, Filled = true }),
         line = create("Line")
     }
+
+    stateText = create("Text", {
+    Center = false,
+    Size = espLibrary.options.fontSize,
+    Font = espLibrary.options.font,
+    Outline = true,
+    OutlineColor = color3New(0,0,0),
+    Visible = false,
+    Color = espLibrary.options.statesColor,
+    Text = "",
+})
 
     local gradient = Instance.new("UIGradient")
 gradient.Name = "BoxGradient"
@@ -704,11 +706,6 @@ if objects.stateText and character and torso then
         objects.stateText.Visible = false
     end
 end
-
-
-
-
-
 
 
 
