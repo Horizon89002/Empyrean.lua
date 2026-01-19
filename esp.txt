@@ -1,4 +1,4 @@
---------------------------y
+
 
 local espLibrary = {
     instances = {},
@@ -495,7 +495,7 @@ _G.GradientSpinSpeed =  180
 
             if (character and torso) then
                 local onScreen, size, position, torsoPosition = self.getBoxData(torso.Position, Vector3.new(5, 6));
-                local distance = (currentCamera.CFrame.Position - torso.Position).Magnitude;
+                local distance = (localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") and localPlayer.Character.HumanoidRootPart.Position - torso.Position).Magnitude or 0
                 local canShow, enabled = onScreen and (size and position), self.options.enabled;
                 local team, teamColor = self.getTeam(player);
                 local color = self.options.teamColor and teamColor or nil;
@@ -712,7 +712,7 @@ if objects.teamText and character and torso then
 
 
 
-    objects.teamText.Text = targetTeam and targetTeam.Name or "No Team"
+    objects.teamText.Text = targetTeam and targetTeam.Name or "None"
 
     if targetTeam == myTeam then
         objects.teamText.Color = espLibrary.options.teamMyColor
