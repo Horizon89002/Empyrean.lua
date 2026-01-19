@@ -1,4 +1,4 @@
--- e
+
 
 local espLibrary = {
     instances = {},
@@ -646,6 +646,9 @@ end
 
 
 
+-- ===== STATES (FIXED & SAFE) =====
+if not objects or not objects.stateText then return end
+
 objects.stateText.Visible = show and espLibrary.options.statesEnabled
 objects.stateText.Font = espLibrary.options.font
 objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
@@ -658,7 +661,7 @@ if humanoid and torso then
     local state = humanoid:GetState()
     local stateName = state.Name
 
-   
+
     local rename = {
         FallingDown = "Falling",
         RunningNoPhysics = "Running",
@@ -672,8 +675,15 @@ if humanoid and torso then
     local vel = torso.AssemblyLinearVelocity or torso.Velocity
     local horizontalSpeed = Vector3.new(vel.X, 0, vel.Z).Magnitude
 
+
     if state == Enum.HumanoidStateType.Running and horizontalSpeed < 0.1 then
         table.insert(states, "Idle")
+
+
+    elseif state == Enum.HumanoidStateType.Jumping then
+        table.insert(states, "Jumping")
+
+
     else
         table.insert(states, stateName)
     end
@@ -682,6 +692,7 @@ if humanoid and torso then
         if state == Enum.HumanoidStateType.Freefall then
             table.insert(states, "Air")
         end
+
 
         local lastCF = objects.lastCF
         if lastCF and (torso.Position - lastCF.Position).Magnitude > 25 then
@@ -694,6 +705,7 @@ end
 
 objects.stateText.Text = table.concat(states, ", ")
 objects.stateText.Color = espLibrary.options.statesColor
+-- =================================
 
 
 
