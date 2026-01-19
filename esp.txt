@@ -1,4 +1,4 @@
-
+--E
 
 local espLibrary = {
     instances = {},
@@ -646,7 +646,7 @@ end
 
 
 
--- ===== STATES (FIXED & SAFE) =====
+
 if not objects or not objects.stateText then return end
 
 objects.stateText.Visible = show and espLibrary.options.statesEnabled
@@ -705,7 +705,7 @@ end
 
 objects.stateText.Text = table.concat(states, ", ")
 objects.stateText.Color = espLibrary.options.statesColor
--- =================================
+
 
 
 
@@ -735,8 +735,14 @@ objects.stateText.Color = espLibrary.options.statesColor
                 objects.line.To = torsoPosition;
             else
                 for _, object in next, objects do
-                    object.Visible = false;
-                end
+    if typeof(object) == "table" then
+    elseif typeof(object) == "Instance" then
+        object.Visible = false
+    elseif typeof(object) == "userdata" and object.Visible ~= nil then
+        object.Visible = false
+    end
+end
+
             end
         end
 
