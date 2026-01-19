@@ -1,4 +1,4 @@
---GGG
+
 
 local espLibrary = {
     instances = {},
@@ -74,6 +74,10 @@ local espLibrary = {
         statesEnabled = true,      
         statesColor = Color3.new(1,1,1), 
         customStatesEnabled = true,  
+        teamEspEnabled = true,
+        teamMyColor = Color3.new(0, 1, 0),
+        teamEnemyColor = Color3.new(1, 0, 0),
+
     },
 };
 
@@ -270,6 +274,18 @@ function espLibrary.addEsp(player)
         side = create("Text", { Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         bottom = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         stateText = create("Text",{Center=false,Size=espLibrary.options.fontSize,Font=espLibrary.options.font,Outline=true,OutlineColor=color3New(),Visible=false,Color=espLibrary.options.statesColor,Text=""}),
+
+
+
+        teamText = create("Text", {
+    Center = false,
+    Size = espLibrary.options.fontSize,
+    Font = espLibrary.options.font,
+    Outline = true,
+    OutlineColor = color3New(),
+    Visible = false,
+    Text = ""
+}),
 
 
         boxFill = espLibrary.options.image and espLibrary.options.boxes and (function()
@@ -557,7 +573,7 @@ _G.GradientSpinSpeed =  180
                 objects.side.Size = self.options.fontSize;
                 objects.side.Transparency = self.options.healthTextTransparency;
                 objects.side.Color = color or self.options.healthTextColor;
-                objects.side.Text = health .. self.options.healthTextSuffix;
+                objects.side.Text = math.round(health) .. self.options.healthTextSuffix;
                 objects.side.Position = round(position + vector2New(size.X + 3, -3));
 
                 objects.bottom.Visible = show and self.options.distance;
@@ -674,6 +690,31 @@ if objects.stateText and character and torso then
         objects.stateText.Visible = false
     end
 end
+
+if objects.teamText and character and torso then
+    local myTeam = localPlayer.Team
+    local targetTeam = player.Team
+
+    objects.teamText.Visible = show and espLibrary.options.teamEspEnabled
+    objects.teamText.Font = espLibrary.options.font
+    objects.teamText.Size = math.max(10, espLibrary.options.fontSize - 3)
+
+  
+    objects.teamText.Position = round(position + Vector2.new(size.X + 3, 24))
+
+    objects.teamText.Text = targetTeam and targetTeam.Name or "No Team"
+
+    if targetTeam == myTeam then
+        objects.teamText.Color = espLibrary.options.teamMyColor
+    else
+        objects.teamText.Color = espLibrary.options.teamEnemyColor
+    end
+else
+    if objects.teamText then
+        objects.teamText.Visible = false
+    end
+end
+
 
 
 
