@@ -1,4 +1,4 @@
---E
+
 
 local espLibrary = {
     instances = {},
@@ -702,7 +702,8 @@ if objects.teamText and character and torso then
     objects.teamText.Font = espLibrary.options.font
     objects.teamText.Size = math.max(10, espLibrary.options.fontSize - 3)
 
-    objects.teamText.Position = Vector2.new(position.X + size.X + 3, position.Y - 6 + math.min(size.Y * 0.5, 15))
+    objects.teamText.Position = Vector2.new(position.X + size.X + 3, position.Y - 3 + math.min(size.Y * 0.5, 15) - math.max(0, 15 - size.Y * 0.5) * 0.2)
+
 
 
 
