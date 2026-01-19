@@ -1,4 +1,4 @@
-
+-- final
 
 local espLibrary = {
     instances = {},
@@ -676,11 +676,16 @@ if humanoid and torso then
     stateName = rename[stateName] or stateName
 
     local vel = torso.AssemblyLinearVelocity or torso.Velocity
-    local horizontalSpeed = Vector3.new(vel.X, 0, vel.Z).Magnitude
+    local horizontalVel = Vector3.new(vel.X, 0, vel.Z).Magnitude
 
-    if state == Enum.HumanoidStateType.Running and horizontalSpeed < 0.1 then
+    if state == Enum.HumanoidStateType.Running then
+    if horizontalVel <= 0.1 then
         table.insert(states, "Idle")
-    elseif state == Enum.HumanoidStateType.Jumping then
+    else
+        table.insert(states, "Running")
+    end
+end
+    if state == Enum.HumanoidStateType.Jumping then
         table.insert(states, "Jumping")
     else
         table.insert(states, stateName)
@@ -698,7 +703,7 @@ if humanoid and torso then
 
         if state == Enum.HumanoidStateType.Freefall then
             if verticalDrop > 20 then
-                table.insert(states, "Air")
+                table.insert(states, "Falling")
             else
                 table.insert(states, "Jumping")
             end
