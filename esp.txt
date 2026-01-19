@@ -1,4 +1,4 @@
---
+
 
 local espLibrary = {
     instances = {},
@@ -562,7 +562,7 @@ _G.GradientSpinSpeed =  180
 
                 objects.top.Visible = show and self.options.names;
                 objects.top.Font = self.options.font;
-                objects.top.Size = math.max(10, round(espLibrary.options.fontSize * espLibrary.getScaleFactor(currentCamera.FieldOfView, (localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") or torso).Position - torso.Position).Magnitude))
+                objects.top.Size = math.max(10, round(espLibrary.options.fontSize / (torso.Position - (localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") or torso).Position).Magnitude * 1000))
                 objects.top.Transparency = self.options.nameTransparency;
                 objects.top.Color = color or self.options.nameColor;
                 objects.top.Text = player.Name;
