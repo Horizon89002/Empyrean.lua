@@ -1,5 +1,5 @@
 
---
+
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -12,8 +12,8 @@ local espLibrary = {
         enabled = false,
         minScaleFactorX = 3,
         maxScaleFactorX = 3,
-       minScaleFactorY = 3.5,
-        maxScaleFactorY = 4.5,
+       minScaleFactorY = 4.5,
+        maxScaleFactorY = 7,
         scaleFactorX = 5,
         scaleFactorY = 5.8,
 
