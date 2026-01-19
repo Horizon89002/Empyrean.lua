@@ -1,5 +1,5 @@
 
-
+----------
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -770,7 +770,7 @@ end
         elseif typeof(object) == "table" and object.Visible ~= nil then
          
             object.Visible = false
-        end
+        end)
     end
 end
 
