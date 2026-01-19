@@ -1,4 +1,4 @@
--- final
+
 
 local espLibrary = {
     instances = {},
@@ -73,7 +73,10 @@ local espLibrary = {
         FILLbox = false,
         statesEnabled = true,      
         statesColor = Color3.new(1,1,1), 
-        customStatesEnabled = true,   
+        customStatesEnabled = true,  
+        teamEspEnabled = true,                
+        teamEspMyColor = Color3.new(0, 1, 0), 
+        teamEspOtherColor = Color3.new(1, 0, 0), 
 
     },
 };
@@ -651,71 +654,66 @@ end
 
 
 
-if not objects or not objects.stateText then return end
+if objects.stateText then
+    if character and torso then
+        objects.stateText.Visible = show and espLibrary.options.statesEnabled
+        objects.stateText.Font = espLibrary.options.font
+        objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
+        objects.stateText.Position = round(position + Vector2.new(size.X + 3, 10))
 
-objects.stateText.Visible = show and espLibrary.options.statesEnabled
-objects.stateText.Font = espLibrary.options.font
-objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
-objects.stateText.Position = round(position + vector2New(size.X + 3, 10))
+        local humanoid = findFirstChild(character, "Humanoid")
+        if humanoid then
+            local state = humanoid:GetState()
+            local horizontalVel = Vector3.new(torso.AssemblyLinearVelocity.X, 0, torso.AssemblyLinearVelocity.Z).Magnitude
 
-local humanoid = findFirstChild(character, "Humanoid")
-local states = {}
+            local finalState = ""
 
-if humanoid and torso then
-    local state = humanoid:GetState()
-    local stateName = state.Name
-
-    local rename = {
-        FallingDown = "Falling",
-        RunningNoPhysics = "Running",
-        StrafingNoPhysics = "Strafing",
-        PlatformStanding = "Platform",
-        GettingUp = "GetUp",
-    }
-
-    stateName = rename[stateName] or stateName
-
-    local vel = torso.AssemblyLinearVelocity or torso.Velocity
-    local horizontalVel = Vector3.new(vel.X, 0, vel.Z).Magnitude
-
-    if state == Enum.HumanoidStateType.Running then
-    if horizontalVel <= 0.1 then
-        table.insert(states, "Idle")
-    else
-        table.insert(states, "Running")
-    end
-end
-    if state == Enum.HumanoidStateType.Jumping then
-        table.insert(states, "Jumping")
-    else
-        table.insert(states, stateName)
-    end
-
-    if espLibrary.options.customStatesEnabled then
-        local lastCF = espLibrary.lastCFs[player]
-        local lastY = espLibrary.lastY[player] or torso.Position.Y
-        local verticalDrop = lastY - torso.Position.Y
-
-
-        if lastCF and (torso.Position - lastCF.Position).Magnitude > 25 then
-            table.insert(states, "Desync")
-        end
-
-        if state == Enum.HumanoidStateType.Freefall then
-            if verticalDrop > 20 then
-                table.insert(states, "Falling")
+            
+            local lastCF = espLibrary.lastCFs[player]
+            if lastCF and (torso.Position - lastCF.Position).Magnitude > 25 then
+                finalState = "Desync"
             else
-                table.insert(states, "Jumping")
-            end
-        end
+               
+                local lastY = espLibrary.lastY[player] or torso.Position.Y
+                local verticalDrop = lastY - torso.Position.Y
 
-        espLibrary.lastCFs[player] = torso.CFrame
-        espLibrary.lastY[player] = torso.Position.Y
+                if state == Enum.HumanoidStateType.Freefall and verticalDrop > 20 then
+                    finalState = "Air"
+                elseif state == Enum.HumanoidStateType.Jumping then
+                    finalState = "Jumping"
+                elseif state == Enum.HumanoidStateType.Running then
+                    if horizontalVel <= 0.1 then
+                        finalState = "Idle"
+                    else
+                        finalState = "Running"
+                    end
+                else
+             
+                    local rename = {
+                        FallingDown = "Falling",
+                        RunningNoPhysics = "Running",
+                        StrafingNoPhysics = "Strafing",
+                        PlatformStanding = "Platform",
+                        GettingUp = "GetUp",
+                    }
+                    finalState = rename[state.Name] or state.Name
+                end
+            end
+
+    
+            espLibrary.lastCFs[player] = torso.CFrame
+            espLibrary.lastY[player] = torso.Position.Y
+
+            objects.stateText.Text = finalState
+            objects.stateText.Color = espLibrary.options.statesColor
+        else
+            objects.stateText.Visible = false
+        end
+    else
+       
+        objects.stateText.Visible = false
     end
 end
-
-objects.stateText.Text = table.concat(states, ", ")
-objects.stateText.Color = espLibrary.options.statesColor
 
 
 
