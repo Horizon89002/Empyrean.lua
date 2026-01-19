@@ -1,4 +1,4 @@
-
+-- E
 
 local espLibrary = {
     instances = {},
@@ -57,7 +57,7 @@ local espLibrary = {
         healthTextColor = Color3.new(1, 1, 1),
         distance = true,
         distanceTransparency = 1,
-        distanceSuffix = " M",
+        distanceSuffix = "M",
         distanceColor = Color3.new(1, 1, 1),
         tracers = false,
         tracerTransparency = 1,
@@ -654,66 +654,59 @@ end
 
 
 
-if objects.stateText then
-    if character and torso then
-        objects.stateText.Visible = show and espLibrary.options.statesEnabled
-        objects.stateText.Font = espLibrary.options.font
-        objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
-        objects.stateText.Position = round(position + Vector2.new(size.X + 3, 10))
 
-        local humanoid = findFirstChild(character, "Humanoid")
-        if humanoid then
-            local state = humanoid:GetState()
-            local horizontalVel = Vector3.new(torso.AssemblyLinearVelocity.X, 0, torso.AssemblyLinearVelocity.Z).Magnitude
+if objects.stateText and character and torso and character:FindFirstChild("Humanoid") then
 
-            local finalState = ""
+ 
+    objects.stateText.Visible = show and espLibrary.options.statesEnabled
+    objects.stateText.Font = espLibrary.options.font
+    objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
+    objects.stateText.Position = round(position + Vector2.new(size.X + 3, 10))
 
-            
-            local lastCF = espLibrary.lastCFs[player]
-            if lastCF and (torso.Position - lastCF.Position).Magnitude > 25 then
-                finalState = "Desync"
-            else
-               
-                local lastY = espLibrary.lastY[player] or torso.Position.Y
-                local verticalDrop = lastY - torso.Position.Y
+    local humanoid = character:FindFirstChild("Humanoid")
+    local state = humanoid:GetState()
+    local horizontalVel = Vector3.new(torso.AssemblyLinearVelocity.X, 0, torso.AssemblyLinearVelocity.Z).Magnitude
 
-                if state == Enum.HumanoidStateType.Freefall and verticalDrop > 20 then
-                    finalState = "Air"
-                elseif state == Enum.HumanoidStateType.Jumping then
-                    finalState = "Jumping"
-                elseif state == Enum.HumanoidStateType.Running then
-                    if horizontalVel <= 0.1 then
-                        finalState = "Idle"
-                    else
-                        finalState = "Running"
-                    end
-                else
-             
-                    local rename = {
-                        FallingDown = "Falling",
-                        RunningNoPhysics = "Running",
-                        StrafingNoPhysics = "Strafing",
-                        PlatformStanding = "Platform",
-                        GettingUp = "GetUp",
-                    }
-                    finalState = rename[state.Name] or state.Name
-                end
-            end
+    local finalState = ""
 
-    
-            espLibrary.lastCFs[player] = torso.CFrame
-            espLibrary.lastY[player] = torso.Position.Y
-
-            objects.stateText.Text = finalState
-            objects.stateText.Color = espLibrary.options.statesColor
-        else
-            objects.stateText.Visible = false
-        end
+    local lastCF = espLibrary.lastCFs[player]
+    if lastCF and (torso.Position - lastCF.Position).Magnitude > 25 then
+        finalState = "Desync"
     else
-       
-        objects.stateText.Visible = false
+
+        local lastY = espLibrary.lastY[player] or torso.Position.Y
+        local verticalDrop = lastY - torso.Position.Y
+
+        if state == Enum.HumanoidStateType.Freefall and verticalDrop > 20 then
+            finalState = "Air"
+        elseif state == Enum.HumanoidStateType.Jumping then
+            finalState = "Jumping"
+        elseif state == Enum.HumanoidStateType.Running then
+            if horizontalVel <= 0.1 then
+                finalState = "Idle"
+            else
+                finalState = "Running"
+            end
+        else
+            local rename = {
+                FallingDown = "Falling",
+                RunningNoPhysics = "Running",
+                StrafingNoPhysics = "Strafing",
+                PlatformStanding = "Platform",
+                GettingUp = "GetUp",
+            }
+            finalState = rename[state.Name] or state.Name
+        end
     end
-end
+
+  
+    espLibrary.lastCFs[player] = torso.CFrame
+    espLibrary.lastY[player] = torso.Position.Y
+
+    objects.stateText.Text = finalState
+    objects.stateText.Color = espLibrary.options.statesColor
+
+end 
 
 
 
