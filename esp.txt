@@ -1,4 +1,4 @@
---FINAL
+
 
 local espLibrary = {
     instances = {},
@@ -57,7 +57,7 @@ local espLibrary = {
         healthTextColor = Color3.new(1, 1, 1),
         distance = true,
         distanceTransparency = 1,
-        distanceSuffix = "M",
+        distanceSuffix = " Studs",
         distanceColor = Color3.new(1, 1, 1),
         tracers = false,
         tracerTransparency = 1,
@@ -74,10 +74,6 @@ local espLibrary = {
         statesEnabled = true,      
         statesColor = Color3.new(1,1,1), 
         customStatesEnabled = true,  
-        teamEspEnabled = true,                
-        teamEspMyColor = Color3.new(0, 1, 0), 
-        teamEspOtherColor = Color3.new(1, 0, 0), 
-
     },
 };
 
@@ -159,29 +155,16 @@ local function round(number)
     return typeof(number) == "Vector2" and vector2New(round(number.X), round(number.Y)) or floor(number);
 end
 
-
+-- Main Functions
 function espLibrary.getTeam(player)
     local team = player.Team;
     return team, player.TeamColor.Color;
 end
 
 function espLibrary.getCharacter(player)
-    local character = player.Character
-    if not character then
-        return nil, nil, nil
-    end
-
-    local hrp = character:FindFirstChild("HumanoidRootPart")
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-
-    if not hrp or not humanoid then
-        return nil, nil, nil
-    end
-
-    return character, hrp, humanoid
+    local character = player.Character;
+    return character, character and findFirstChild(character, "HumanoidRootPart");
 end
-
-
 
 function espLibrary.getBoundingBox(character, torso)
     if (espLibrary.options.boundingBox) then
@@ -287,10 +270,6 @@ function espLibrary.addEsp(player)
         side = create("Text", { Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         bottom = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
 
-        
-
-
-
         boxFill = espLibrary.options.image and espLibrary.options.boxes and (function()
             local img = Instance.new("ImageLabel")
             img.Name = "boxFill"
@@ -325,17 +304,6 @@ function espLibrary.addEsp(player)
         healthBar = create("Square", { Thickness = 1, Filled = true }),
         line = create("Line")
     }
-
-    stateText = create("Text", {
-    Center = false,
-    Size = espLibrary.options.fontSize,
-    Font = espLibrary.options.font,
-    Outline = true,
-    OutlineColor = color3New(0,0,0),
-    Visible = false,
-    Color = espLibrary.options.statesColor,
-    Text = "",
-})
 
     local gradient = Instance.new("UIGradient")
 gradient.Name = "BoxGradient"
@@ -378,9 +346,12 @@ function espLibrary.removeEsp(player)
         for index, object in next, espCache do
             espCache[index] = nil;
             object:Remove();
+
+        
         end
     end
 end
+
 
 
 function espLibrary.addChams(player)
@@ -504,20 +475,9 @@ _G.GradientSpinSpeed =  180
 
     runService:BindToRenderStep("esp_rendering", renderValue or (Enum.RenderPriority.Camera.Value + 1), function()
         for player, objects in next, self.espCache do
-    local character, torso, humanoid = self.getCharacter(player)
-    if not character or not torso or not humanoid then
-        for _, object in next, objects do
-            if typeof(object) == "Instance" and object.Visible ~= nil then
-                object.Visible = false
-            elseif typeof(object) == "table" and object.boxFill then
-                object.boxFill.Visible = false
-            end
-        end
-        continue
-    end
+            local character, torso = self.getCharacter(player);
 
-
-        
+            if (character and torso) then
                 local onScreen, size, position, torsoPosition = self.getBoxData(torso.Position, Vector3.new(5, 6));
                 local distance = (currentCamera.CFrame.Position - torso.Position).Magnitude;
                 local canShow, enabled = onScreen and (size and position), self.options.enabled;
@@ -585,7 +545,7 @@ _G.GradientSpinSpeed =  180
                 objects.arrowOutline.PointC = pointC;
 
                 objects.top.Visible = show and self.options.names;
-                objects.top.Font = tonumber(self.options.font) or 2
+                objects.top.Font = self.options.font;
                 objects.top.Size = self.options.fontSize;
                 objects.top.Transparency = self.options.nameTransparency;
                 objects.top.Color = color or self.options.nameColor;
@@ -593,19 +553,19 @@ _G.GradientSpinSpeed =  180
                 objects.top.Position = round(position + vector2New(size.X * 0.5, -(objects.top.TextBounds.Y + 2)));
 
                 objects.side.Visible = show and self.options.healthText;
-                objects.side.Font = tonumber(self.options.font) or 2
+                objects.side.Font = self.options.font;
                 objects.side.Size = self.options.fontSize;
                 objects.side.Transparency = self.options.healthTextTransparency;
                 objects.side.Color = color or self.options.healthTextColor;
-                objects.side.Text = math.round(health) .. self.options.healthTextSuffix;
+                objects.side.Text = health .. self.options.healthTextSuffix;
                 objects.side.Position = round(position + vector2New(size.X + 3, -3));
 
                 objects.bottom.Visible = show and self.options.distance;
-                objects.bottom.Font = tonumber(self.options.font) or 2
+                objects.bottom.Font = self.options.font;
                 objects.bottom.Size = self.options.fontSize;
                 objects.bottom.Transparency = self.options.distanceTransparency;
                 objects.bottom.Color = color or self.options.nameColor;
-                objects.bottom.Text = "[" .. tostring(round(distance)) .. self.options.distanceSuffix .. "]";
+                objects.bottom.Text = tostring(round(distance)) .. self.options.distanceSuffix;
                 objects.bottom.Position = round(position + vector2New(size.X * 0.5, size.Y + 1));
 
                 objects.box.Visible = show and self.options.boxes;
@@ -667,9 +627,6 @@ if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill
 end
 
 
-
-
-
 if objects.stateText and character and torso then
     local humanoid = findFirstChild(character, "Humanoid")
     if humanoid then
@@ -708,34 +665,33 @@ if objects.stateText and character and torso then
 end
 
 
-objects.healthBar.Visible = show and self.options.healthBars
-objects.healthBar.Color = color or self.options.healthBarsColor
-objects.healthBar.Transparency = self.options.healthBarsTransparency
-objects.healthBar.Size = healthBarSize
-objects.healthBar.Position = healthBarPosition
 
-objects.healthBarOutline.Visible = show and self.options.healthBars
-objects.healthBarOutline.Transparency = self.options.healthBarsTransparency
-objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2))
-objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1)
 
-objects.line.Visible = show and self.options.tracers
-objects.line.Color = color or self.options.tracerColor
-objects.line.Transparency = self.options.tracerTransparency
-objects.line.From =
-    origin == "Mouse" and userInputService:GetMouseLocation() or
-    origin == "Top" and vector2New(viewportSize.X * 0.5, 0) or
-    origin == "Bottom" and vector2New(viewportSize.X * 0.5, viewportSize.Y)
-objects.line.To = torsoPosition
+                objects.healthBar.Visible = show and self.options.healthBars;
+                objects.healthBar.Color = color or self.options.healthBarsColor;
+                objects.healthBar.Transparency = self.options.healthBarsTransparency;
+                objects.healthBar.Size = healthBarSize;
+                objects.healthBar.Position = healthBarPosition;
 
-if not character or not torso or not humanoid then
-    for _, object in next, objects do
-        object.Visible = false
-    end
-end
+                objects.healthBarOutline.Visible = show and self.options.healthBars;
+                objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
+                objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
+                objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1);
 
-      
-
+                objects.line.Visible = show and self.options.tracers;
+                objects.line.Color = color or self.options.tracerColor;
+                objects.line.Transparency = self.options.tracerTransparency;
+                objects.line.From =
+                    origin == "Mouse" and userInputService:GetMouseLocation() or
+                    origin == "Top" and vector2New(viewportSize.X * 0.5, 0) or
+                    origin == "Bottom" and vector2New(viewportSize.X * 0.5, viewportSize.Y);
+                objects.line.To = torsoPosition;
+            else
+                for _, object in next, objects do
+                    object.Visible = false;
+                end
+            end
+        end
 
         for player, highlight in next, self.chamsCache do
             local character, torso = self.getCharacter(player);
