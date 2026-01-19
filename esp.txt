@@ -1,4 +1,4 @@
-
+--
 
 local espLibrary = {
     instances = {},
@@ -9,7 +9,7 @@ local espLibrary = {
     whitelist = {}, -- insert string that is the player's name you want to whitelist (turns esp color to whitelistColor in options)
     blacklist = {}, -- insert string that is the player's name you want to blacklist (removes player from esp)
     options = {
-        enabled = false,
+        enabled = true,
         minScaleFactorX = 3,
         maxScaleFactorX = 3,
         minScaleFactorY = 4,
@@ -683,7 +683,11 @@ if objects.stateText and character and torso then
         objects.stateText.Visible = show and espLibrary.options.statesEnabled
         objects.stateText.Font = espLibrary.options.font
         objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
-        objects.stateText.Position = round(position + Vector2.new(size.X + 3, -3 + 12))
+        objects.stateText.Position = Vector2.new(
+    position.X + size.X + 3,
+    position.Y - 3
+)
+
         objects.stateText.Text = finalState
         objects.stateText.Color = espLibrary.options.statesColor
     else
@@ -700,7 +704,11 @@ if objects.teamText and character and torso then
     objects.teamText.Size = math.max(10, espLibrary.options.fontSize - 3)
 
   
-    objects.teamText.Position = round(position + Vector2.new(size.X + 3, -3 + 12 * 2))
+    objects.teamText.Position = Vector2.new(
+    position.X + size.X + 3,
+    position.Y + 9
+)
+
 
     objects.teamText.Text = targetTeam and targetTeam.Name or "No Team"
 
