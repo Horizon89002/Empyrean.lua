@@ -12,12 +12,10 @@ local espLibrary = {
         enabled = false,
         minScaleFactorX = 3,
         maxScaleFactorX = 3,
-       minScaleFactorY = 4.5,
-        maxScaleFactorY = 7,
+        minScaleFactorY = 4,
+        maxScaleFactorY = 5,
         scaleFactorX = 5,
-        scaleFactorY = 5.8,
-
-        
+        scaleFactorY = 6,
         boundingBox = false, -- WARNING | Significant Performance Decrease when true
         boundingBoxDescending = true,
         excludedPartNames = {},
