@@ -1,4 +1,4 @@
------------------------H
+
 
 local espLibrary = {
     instances = {},
@@ -269,6 +269,8 @@ function espLibrary.addEsp(player)
         top = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         side = create("Text", { Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         bottom = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
+        stateText = create("Text",{Center=false,Size=espLibrary.options.fontSize,Font=espLibrary.options.font,Outline=true,OutlineColor=color3New(),Visible=false,Color=espLibrary.options.statesColor,Text=""}),
+
 
         boxFill = espLibrary.options.image and espLibrary.options.boxes and (function()
             local img = Instance.new("ImageLabel")
@@ -281,20 +283,6 @@ function espLibrary.addEsp(player)
             img.ScaleType = Enum.ScaleType.Stretch
             img.Size = UDim2.new(1, 0, 1, 0)
             img.Position = UDim2.new(0, 0, 0, 0)
-
-            stateText = create("Text", {
-    Center = false,
-    Size = espLibrary.options.fontSize,
-    Font = espLibrary.options.font,
-    Outline = true,
-    OutlineColor = color3New(0,0,0),
-    Visible = false,
-    Color = espLibrary.options.statesColor,
-    Text = "",
-})
-
-
-            
 
 
             local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
