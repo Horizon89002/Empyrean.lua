@@ -1,4 +1,4 @@
---------------------------------------------------------------------
+
 
 local espLibrary = {
     instances = {},
@@ -683,7 +683,7 @@ if objects.stateText and character and torso then
         objects.stateText.Visible = show and espLibrary.options.statesEnabled
         objects.stateText.Font = espLibrary.options.font
         objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
-        objects.stateText.Position = round(position + Vector2.new(size.X + 3, -3 + objects.side.TextBounds.Y + 2))
+        objects.stateText.Position = round(position + Vector2.new(size.X + 3, -3 + 12))
         objects.stateText.Text = finalState
         objects.stateText.Color = espLibrary.options.statesColor
     else
@@ -700,13 +700,7 @@ if objects.teamText and character and torso then
     objects.teamText.Size = math.max(10, espLibrary.options.fontSize - 3)
 
   
-    objects.teamText.Position = round(
-    position + Vector2.new(
-        size.X + 3,
-        -3 + objects.side.TextBounds.Y + objects.stateText.TextBounds.Y + 4
-    )
-)
-
+    objects.teamText.Position = round(position + Vector2.new(size.X + 3, -3 + 12 * 2))
 
     objects.teamText.Text = targetTeam and targetTeam.Name or "No Team"
 
