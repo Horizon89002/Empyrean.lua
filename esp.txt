@@ -1,4 +1,4 @@
---ee
+
 
 local espLibrary = {
     instances = {},
@@ -296,7 +296,7 @@ function espLibrary.addEsp(player)
     Visible = false,
     Color = espLibrary.options.statesColor,
     Text = "",
-}),
+})
 
 
 
@@ -366,21 +366,12 @@ end
     espLibrary.espCache[player] = objects
 end
 
-espLibrary.lastCFs = espLibrary.lastCFs or {}
-espLibrary.lastY = espLibrary.lastY or {}
 
 function espLibrary.removeEsp(player)
     local espCache = espLibrary.espCache[player];
 
     if (espCache) then
         espLibrary.espCache[player] = nil;
-
-        if espLibrary.lastCFs then
-            espLibrary.lastCFs[player] = nil
-        end
-        if espLibrary.lastY then
-            espLibrary.lastY[player] = nil
-        end
 
         for index, object in next, espCache do
             espCache[index] = nil;
@@ -677,59 +668,37 @@ end
 
 
 
+if objects.stateText and character and torso then
+    local humanoid = findFirstChild(character, "Humanoid")
+    if humanoid then
+        local state = humanoid:GetState()
+        local horizontalVel = Vector3.new(torso.AssemblyLinearVelocity.X, 0, torso.AssemblyLinearVelocity.Z).Magnitude
 
-if objects.stateText then
-    if character and torso then
+        local finalState = ""
+
+        if state == Enum.HumanoidStateType.Jumping then
+            finalState = "Jumping"
+        elseif state == Enum.HumanoidStateType.Freefall then
+            finalState = "Falling"
+        elseif state == Enum.HumanoidStateType.Running then
+            finalState = horizontalVel <= 0.1 and "Idle" or "Moving"
+        else
+            local rename = {
+                FallingDown = "Falling",
+                RunningNoPhysics = "Running",
+                StrafingNoPhysics = "Strafing",
+                PlatformStanding = "Platform",
+                GettingUp = "GetUp",
+                Running = "Moving",
+            }
+            finalState = rename[state.Name] or state.Name
+        end
+
         objects.stateText.Visible = show and espLibrary.options.statesEnabled
         objects.stateText.Font = espLibrary.options.font
         objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
         objects.stateText.Position = round(position + Vector2.new(size.X + 3, 10))
-
-        local humanoid = findFirstChild(character, "Humanoid")
-        if humanoid then
-            local state = humanoid:GetState()
-            local horizontalVel = Vector3.new(torso.AssemblyLinearVelocity.X, 0, torso.AssemblyLinearVelocity.Z).Magnitude
-
-            local finalState = ""
-
-            
-            local lastCF = espLibrary.lastCFs[player]
-            if lastCF and (torso.Position - lastCF.Position).Magnitude > 25 then
-                finalState = "Desync"
-            else
-               
-                local lastY = espLibrary.lastY[player] or torso.Position.Y
-                local verticalDrop = lastY - torso.Position.Y
-
-                if state == Enum.HumanoidStateType.Freefall and verticalDrop > 20 then
-                    finalState = "Air"
-                elseif state == Enum.HumanoidStateType.Jumping then
-                    finalState = "Jumping"
-                elseif state == Enum.HumanoidStateType.Running then
-                    if horizontalVel <= 0.1 then
-                        finalState = "Idle"
-                    else
-                        finalState = "Moving"
-                    end
-                else
-             
-                    local rename = {
-                        FallingDown = "Falling",
-                        RunningNoPhysics = "Running",
-                        StrafingNoPhysics = "Strafing",
-                        PlatformStanding = "Platform",
-                        GettingUp = "GetUp",
-                        Running = "Moving",
-                    }
-                    finalState = rename[state.Name] or state.Name
-                end
-            end
-
-    
-            espLibrary.lastCFs[player] = torso.CFrame
-            espLibrary.lastY[player] = torso.Position.Y
-
-            objects.stateText.Text = finalState
+        objects.stateText.Text = finalState
         objects.stateText.Color = espLibrary.options.statesColor
     else
         objects.stateText.Visible = false
@@ -763,19 +732,10 @@ end
                     origin == "Bottom" and vector2New(viewportSize.X * 0.5, viewportSize.Y);
                 objects.line.To = torsoPosition;
             else
-                
                 for _, object in next, objects do
-                   
-                    if typeof(object) == "userdata" or typeof(object) == "Instance" then
-                     
-                        pcall(function()
-                            object.Visible = false
-                        end)
-                    elseif typeof(object) == "table" and object.Visible ~= nil then
-                        object.Visible = false
-                    end
+                    object.Visible = false;
                 end
-            end 
+            end
         end
 
         for player, highlight in next, self.chamsCache do
