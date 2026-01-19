@@ -1,4 +1,4 @@
-
+-- e
 
 local espLibrary = {
     instances = {},
@@ -648,42 +648,54 @@ end
 
 objects.stateText.Visible = show and espLibrary.options.statesEnabled
 objects.stateText.Font = espLibrary.options.font
-objects.stateText.Size = espLibrary.options.fontSize
-objects.stateText.Position = round(position + vector2New(size.X + 3, 12))
+objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
+objects.stateText.Position = round(position + vector2New(size.X + 3, 10))
 
 local humanoid = findFirstChild(character, "Humanoid")
 local states = {}
 
-if humanoid then
-    table.insert(states, humanoid:GetState().Name)
-end
-
-if espLibrary.options.customStatesEnabled and humanoid and torso then
+if humanoid and torso then
     local state = humanoid:GetState()
+    local stateName = state.Name
 
-    if state == Enum.HumanoidStateType.Freefall then
-        table.insert(states, "Flying")
+   
+    local rename = {
+        FallingDown = "Falling",
+        RunningNoPhysics = "Running",
+        StrafingNoPhysics = "Strafing",
+        PlatformStanding = "Platform",
+        GettingUp = "GetUp",
+    }
+
+    stateName = rename[stateName] or stateName
+
+    local vel = torso.AssemblyLinearVelocity or torso.Velocity
+    local horizontalSpeed = Vector3.new(vel.X, 0, vel.Z).Magnitude
+
+    if state == Enum.HumanoidStateType.Running and horizontalSpeed < 0.1 then
+        table.insert(states, "Idle")
+    else
+        table.insert(states, stateName)
     end
 
-    local lastCF = objects.lastCF
-    if lastCF and (torso.Position - lastCF.Position).Magnitude > 25 then
-        table.insert(states, "Desync")
-    end
+    if espLibrary.options.customStatesEnabled then
+        if state == Enum.HumanoidStateType.Freefall then
+            table.insert(states, "Air")
+        end
 
-    objects.lastCF = torso.CFrame
+        local lastCF = objects.lastCF
+        if lastCF and (torso.Position - lastCF.Position).Magnitude > 25 then
+            table.insert(states, "Desync")
+        end
+
+        objects.lastCF = torso.CFrame
+    end
 end
 
-
-local seen, final = {}, {}
-for _, s in ipairs(states) do
-    if not seen[s] then
-        seen[s] = true
-        table.insert(final, s)
-    end
-end
-
-objects.stateText.Text = table.concat(final, ", ")
+objects.stateText.Text = table.concat(states, ", ")
 objects.stateText.Color = espLibrary.options.statesColor
+
+
 
 
 
