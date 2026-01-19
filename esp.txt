@@ -1,4 +1,4 @@
---EEE
+
 
 local espLibrary = {
     instances = {},
@@ -350,25 +350,28 @@ end
     espLibrary.espCache[player] = objects
 end
 
+espLibrary.lastCFs = espLibrary.lastCFs or {}
+espLibrary.lastY = espLibrary.lastY or {}
 
 function espLibrary.removeEsp(player)
     local espCache = espLibrary.espCache[player];
 
-
     if (espCache) then
         espLibrary.espCache[player] = nil;
-        espCache.lastCF = nil
+
+        if espLibrary.lastCFs then
+            espLibrary.lastCFs[player] = nil
+        end
+        if espLibrary.lastY then
+            espLibrary.lastY[player] = nil
+        end
 
         for index, object in next, espCache do
             espCache[index] = nil;
             object:Remove();
-
-        
         end
     end
 end
-
-
 
 
 function espLibrary.addChams(player)
@@ -662,7 +665,6 @@ if humanoid and torso then
     local state = humanoid:GetState()
     local stateName = state.Name
 
-
     local rename = {
         FallingDown = "Falling",
         RunningNoPhysics = "Running",
@@ -676,37 +678,39 @@ if humanoid and torso then
     local vel = torso.AssemblyLinearVelocity or torso.Velocity
     local horizontalSpeed = Vector3.new(vel.X, 0, vel.Z).Magnitude
 
-
     if state == Enum.HumanoidStateType.Running and horizontalSpeed < 0.1 then
         table.insert(states, "Idle")
-
-
     elseif state == Enum.HumanoidStateType.Jumping then
         table.insert(states, "Jumping")
-
-
     else
         table.insert(states, stateName)
     end
 
     if espLibrary.options.customStatesEnabled then
-        if state == Enum.HumanoidStateType.Freefall then
-            table.insert(states, "Air")
-        end
+        local lastCF = espLibrary.lastCFs[player]
+        local lastY = espLibrary.lastY[player] or torso.Position.Y
+        local verticalDrop = lastY - torso.Position.Y
 
 
-        local lastCF = objects.lastCF
         if lastCF and (torso.Position - lastCF.Position).Magnitude > 25 then
             table.insert(states, "Desync")
         end
 
-        objects.lastCF = torso.CFrame
+        if state == Enum.HumanoidStateType.Freefall then
+            if verticalDrop > 20 then
+                table.insert(states, "Air")
+            else
+                table.insert(states, "Jumping")
+            end
+        end
+
+        espLibrary.lastCFs[player] = torso.CFrame
+        espLibrary.lastY[player] = torso.Position.Y
     end
 end
 
 objects.stateText.Text = table.concat(states, ", ")
 objects.stateText.Color = espLibrary.options.statesColor
-
 
 
 
