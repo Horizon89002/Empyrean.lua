@@ -1,4 +1,4 @@
--- R
+--------------------------y
 
 local espLibrary = {
     instances = {},
@@ -51,7 +51,7 @@ local espLibrary = {
         healthBarsSize = 1,
         healthBarsTransparency = 1,
         healthBarsColor = Color3.new(0, 1, 0),
-        healthText = true,
+        healthText = false,
         healthTextTransparency = 1,
         healthTextSuffix = "%",
         healthTextColor = Color3.new(1, 1, 1),
@@ -703,7 +703,11 @@ if objects.teamText and character and torso then
     objects.teamText.Size = math.max(10, espLibrary.options.fontSize - 3)
 
   
-    objects.teamText.Position = Vector2.new(position.X + size.X + 3, position.Y + 9)
+    objects.teamText.Position = Vector2.new(
+    position.X + size.X + 3,
+    position.Y + size.Y * 0.5  
+)
+
 
 
 
