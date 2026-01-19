@@ -1,4 +1,4 @@
-
+--e
 
 local espLibrary = {
     instances = {},
@@ -562,7 +562,8 @@ _G.GradientSpinSpeed =  180
 
                 objects.top.Visible = show and self.options.names;
                 objects.top.Font = self.options.font;
-                objects.top.Size = math.max(10, round(espLibrary.options.fontSize / (torso.Position - (localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") or torso).Position).Magnitude * 1000))
+                objects.top.Size = math.max(10, round(espLibrary.options.fontSize * espLibrary.getScaleFactor(currentCamera.FieldOfView, (localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") or torso).Position - torso.Position).Magnitude))
+                objects.top.Size = round(espLibrary.options.fontSize * (size.Y / espLibrary.options.scaleFactorY))
                 objects.top.Transparency = self.options.nameTransparency;
                 objects.top.Color = color or self.options.nameColor;
                 objects.top.Text = player.Name;
@@ -570,7 +571,7 @@ _G.GradientSpinSpeed =  180
 
                 objects.side.Visible = show and self.options.healthText;
                 objects.side.Font = self.options.font;
-                objects.side.Size = math.max(10, round(espLibrary.options.fontSize * espLibrary.getScaleFactor(currentCamera.FieldOfView, (localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") or torso).Position - torso.Position).Magnitude))
+                objects.side.Size = round(espLibrary.options.fontSize * (size.Y / espLibrary.options.scaleFactorY))
                 objects.side.Transparency = self.options.healthTextTransparency;
                 objects.side.Color = color or self.options.healthTextColor;
                 objects.side.Text = math.round(health) .. self.options.healthTextSuffix;
