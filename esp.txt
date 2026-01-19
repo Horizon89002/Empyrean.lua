@@ -1,4 +1,4 @@
-
+--n
 
 local espLibrary = {
     instances = {},
@@ -167,29 +167,14 @@ end
 
 function espLibrary.getCharacter(player)
     local character = player.Character
-    if not character or not character:IsDescendantOf(workspace) then
+    if not character then
         return nil, nil, nil
     end
 
     local hrp = character:FindFirstChild("HumanoidRootPart")
     local humanoid = character:FindFirstChildOfClass("Humanoid")
 
-
     if not hrp or not humanoid then
-        return nil, nil, nil
-    end
-
-
-    if typeof(hrp.Position) ~= "Vector3" then
-        return nil, nil, nil
-    end
-
-    if humanoid.Health == nil then
-        return nil, nil, nil
-    end
-
-    local success, state = pcall(function() return humanoid:GetState() end)
-    if not success or state == nil then
         return nil, nil, nil
     end
 
@@ -523,6 +508,11 @@ _G.GradientColor3 =  Color3.new(1,1,1)
 _G.GradientSpin = false
 _G.GradientSpinSpeed =  180
 
+espLibrary.lastUpdate = espLibrary.lastUpdate or {}
+espLibrary._lastCleanup = espLibrary._lastCleanup or 0
+local CLEANUP_DELAY = 5     
+local CLEANUP_INTERVAL = 1   
+
 
     runService:BindToRenderStep("esp_rendering", renderValue or (Enum.RenderPriority.Camera.Value + 1), function()
         for player, objects in next, self.espCache do
@@ -537,6 +527,8 @@ _G.GradientSpinSpeed =  180
         end
         continue
     end
+
+    espLibrary.lastUpdate[player] = tick()
 
 
         
@@ -569,6 +561,8 @@ _G.GradientSpinSpeed =  180
                 if (self.options.teamCheck and (team == self.getTeam(localPlayer))) then
                     enabled = false;
                 end
+
+                
 
                 local viewportSize = currentCamera.ViewportSize;
 
@@ -865,6 +859,33 @@ end
             cache.text.Color = cache.options.color;
             cache.text.Text = cache.options.text;
             cache.text.Position = round(screenPosition);
+
+
+            local CLEANUP_DELAY = 5    
+local CLEANUP_INTERVAL = 1  
+
+if tick() - espLibrary._lastCleanup >= CLEANUP_INTERVAL then
+    espLibrary._lastCleanup = tick()
+    
+    for player, objects in pairs(espLibrary.espCache) do
+        local last = espLibrary.lastUpdate[player] or 0
+        if tick() - last > CLEANUP_DELAY then
+        
+            for _, object in pairs(objects) do
+                if typeof(object) == "Instance" and object.Visible ~= nil then
+                    object.Visible = false
+                elseif typeof(object) == "table" then
+                    for _, nested in pairs(object) do
+                        if typeof(nested) == "Instance" and nested.Visible ~= nil then
+                            nested.Visible = false
+                        end
+                    end
+                end
+            end
+            print("[ESP CLEANUP] Removed frozen ESP for player: " .. player.Name)
+        end
+    end
+end
         end
     end);
 end
