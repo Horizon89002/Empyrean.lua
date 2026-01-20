@@ -495,7 +495,8 @@ _G.GradientSpinSpeed =  180
 
             if (character and torso) then
                 local onScreen, size, position, torsoPosition = self.getBoxData(torso.Position, Vector3.new(5, 6));
-                local distance = (localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") and localPlayer.Character.HumanoidRootPart.Position - torso.Position).Magnitude or 0
+                local distance = (localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") and (localPlayer.Character.HumanoidRootPart.Position - torso.Position).Magnitude) or 0
+
                 local canShow, enabled = onScreen and (size and position), self.options.enabled;
                 local team, teamColor = self.getTeam(player);
                 local color = self.options.teamColor and teamColor or nil;
