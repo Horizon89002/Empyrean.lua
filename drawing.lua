@@ -115,16 +115,33 @@ do
 					ZIndex = 0
 				},
 				_frame = create("Frame", {
-					Name = id,
-					AnchorPoint = _vector2new(0.5, 0.5),
-					BackgroundColor3 = _color3new(),
-					BorderSizePixel = 0,
-					Parent = drawingDirectory,
-					Position = _udim2new(),
-					Size = _udim2new(),
-					Visible = false,
-					ZIndex = 0
-				})
+    Name = id,
+    AnchorPoint = _vector2new(0.5, 0.5),
+    BackgroundColor3 = _color3new(),
+    BackgroundTransparency = 1,
+    BorderSizePixel = 0,
+    Parent = drawingDirectory,
+    Position = _udim2new(),
+    Size = _udim2new(),
+    Visible = false,
+    ZIndex = 0
+}, {
+    create("UICorner", {
+        Name = "_corner",
+        CornerRadius = _udimnew(1, 0)
+    }),
+    create("UIStroke", {
+        Name = "_stroke",
+        Color = _color3new(),
+        Thickness = 1,
+    }),
+    create("UIGradient", {
+        Name = "_gradient",
+        Enabled = false,
+        Rotation = 90
+    })
+})
+
 			}, line);
 
 			cache[id] = newLine;
