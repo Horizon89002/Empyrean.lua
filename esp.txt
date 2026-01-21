@@ -49,6 +49,8 @@ local espLibrary = {
         boxFillColor = Color3.new(1, 0, 0),
         healthBars = true,
         healthBarsSize = 1,
+        toolNameTransparency = 1,
+        toolNameColor = Color3.new(1, 1, 1),
         healthBarsTransparency = 1,
         healthBarsColor = Color3.new(0, 1, 0),
         healthText = false,
@@ -66,6 +68,7 @@ local espLibrary = {
         chams = true,
         chamsFillColor = Color3.new(1, 0, 0),
         chamsFillTransparency = 0.5,
+        toolName = true,
         chamsOutlineColor = Color3.new(),
         chamsOutlineTransparency = 0,
         image = true,
@@ -77,6 +80,8 @@ local espLibrary = {
         teamEspEnabled = true,
         teamMyColor = Color3.new(0, 1, 0),
         teamEnemyColor = Color3.new(1, 0, 0),
+        
+
 
     },
 };
@@ -128,7 +133,6 @@ local lastFov, lastScale;
 -- instance functions
 local wtvp = currentCamera.WorldToViewportPoint;
 
--- Support Functions
 local function isDrawing(type)
     return type == "Square" or type == "Text" or type == "Triangle" or type == "Image" or type == "Line" or type == "Circle";
 end
@@ -286,6 +290,15 @@ function espLibrary.addEsp(player)
     Visible = false,
     Text = ""
 }),
+
+tool = create("Text", {
+    Center = true,
+    Size = 13,
+    Outline = true,
+    OutlineColor = color3New(),
+    Font = 2
+}),
+
 
 
         boxFill = espLibrary.options.image and espLibrary.options.boxes and (function()
@@ -584,6 +597,30 @@ _G.GradientSpinSpeed =  180
                 objects.bottom.Color = color or self.options.nameColor;
                 objects.bottom.Text = "[" .. tostring(round(distance)) .. self.options.distanceSuffix .. "]";
                 objects.bottom.Position = round(position + vector2New(size.X * 0.5, size.Y + 1));
+               
+                local tName = ""
+                local char = player.Character
+
+                if char then
+                     local tl = char:FindFirstChildOfClass("Tool")
+                if tl then
+                    tName = tl.Name
+                end
+            end
+
+            objects.tool.Visible = show and self.options.toolName and tName ~= ""
+            objects.tool.Font = self.options.font
+            objects.tool.Size = self.options.fontSize
+            objects.tool.Transparency = self.options.toolNameTransparency
+            objects.tool.Color = self.options.toolNameColor
+            objects.tool.Text = tName
+            objects.tool.Position = round(
+                  position + vector2New(
+                   size.X * 0.5,
+                     size.Y + 1 + objects.bottom.TextBounds.Y + 1
+                )
+            )
+
 
                 objects.box.Visible = show and self.options.boxes;
                 objects.box.Color = color or self.options.boxesColor;
