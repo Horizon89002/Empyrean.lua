@@ -1,6 +1,7 @@
+-- e
+
+
 local HitEffects = {}
-
-
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -397,7 +398,7 @@ local function createEffectTemplates()
                         NumberSequenceKeypoint.new(1, 18.56),
                     })
                     pe2.RotSpeed = NumberRange.new(-20, 20)
-                    pe2.Rate = 30
+                    pe2.Rate = 100
                     pe2.Texture = 'rbxassetid://10149702982'
                     pe2.EmissionDirection = Enum.NormalId.Front
                     pe2.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
