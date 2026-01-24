@@ -1,6 +1,3 @@
--- e
-
-
 local HitEffects = {}
 
 local Players = game:GetService("Players")
@@ -264,7 +261,7 @@ local function createEffectTemplates()
                     local startAttachment = Instance.new('Attachment')
 
                     startAttachment.Name = 'Start'
-                    startAttachment.CFrame = CFrame.new(0, 20, 0)
+                    startAttachment.CFrame = CFrame.new(0, 45, 0)
                     startAttachment.Parent = lightningAttachment
 
                     local endAttachment = Instance.new('Attachment')
@@ -278,13 +275,11 @@ local function createEffectTemplates()
                     beam1.FaceCamera = true
                     beam1.ZOffset = 0.3
                     beam1.TextureSpeed = 1.5
-                    beam1.Width1 = 5
-                    beam1.Width0 = 2
+                    beam1.Width1 = 6
+                    beam1.Width0 = 12
                     beam1.Transparency = NumberSequence.new({
-                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0, 0),
                         NumberSequenceKeypoint.new(0.0112219, 0),
-                        NumberSequenceKeypoint.new(0.9912719, 0),
-                        NumberSequenceKeypoint.new(1, 1),
                     })
                     beam1.TextureLength = 0.5
                     beam1.LightEmission = 1
@@ -298,13 +293,12 @@ local function createEffectTemplates()
                     beam2.FaceCamera = true
                     beam2.ZOffset = 0.3
                     beam2.TextureSpeed = 1.5
-                    beam2.Width1 = 5
-                    beam2.Width0 = 2
+                    beam2.Width1 = 6
+                    beam2.Width0 = 12
                     beam2.Transparency = NumberSequence.new({
-                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0, 0),
                         NumberSequenceKeypoint.new(0.0112219, 0),
-                        NumberSequenceKeypoint.new(0.9912719, 0),
-                        NumberSequenceKeypoint.new(1, 1),
+
                     })
                     beam2.TextureLength = 0.5
                     beam2.LightEmission = 1
@@ -389,7 +383,7 @@ local function createEffectTemplates()
                     pe2.Color = ColorSequence.new(Color3.fromRGB(255, 17, 17))
                     pe2.VelocitySpread = 360
                     pe2.Speed = NumberRange.new(0.0135816, 0.0135816)
-                    pe2.Brightness = 20
+                    pe2.Brightness = 10
                     pe2.Size = NumberSequence.new({
                         NumberSequenceKeypoint.new(0, 0),
                         NumberSequenceKeypoint.new(0.064513, 5.37),
@@ -398,7 +392,7 @@ local function createEffectTemplates()
                         NumberSequenceKeypoint.new(1, 18.56),
                     })
                     pe2.RotSpeed = NumberRange.new(-20, 20)
-                    pe2.Rate = 100
+                    pe2.Rate = 3
                     pe2.Texture = 'rbxassetid://10149702982'
                     pe2.EmissionDirection = Enum.NormalId.Front
                     pe2.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
