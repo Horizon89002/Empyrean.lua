@@ -1,787 +1,899 @@
-local DhLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/Horizon89002/Empyrean.lua/refs/heads/main/stomp%20effects/library.txt"))()
-local Services   = DhLibrary:Services()
+local HitEffects = {}
 
-local LightingService   = game:GetService("Lighting")
-local ReplicatedStorage = Services.ReplicatedStorage
-local LocalPlayer       = Services.LocalPlayer
-local RunService        = Services.RunService
-local Workspace         = Services.Workspace
-local Players           = Services.Players 
-------------------------------------------------------------------------------------------------------------
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
-local HollowPurple = game:GetObjects("rbxassetid://113021961115483")[1]
-local RoadRoller = game:GetObjects("rbxassetid://85904556439762")[1]
-local SonicRings = game:GetObjects("rbxassetid://107016840921635")[1]
-local BlackHole  = game:GetObjects("rbxassetid://107558636253769")[1]
-local Spirit     = game:GetObjects("rbxassetid://89731535148122")[1]
-local Charm      = game:GetObjects("rbxassetid://139067309930404")[1]
-local Thanos     = game:GetObjects("rbxassetid://129891025243944")[1]
-local AfterSlash = game:GetObjects("rbxassetid://102168430997910")[1]
-local Rune       = game:GetObjects("rbxassetid://139139192547301")[1]
+local effectTemplates = {}
+local templatesCreated = false
 
+local enabled = true
+local effectColor = Color3.fromRGB(255, 255, 255)
+local selectedEffects = {} 
+local activeEmitters = {} 
 
-local TweenService = game:GetService("TweenService")
-local AssetService = game:GetService("AssetService")
+local effectLifetime = 3 
 
-local Train = AssetService:CreateMeshPartAsync("rbxassetid://743576537")
-local Aura = AssetService:CreateMeshPartAsync("http://www.roblox.com/asset/?id=1323306")
+local function createEffectTemplates()
+	if templatesCreated then return end
+	templatesCreated = true
 
-local Camera  = Workspace.CurrentCamera 
+                    local particleAttachment = Instance.new('Attachment')
+                    local dots1 = Instance.new('ParticleEmitter')
 
+                    dots1.Name = 'Dots 1'
+                    dots1.LightEmission = 1
+                    dots1.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+                    dots1.LockedToPart = false
+                    dots1.ZOffset = 10
+                    dots1.Texture = 'rbxassetid://7216849075'
+                    dots1.VelocitySpread = 360
+                    dots1.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(1, 0.663),
+                    })
+                    dots1.Lifetime = NumberRange.new(1, 5)
+                    dots1.Speed = NumberRange.new(1, 210)
+                    dots1.SpreadAngle = Vector2.new(360, -360)
+                    dots1.Rate = 60
+                    dots1.Size = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0.1),
+                        NumberSequenceKeypoint.new(0.428, 0),
+                        NumberSequenceKeypoint.new(1, 0.627),
+                    })
+                    dots1.Enabled = false
+                    dots1.Parent = particleAttachment
 
-local Shock = AssetService:CreateMeshPartAsync("rbxassetid://5139788115")
-local Wind  = AssetService:CreateMeshPartAsync("rbxassetid://4681227436")
-local Root  = AssetService:CreateMeshPartAsync("rbxassetid://5139788213")
+                    local dots2 = Instance.new('ParticleEmitter')
 
-Shock.Color = Color3.fromRGB(248, 248, 248)
-Shock.Anchored = true 
-Shock.Parent = workspace
-Shock.CastShadow = false 
-Shock.CanCollide = false 
-Shock.Material = "Neon"
+                    dots2.Name = 'Dots 2'
+                    dots2.LightEmission = 1
+                    dots2.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+                    dots2.LockedToPart = false
+                    dots2.ZOffset = 10
+                    dots2.Texture = 'rbxassetid://7216849075'
+                    dots2.VelocitySpread = 360
+                    dots2.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(1, 0.663),
+                    })
+                    dots2.Lifetime = NumberRange.new(1, 5)
+                    dots2.Speed = NumberRange.new(1, 210)
+                    dots2.SpreadAngle = Vector2.new(360, -360)
+                    dots2.Rate = 100
+                    dots2.Size = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0.1),
+                        NumberSequenceKeypoint.new(0.502, 1.438),
+                        NumberSequenceKeypoint.new(0.925, 1.125),
+                        NumberSequenceKeypoint.new(1, 0.397),
+                    })
+                    dots2.Enabled = false
+                    dots2.Orientation = Enum.ParticleOrientation.FacingCamera
+                    dots2.Parent = particleAttachment
+                    effectTemplates['Particle'] = particleAttachment
 
-Wind.Color = Color3.fromRGB(248, 248, 248)
-Wind.Anchored = true 
-Wind.Parent = workspace
-Wind.CastShadow = false 
-Wind.CanCollide = false 
-Wind.Material = "Neon"
+                    local bloodAttachment = Instance.new('Attachment')
+                    local blood02 = Instance.new('ParticleEmitter')
 
-Root.Color = Color3.fromRGB(248, 248, 248)
-Root.Anchored = true 
-Root.Parent = workspace
-Root.CastShadow = false 
-Root.CanCollide = false 
-Root.Material = "Neon"
+                    blood02.Name = 'Blood-02'
+                    blood02.Lifetime = NumberRange.new(0.5, 0.75)
+                    blood02.SpreadAngle = Vector2.new(90, 90)
+                    blood02.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.125, 0.5),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    blood02.Color = ColorSequence.new(Color3.fromRGB(130, 0, 0))
+                    blood02.VelocitySpread = 90
+                    blood02.Speed = NumberRange.new(5, 10)
+                    blood02.Size = NumberSequence.new(0.5, 2)
+                    blood02.Acceleration = Vector3.new(0, -20, 0)
+                    blood02.RotSpeed = NumberRange.new(-90, 90)
+                    blood02.Rate = 250
+                    blood02.Texture = 'rbxassetid://241576804'
+                    blood02.Rotation = NumberRange.new(-360, 360)
+                    blood02.Enabled = false
+                    blood02.Parent = bloodAttachment
 
+                    local blood01 = Instance.new('ParticleEmitter')
 
+                    blood01.Name = 'Blood-01'
+                    blood01.Lifetime = NumberRange.new(0.5, 0.5)
+                    blood01.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
+                    blood01.SpreadAngle = Vector2.new(10, 10)
+                    blood01.LockedToPart = true
+                    blood01.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.105985, 0),
+                        NumberSequenceKeypoint.new(0.5024938, 0),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    blood01.Color = ColorSequence.new(Color3.fromRGB(130, 0, 0))
+                    blood01.VelocitySpread = 10
+                    blood01.Speed = NumberRange.new(0.01, 0.01)
+                    blood01.ZOffset = 0.5
+                    blood01.Size = NumberSequence.new(2.1875, 3.5625)
+                    blood01.Rate = 10
+                    blood01.Texture = 'rbxassetid://16668936898'
+                    blood01.EmissionDirection = Enum.NormalId.Front
+                    blood01.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
+                    blood01.Rotation = NumberRange.new(-360, 360)
+                    blood01.Enabled = false
+                    blood01.Parent = bloodAttachment
 
-Aura.Color = Color3.fromRGB(4, 175, 236)
-Aura.Anchored = true 
-Aura.Parent = workspace
-Aura.CanCollide = false 
-Aura.CastShadow = false 
+                    local blood03 = Instance.new('ParticleEmitter')
 
-Train.TextureID = "rbxassetid://743576568"
-Train.Anchored = true 
-Train.Parent = workspace
-Train.CFrame = Train.CFrame * CFrame.Angles(0,-math.rad(90),0)
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------
--- Ts shake Module was NOT made by me
-local ShakeModule = {}
+                    blood03.Name = 'Blood-03'
+                    blood03.LightInfluence = 1
+                    blood03.Lifetime = NumberRange.new(0.25, 0.5)
+                    blood03.SpreadAngle = Vector2.new(360, 360)
+                    blood03.LockedToPart = true
+                    blood03.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.25, 0),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    blood03.Color = ColorSequence.new(Color3.fromRGB(100, 0, 0))
+                    blood03.VelocitySpread = 360
+                    blood03.Squash = NumberSequence.new(0, -3)
+                    blood03.Speed = NumberRange.new(15, 25)
+                    blood03.Size = NumberSequence.new(0.125, 0.6874996)
+                    blood03.Acceleration = Vector3.new(0, -75, 0)
+                    blood03.Rate = 100
+                    blood03.Texture = 'rbxassetid://4509687978'
+                    blood03.Orientation = Enum.ParticleOrientation.VelocityParallel
+                    blood03.Enabled = false
+                    blood03.Parent = bloodAttachment
 
-local shakeActive = false
-local shakeStartTime = 0
-local shakeDuration = 0.8
-local initialIntensity = 1
+                    local blood05 = Instance.new('ParticleEmitter')
 
-local noise = math.noise 
+                    blood05.Name = 'Blood-05'
+                    blood05.Lifetime = NumberRange.new(0.75, 0.75)
+                    blood05.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
+                    blood05.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.5037407, 0),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    blood05.Color = ColorSequence.new(Color3.fromRGB(130, 0, 0))
+                    blood05.Speed = NumberRange.new(0.001, 0.001)
+                    blood05.ZOffset = 4
+                    blood05.Size = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0.25),
+                        NumberSequenceKeypoint.new(0.3764706, 2.0625, 0.5763994),
+                        NumberSequenceKeypoint.new(1, 2.6875, 0.125),
+                    })
+                    blood05.Rate = 5
+                    blood05.Texture = 'rbxassetid://16664856199'
+                    blood05.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
+                    blood05.Rotation = NumberRange.new(-360, 360)
+                    blood05.Enabled = false
+                    blood05.Parent = bloodAttachment
 
-local function updateCameraShake()
-    if not shakeActive then return end
-    
-    local elapsed = os.clock() - shakeStartTime
-    if elapsed >= shakeDuration then
-        shakeActive = false
-        return
-    end
-    
-    local progress = elapsed / shakeDuration
-    local currentIntensity = initialIntensity * (1 - progress^2)
-    
-    local downwardOffset = Vector3.new(0, -0.5 * currentIntensity, 0)
-    local bounceOffset = Vector3.new(0, 0.3 * currentIntensity * math.sin(progress * 10), 0)
-    
-    local timeFactor = os.clock() * 10
-    local shakeX = noise(timeFactor, 0) * currentIntensity * 0.1
-    local shakeY = noise(timeFactor, 100) * currentIntensity * 0.1
-    local shakeZ = noise(timeFactor, 200) * currentIntensity * 0.1
-    
-    local rotX = noise(timeFactor, 300) * currentIntensity * 0.05 
-    local rotY = noise(timeFactor, 400) * currentIntensity * 0.05 
-    local rotZ = noise(timeFactor, 500) * currentIntensity * 0.05 
-    
-    local offsetPosition = downwardOffset + bounceOffset + Vector3.new(shakeX, shakeY, shakeZ)
-    local offsetRotation = CFrame.Angles(rotX, rotY, rotZ)
-    
-    Camera.CFrame = Camera.CFrame * CFrame.new(offsetPosition) * offsetRotation
+                    local blood04 = Instance.new('ParticleEmitter')
+
+                    blood04.Name = 'Blood-04'
+                    blood04.LightInfluence = 1
+                    blood04.Lifetime = NumberRange.new(0.25, 0.5)
+                    blood04.SpreadAngle = Vector2.new(180, 180)
+                    blood04.LockedToPart = true
+                    blood04.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.25, 0),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    blood04.Color = ColorSequence.new(Color3.fromRGB(100, 0, 0))
+                    blood04.VelocitySpread = 180
+                    blood04.Squash = NumberSequence.new(0, -3)
+                    blood04.Speed = NumberRange.new(29, 29)
+                    blood04.Size = NumberSequence.new(0.125, 0.6874996)
+                    blood04.Acceleration = Vector3.new(0, -45, 0)
+                    blood04.Rate = 100
+                    blood04.Texture = 'rbxassetid://4509687978'
+                    blood04.Orientation = Enum.ParticleOrientation.VelocityParallel
+                    blood04.Enabled = false
+                    blood04.Parent = bloodAttachment
+                    effectTemplates['Blood'] = bloodAttachment
+
+                    local lightAttachment = Instance.new('Attachment')
+                    local light1 = Instance.new('ParticleEmitter')
+
+                    light1.LightInfluence = 1
+                    light1.Lifetime = NumberRange.new(1, 1)
+                    light1.LockedToPart = true
+                    light1.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.2066596, 0),
+                        NumberSequenceKeypoint.new(0.4947146, 0),
+                        NumberSequenceKeypoint.new(0.7996829, 0),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    light1.LightEmission = 1
+                    light1.Speed = NumberRange.new(0, 0)
+                    light1.ZOffset = 4
+                    light1.Size = NumberSequence.new(7.5)
+                    light1.RotSpeed = NumberRange.new(100, 100)
+                    light1.Rate = 1
+                    light1.Texture = 'rbxassetid://271370648'
+                    light1.Enabled = false
+                    light1.Parent = lightAttachment
+
+                    local light2 = Instance.new('ParticleEmitter')
+
+                    light2.LightInfluence = 1
+                    light2.Lifetime = NumberRange.new(1, 1)
+                    light2.LockedToPart = true
+                    light2.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.4947146, 0),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    light2.LightEmission = 1
+                    light2.Speed = NumberRange.new(0, 0)
+                    light2.ZOffset = 5
+                    light2.Size = NumberSequence.new(7.5)
+                    light2.Rate = 2
+                    light2.Texture = 'rbxassetid://13275495915'
+                    light2.Enabled = false
+                    light2.Parent = lightAttachment
+
+                    local light3 = Instance.new('ParticleEmitter')
+
+                    light3.LightInfluence = 1
+                    light3.Lifetime = NumberRange.new(1, 1)
+                    light3.LockedToPart = true
+                    light3.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(0.5042283, 0.49375),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    light3.LightEmission = 1
+                    light3.Speed = NumberRange.new(0, 0)
+                    light3.ZOffset = 5
+                    light3.Size = NumberSequence.new(0, 7.4375)
+                    light3.Rate = 3
+                    light3.Texture = 'rbxassetid://15267994078'
+                    light3.Rotation = NumberRange.new(-360, 360)
+                    light3.Enabled = false
+                    light3.Parent = lightAttachment
+                    effectTemplates['Light'] = lightAttachment
+
+                    local lightningAttachment = Instance.new('Attachment')
+                    local startAttachment = Instance.new('Attachment')
+
+                    startAttachment.Name = 'Start'
+                    startAttachment.CFrame = CFrame.new(0, 20, 0)
+                    startAttachment.Parent = lightningAttachment
+
+                    local endAttachment = Instance.new('Attachment')
+
+                    endAttachment.Name = 'End'
+                    endAttachment.CFrame = CFrame.new(0, 0, 0)
+                    endAttachment.Parent = lightningAttachment
+
+                    local beam1 = Instance.new('Beam')
+
+                    beam1.FaceCamera = true
+                    beam1.ZOffset = 0.3
+                    beam1.TextureSpeed = 1.5
+                    beam1.Width1 = 5
+                    beam1.Width0 = 2
+                    beam1.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.0112219, 0),
+                        NumberSequenceKeypoint.new(0.9912719, 0),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    beam1.TextureLength = 0.5
+                    beam1.LightEmission = 1
+                    beam1.Texture = 'rbxassetid://7216850022'
+                    beam1.Attachment0 = startAttachment
+                    beam1.Attachment1 = endAttachment
+                    beam1.Parent = startAttachment
+
+                    local beam2 = Instance.new('Beam')
+
+                    beam2.FaceCamera = true
+                    beam2.ZOffset = 0.3
+                    beam2.TextureSpeed = 1.5
+                    beam2.Width1 = 5
+                    beam2.Width0 = 2
+                    beam2.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.0112219, 0),
+                        NumberSequenceKeypoint.new(0.9912719, 0),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    beam2.TextureLength = 0.5
+                    beam2.LightEmission = 1
+                    beam2.Texture = 'rbxassetid://7216850022'
+                    beam2.Attachment0 = startAttachment
+                    beam2.Attachment1 = endAttachment
+                    beam2.Parent = startAttachment
+
+                    local lightningOne = Instance.new('ParticleEmitter')
+
+                    lightningOne.Name = 'Lightning One'
+                    lightningOne.FlipbookFramerate = NumberRange.new(17, 17)
+                    lightningOne.Lifetime = NumberRange.new(0.1, 1)
+                    lightningOne.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
+                    lightningOne.LockedToPart = true
+                    lightningOne.Speed = NumberRange.new(0.01, 0.01)
+                    lightningOne.Brightness = 15
+                    lightningOne.ZOffset = 3
+                    lightningOne.Size = NumberSequence.new(5)
+                    lightningOne.Rate = 5
+                    lightningOne.Texture = 'rbxassetid://14582813693'
+                    lightningOne.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
+                    lightningOne.Rotation = NumberRange.new(-360, 360)
+                    lightningOne.Enabled = false
+                    lightningOne.Parent = endAttachment
+
+                    local lightningTwo = Instance.new('ParticleEmitter')
+
+                    lightningTwo.Name = 'Lightning two'
+                    lightningTwo.FlipbookFramerate = NumberRange.new(17, 17)
+                    lightningTwo.Lifetime = NumberRange.new(0.1, 1)
+                    lightningTwo.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
+                    lightningTwo.LockedToPart = true
+                    lightningTwo.Speed = NumberRange.new(0.01, 0.01)
+                    lightningTwo.Brightness = 15
+                    lightningTwo.ZOffset = 3
+                    lightningTwo.Size = NumberSequence.new(5)
+                    lightningTwo.Rate = 5
+                    lightningTwo.Texture = 'rbxassetid://14582813693'
+                    lightningTwo.Orientation = Enum.ParticleOrientation.VelocityParallel
+                    lightningTwo.Rotation = NumberRange.new(-360, 360)
+                    lightningTwo.Enabled = false
+                    lightningTwo.Parent = endAttachment
+
+                    local glow = Instance.new('ParticleEmitter')
+
+                    glow.Name = 'Glow'
+                    glow.Lifetime = NumberRange.new(0.4, 0.4)
+                    glow.SpreadAngle = Vector2.new(360, 360)
+                    glow.Transparency = NumberSequence.new(0, 1)
+                    glow.LightEmission = 1
+                    glow.Drag = 15
+                    glow.VelocitySpread = 360
+                    glow.Speed = NumberRange.new(0.0099825, 0.0099825)
+                    glow.Brightness = 5
+                    glow.ZOffset = 4
+                    glow.Size = NumberSequence.new(5)
+                    glow.Rate = 2
+                    glow.Texture = 'rbxassetid://13305806509'
+                    glow.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
+                    glow.Enabled = false
+                    glow.Parent = endAttachment
+                    effectTemplates['Lightning'] = lightningAttachment
+
+                    local blackFlashAttachment = Instance.new('Attachment')
+                    local pe2 = Instance.new('ParticleEmitter')
+
+                    pe2.Name = '2'
+                    pe2.LightInfluence = 0.2
+                    pe2.Lifetime = NumberRange.new(0.1, 0.25)
+                    pe2.SpreadAngle = Vector2.new(360, 360)
+                    pe2.LockedToPart = true
+                    pe2.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(0.037522, 0.291925),
+                        NumberSequenceKeypoint.new(0.13103, 0.602484),
+                        NumberSequenceKeypoint.new(0.259083, 0.78882),
+                        NumberSequenceKeypoint.new(0.403812, 0.906832),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    pe2.LightEmission = 1
+                    pe2.Color = ColorSequence.new(Color3.fromRGB(255, 17, 17))
+                    pe2.VelocitySpread = 360
+                    pe2.Speed = NumberRange.new(0.0135816, 0.0135816)
+                    pe2.Brightness = 10
+                    pe2.Size = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(0.064513, 5.37),
+                        NumberSequenceKeypoint.new(0.236513, 11.31),
+                        NumberSequenceKeypoint.new(0.586513, 15.7),
+                        NumberSequenceKeypoint.new(1, 18.56),
+                    })
+                    pe2.RotSpeed = NumberRange.new(-20, 20)
+                    pe2.Rate = 20
+                    pe2.Texture = 'rbxassetid://10149702982'
+                    pe2.EmissionDirection = Enum.NormalId.Front
+                    pe2.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
+                    pe2.Rotation = NumberRange.new(-360, 360)
+                    pe2.Enabled = false
+                    pe2.Parent = blackFlashAttachment
+
+                    local lightning3 = Instance.new('ParticleEmitter')
+
+                    lightning3.Name = 'Lightning3'
+                    lightning3.Lifetime = NumberRange.new(0.25, 0.41)
+                    lightning3.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
+                    lightning3.SpreadAngle = Vector2.new(16, 16)
+                    lightning3.LockedToPart = true
+                    lightning3.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.0280971, 0),
+                        NumberSequenceKeypoint.new(0.523627, 0.0875),
+                        NumberSequenceKeypoint.new(0.569604, 0.43125),
+                        NumberSequenceKeypoint.new(0.633461, 0.7875),
+                        NumberSequenceKeypoint.new(0.747126, 0.95),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    lightning3.Color = ColorSequence.new(Color3.fromRGB(255, 17, 17))
+                    lightning3.Drag = 5
+                    lightning3.VelocitySpread = 16
+                    lightning3.Speed = NumberRange.new(0.0077598, 0.0077598)
+                    lightning3.ZOffset = 5.3460002
+                    lightning3.Size = NumberSequence.new(9.31)
+                    lightning3.Rate = 3
+                    lightning3.Texture = 'rbxassetid://14934040881'
+                    lightning3.EmissionDirection = Enum.NormalId.Front
+                    lightning3.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
+                    lightning3.Rotation = NumberRange.new(-360, 360)
+                    lightning3.Enabled = false
+                    lightning3.Parent = blackFlashAttachment
+
+                    local flare1 = Instance.new('ParticleEmitter')
+
+                    flare1.Name = 'Flare1'
+                    flare1.Lifetime = NumberRange.new(0.6, 1.3)
+                    flare1.SpreadAngle = Vector2.new(180, 180)
+                    flare1.LockedToPart = true
+                    flare1.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0.602871),
+                        NumberSequenceKeypoint.new(0.113611, 0.842105, 0.0191388),
+                        NumberSequenceKeypoint.new(0.457399, 0.9625),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    flare1.LightEmission = 1
+                    flare1.Drag = 10
+                    flare1.VelocitySpread = 180
+                    flare1.Speed = NumberRange.new(72.6485977, 290.5939941)
+                    flare1.Brightness = 0.75
+                    flare1.ZOffset = 3.459456
+                    flare1.Size = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0.58, 3.49),
+                        NumberSequenceKeypoint.new(0.1, 6.27, 3.49),
+                        NumberSequenceKeypoint.new(0.2, 9.86, 3.49),
+                        NumberSequenceKeypoint.new(0.3, 12.52, 3.49),
+                        NumberSequenceKeypoint.new(0.4, 14.59, 3.49),
+                        NumberSequenceKeypoint.new(0.5, 16.25, 3.49),
+                        NumberSequenceKeypoint.new(0.6, 17.59, 3.49),
+                        NumberSequenceKeypoint.new(0.7, 18.66, 3.49),
+                        NumberSequenceKeypoint.new(0.8, 19.49, 3.49),
+                        NumberSequenceKeypoint.new(0.9, 20.08, 3.49),
+                        NumberSequenceKeypoint.new(1, 20.34, 3.49),
+                    })
+                    flare1.Rate = 3
+                    flare1.Texture = 'rbxassetid://15883763954'
+                    flare1.EmissionDirection = Enum.NormalId.Front
+                    flare1.Orientation = Enum.ParticleOrientation.VelocityParallel
+                    flare1.Rotation = NumberRange.new(-360, 360)
+                    flare1.Enabled = false
+                    flare1.Parent = blackFlashAttachment
+
+                    local flash = Instance.new('ParticleEmitter')
+
+                    flash.Name = 'Flash'
+                    flash.Lifetime = NumberRange.new(0.07, 0.2)
+                    flash.SpreadAngle = Vector2.new(-360, 360)
+                    flash.LockedToPart = true
+                    flash.LightEmission = 1
+                    flash.Color = ColorSequence.new(Color3.fromRGB(255, 17, 17))
+                    flash.VelocitySpread = -360
+                    flash.Squash = NumberSequence.new(0.15)
+                    flash.Speed = NumberRange.new(0.0197291, 0.0197291)
+                    flash.Brightness = 15
+                    flash.ZOffset = 3.9599998
+                    flash.Size = NumberSequence.new(25.55, 0)
+                    flash.Rate = 3
+                    flash.Texture = 'rbxassetid://15446757636'
+                    flash.Orientation = Enum.ParticleOrientation.VelocityParallel
+                    flash.Rotation = NumberRange.new(-360, 360)
+                    flash.Enabled = false
+                    flash.Parent = blackFlashAttachment
+
+                    local impactFlare = Instance.new('ParticleEmitter')
+
+                    impactFlare.Name = 'ImpactFlare'
+                    impactFlare.Lifetime = NumberRange.new(0.1, 0.2)
+                    impactFlare.SpreadAngle = Vector2.new(360, 360)
+                    impactFlare.LockedToPart = true
+                    impactFlare.LightEmission = 1
+                    impactFlare.Color = ColorSequence.new(Color3.fromRGB(255, 17, 17))
+                    impactFlare.VelocitySpread = 360
+                    impactFlare.Squash = NumberSequence.new(-0.25)
+                    impactFlare.Speed = NumberRange.new(0.159667, 0.159667)
+                    impactFlare.Brightness = 15
+                    impactFlare.ZOffset = 3.9599998
+                    impactFlare.Size = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(0.146875, 21.95),
+                        NumberSequenceKeypoint.new(0.475, 5.59),
+                        NumberSequenceKeypoint.new(1, 0),
+                    })
+                    impactFlare.Rate = 3
+                    impactFlare.Texture = 'rbxassetid://15860138158'
+                    impactFlare.Orientation = Enum.ParticleOrientation.VelocityParallel
+                    impactFlare.Enabled = false
+                    impactFlare.Parent = blackFlashAttachment
+                    effectTemplates['BlackFlash'] = blackFlashAttachment
+
+                    local gravityAttachment = Instance.new('Attachment')
+                    local gradient = Instance.new('ParticleEmitter')
+
+                    gradient.Name = 'Gradient'
+                    gradient.Lifetime = NumberRange.new(0.6, 0.6)
+                    gradient.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.578059, 0.7375),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    gradient.LightEmission = 1
+                    gradient.Color = ColorSequence.new(Color3.fromRGB(114, 44, 255))
+                    gradient.Speed = NumberRange.new(0.0629003, 0.0629003)
+                    gradient.Brightness = 4
+                    gradient.Size = NumberSequence.new(0, 35.7745705)
+                    gradient.RotSpeed = NumberRange.new(500, 800)
+                    gradient.Rate = 3
+                    gradient.Texture = 'rbxassetid://8030746658'
+                    gradient.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
+                    gradient.Rotation = NumberRange.new(-360, 360)
+                    gradient.Enabled = false
+                    gradient.Parent = gravityAttachment
+
+                    local specs = Instance.new('ParticleEmitter')
+
+                    specs.Name = 'Specs'
+                    specs.Lifetime = NumberRange.new(0.85, 1)
+                    specs.SpreadAngle = Vector2.new(-30, 30)
+                    specs.LightEmission = 1
+                    specs.Color = ColorSequence.new(Color3.fromRGB(81, 62, 189))
+                    specs.VelocitySpread = -30
+                    specs.Speed = NumberRange.new(5, 10)
+                    specs.Brightness = 4
+                    specs.Size = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(0.1672474, 0.8749998, 0.4375),
+                        NumberSequenceKeypoint.new(1, 0),
+                    })
+                    specs.Rate = 35
+                    specs.Texture = 'rbxassetid://8030760338'
+                    specs.Enabled = false
+                    specs.Parent = gravityAttachment
+
+                    local specs3 = Instance.new('ParticleEmitter')
+
+                    specs3.Name = 'Specs3'
+                    specs3.Lifetime = NumberRange.new(0.2, 0.4)
+                    specs3.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.2606061, 0),
+                        NumberSequenceKeypoint.new(1, 0),
+                    })
+                    specs3.LightEmission = 1
+                    specs3.Color = ColorSequence.new(Color3.fromRGB(114, 44, 255))
+                    specs3.Drag = 1
+                    specs3.Squash = NumberSequence.new(0, 3)
+                    specs3.Speed = NumberRange.new(5, 10)
+                    specs3.Brightness = 3
+                    specs3.Size = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(0.110303, 4.0975556),
+                        NumberSequenceKeypoint.new(1, 0),
+                    })
+                    specs3.ShapeInOut = Enum.ParticleEmitterShapeInOut.InAndOut
+                    specs3.Rate = 70
+                    specs3.Texture = 'rbxassetid://8801300936'
+                    specs3.Orientation = Enum.ParticleOrientation.FacingCameraWorldUp
+                    specs3.Enabled = false
+                    specs3.Parent = gravityAttachment
+
+                    local lines = Instance.new('ParticleEmitter')
+
+                    lines.Name = 'Lines'
+                    lines.LightInfluence = 1
+                    lines.Lifetime = NumberRange.new(0.2, 0.3)
+                    lines.LockedToPart = true
+                    lines.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.244546, 0),
+                        NumberSequenceKeypoint.new(0.5, 0),
+                        NumberSequenceKeypoint.new(0.738232, 0),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    lines.Color = ColorSequence.new(Color3.fromRGB(0, 0, 0))
+                    lines.Squash = NumberSequence.new(0, 2.7750001)
+                    lines.Speed = NumberRange.new(1, 1)
+                    lines.Brightness = 0.645
+                    lines.ZOffset = 1.01
+                    lines.Size = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(0.100266, 0),
+                        NumberSequenceKeypoint.new(0.5092024, 1.6249996, 0.645087),
+                        NumberSequenceKeypoint.new(0.899734, 0),
+                        NumberSequenceKeypoint.new(1, 0),
+                    })
+                    lines.VelocityInheritance = 1
+                    lines.Rate = 200
+                    lines.Texture = 'rbxassetid://8984664353'
+                    lines.EmissionDirection = Enum.NormalId.Back
+                    lines.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
+                    lines.Enabled = false
+                    lines.Parent = gravityAttachment
+
+                    local lines1 = Instance.new('ParticleEmitter')
+
+                    lines1.Name = 'Lines1'
+                    lines1.Lifetime = NumberRange.new(0.2, 0.3)
+                    lines1.LockedToPart = true
+                    lines1.LightEmission = 1
+                    lines1.Color = ColorSequence.new(Color3.fromRGB(126, 66, 255))
+                    lines1.Squash = NumberSequence.new(0, 1.1999998)
+                    lines1.Speed = NumberRange.new(1, 1)
+                    lines1.Brightness = 15
+                    lines1.ZOffset = 1.01
+                    lines1.Size = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(0.100266, 0),
+                        NumberSequenceKeypoint.new(0.5153374, 2.2499995, 0.645087),
+                        NumberSequenceKeypoint.new(0.899734, 0),
+                        NumberSequenceKeypoint.new(1, 0),
+                    })
+                    lines1.VelocityInheritance = 1
+                    lines1.Rate = 200
+                    lines1.Texture = 'rbxassetid://8984664353'
+                    lines1.EmissionDirection = Enum.NormalId.Back
+                    lines1.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
+                    lines1.Enabled = false
+                    lines1.Parent = gravityAttachment
+                    effectTemplates['Gravity'] = gravityAttachment
+
+                    local meteorAttachment = Instance.new('Attachment')
+                    local meteorStart = Instance.new('Attachment')
+
+                    meteorStart.Name = 'MeteorStart'
+                    meteorStart.CFrame = CFrame.new(0, 25, 0)
+                    meteorStart.Parent = meteorAttachment
+
+                    local meteorEnd = Instance.new('Attachment')
+
+                    meteorEnd.Name = 'MeteorEnd'
+                    meteorEnd.CFrame = CFrame.new(0, 0, 0)
+                    meteorEnd.Parent = meteorAttachment
+
+                    local trail = Instance.new('Trail')
+
+                    trail.FaceCamera = true
+                    trail.Color = ColorSequence.new(Color3.fromRGB(79, 25, 255))
+                    trail.WidthScale = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(0.0666667, 0.13125),
+                        NumberSequenceKeypoint.new(0.180117, 0.23125),
+                        NumberSequenceKeypoint.new(0.3309942, 0.2375),
+                        NumberSequenceKeypoint.new(0.4842105, 0.16875),
+                        NumberSequenceKeypoint.new(0.5918128, 0.1),
+                        NumberSequenceKeypoint.new(0.7274854, 0.05),
+                        NumberSequenceKeypoint.new(1, 0),
+                    })
+                    trail.Transparency = NumberSequence.new(0)
+                    trail.Lifetime = 0.2
+                    trail.Brightness = 13
+                    trail.Attachment0 = meteorStart
+                    trail.Attachment1 = meteorEnd
+                    trail.Parent = meteorAttachment
+
+                    local fireSpiky = Instance.new('ParticleEmitter')
+
+                    fireSpiky.Name = 'FireGroundSpikeyFire'
+                    fireSpiky.Lifetime = NumberRange.new(0.1, 0.3)
+                    fireSpiky.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
+                    fireSpiky.SpreadAngle = Vector2.new(40, 40)
+                    fireSpiky.LightEmission = 0.1
+                    fireSpiky.Color = ColorSequence.new(Color3.fromRGB(72, 26, 255))
+                    fireSpiky.Drag = 9
+                    fireSpiky.FlipbookStartRandom = true
+                    fireSpiky.VelocitySpread = 40
+                    fireSpiky.Speed = NumberRange.new(100, 200)
+                    fireSpiky.Brightness = 4.57
+                    fireSpiky.ZOffset = -0.1146465
+                    fireSpiky.Size = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 14.1784506, 0.3640427),
+                        NumberSequenceKeypoint.new(0.374578, 16.1989517, 0.3758909),
+                        NumberSequenceKeypoint.new(1, 10.3182821, 0.689132),
+                    })
+                    fireSpiky.Rate = 30
+                    fireSpiky.Texture = 'http://www.roblox.com/asset/?id=13136714025'
+                    fireSpiky.EmissionDirection = Enum.NormalId.Back
+                    fireSpiky.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
+                    fireSpiky.Rotation = NumberRange.new(0, 360)
+                    fireSpiky.Enabled = false
+                    fireSpiky.Parent = meteorEnd
+
+                    local stars = Instance.new('ParticleEmitter')
+
+                    stars.Name = 'Stars'
+                    stars.Lifetime = NumberRange.new(0.15, 0.25)
+                    stars.SpreadAngle = Vector2.new(30, 30)
+                    stars.LockedToPart = true
+                    stars.LightEmission = 0.6
+                    stars.Color = ColorSequence.new(Color3.fromRGB(69, 44, 255))
+                    stars.Drag = 26
+                    stars.VelocitySpread = 30
+                    stars.Squash = NumberSequence.new(0.2624998, 0.5625)
+                    stars.Speed = NumberRange.new(0.1326618, 0.1326618)
+                    stars.Brightness = 6.885
+                    stars.ZOffset = 3
+                    stars.Size = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(0.2652124, 1.1607907, 0.820863),
+                        NumberSequenceKeypoint.new(0.398578, 4.1880746, 1.0401549),
+                        NumberSequenceKeypoint.new(0.480578, 7.5677743, 1.1607915),
+                        NumberSequenceKeypoint.new(0.530578, 4.3972955, 1.0044292),
+                        NumberSequenceKeypoint.new(0.7210103, 1.4095318, 0.7420586),
+                        NumberSequenceKeypoint.new(1, 0),
+                    })
+                    stars.Rate = 50
+                    stars.Texture = 'rbxassetid://16722791958'
+                    stars.EmissionDirection = Enum.NormalId.Back
+                    stars.Rotation = NumberRange.new(150, 150)
+                    stars.Enabled = false
+                    stars.Parent = meteorEnd
+
+                    local sparks = Instance.new('ParticleEmitter')
+
+                    sparks.Name = 'Sparks'
+                    sparks.Lifetime = NumberRange.new(0.2, 0.4)
+                    sparks.SpreadAngle = Vector2.new(50, 50)
+                    sparks.Color = ColorSequence.new(Color3.fromRGB(84, 41, 255))
+                    sparks.Drag = 8
+                    sparks.VelocitySpread = 50
+                    sparks.Speed = NumberRange.new(141.4421234, 183.8747559)
+                    sparks.Brightness = 12
+                    sparks.ZOffset = -0.3245147
+                    sparks.Size = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(0.2594719, 1.777688, 0.3979976),
+                        NumberSequenceKeypoint.new(1, 0),
+                    })
+                    sparks.Acceleration = Vector3.new(0, -282.8842468261719, 0)
+                    sparks.RotSpeed = NumberRange.new(-30, 30)
+                    sparks.Rate = 40
+                    sparks.Texture = 'rbxassetid://11995504618'
+                    sparks.EmissionDirection = Enum.NormalId.Back
+                    sparks.Orientation = Enum.ParticleOrientation.VelocityParallel
+                    sparks.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
+                    sparks.Enabled = false
+                    sparks.Parent = meteorEnd
+
+                    local meteorFlash = Instance.new('ParticleEmitter')
+
+                    meteorFlash.Name = 'Flash'
+                    meteorFlash.Lifetime = NumberRange.new(0.07, 0.12)
+                    meteorFlash.SpreadAngle = Vector2.new(30, 30)
+                    meteorFlash.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(0.1301587, 0.6625),
+                        NumberSequenceKeypoint.new(0.2412698, 0.91875),
+                        NumberSequenceKeypoint.new(0.4952381, 0.74375),
+                        NumberSequenceKeypoint.new(0.7603174, 0.94375),
+                        NumberSequenceKeypoint.new(0.8857143, 0.8375),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    meteorFlash.Color = ColorSequence.new(Color3.fromRGB(108, 34, 255))
+                    meteorFlash.Drag = 14
+                    meteorFlash.FlipbookStartRandom = true
+                    meteorFlash.VelocitySpread = 30
+                    meteorFlash.Speed = NumberRange.new(57.6029854, 230.4119415)
+                    meteorFlash.Brightness = 14
+                    meteorFlash.ZOffset = 1.7270366
+                    meteorFlash.Size = NumberSequence.new(5.0313563, 6.708528)
+                    meteorFlash.Rate = 80
+                    meteorFlash.Texture = 'rbxassetid://11995386251'
+                    meteorFlash.EmissionDirection = Enum.NormalId.Back
+                    meteorFlash.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
+                    meteorFlash.Rotation = NumberRange.new(0, 360)
+                    meteorFlash.Enabled = false
+                    meteorFlash.Parent = meteorEnd
+                    effectTemplates['Meteor'] = meteorAttachment
 end
 
-function ShakeModule.StartShake(intensity, duration)
-    initialIntensity = intensity or 1
-    shakeDuration = duration or 0.8
-    shakeStartTime = os.clock()
-    shakeActive = true
+
+local function applyColor(inst, color)
+	for _, d in ipairs(inst:GetDescendants()) do
+		if d:IsA("ParticleEmitter") then
+			d.Color = ColorSequence.new(color)
+		end
+	end
 end
 
-DhLibrary:AddConnection("ShakeModule", RunService.Heartbeat:Connect(updateCameraShake))
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-local StompModule = {
-    StompEffect = "HollowPurple",
-    StompCooldown = 2,
-    lastStompTime = 0,
-    CurrentEffects = {}
-}
-StompModule.StartShake = ShakeModule.StartShake
 
-local Effects = {
-    ["RoadRoller"] = function(targetCharacter)
-        RoadRoller.Parent = workspace
-        RoadRoller.Anchored = true 
-        RoadRoller.CFrame = targetCharacter.HumanoidRootPart.CFrame * CFrame.new(0, 40, 0)
-        local Sound = Instance.new("Sound",workspace)
-        Sound.SoundId = "rbxassetid://4877348549"
-        Sound.PlayOnRemove = true 
-        Sound:Destroy()    
-        
-        TweenService:Create(
-            RoadRoller,
-            TweenInfo.new(0.2), 
-            { 
-                CFrame = targetCharacter.HumanoidRootPart.CFrame * 
-                        CFrame.new(0, 3, 0) * 
-                        CFrame.Angles(math.rad(200), -math.rad(200), math.rad(90)) 
-            }
-        ):Play()
-
-        ShakeModule.StartShake(7, 0.5)
-
-        task.wait(2)
-        RoadRoller.CFrame = CFrame.new(20,2000,20)
-    end,
-
-    ["Rings"] = function(targetCharacter) 
-        local Sound = Instance.new("Sound",workspace)
-        Sound.SoundId = "rbxassetid://7456436580"
-        Sound.PlayOnRemove = true 
-        Sound:Destroy()
-
-        local FakePart = Instance.new("Part",workspace)
-        FakePart.Transparency = 1
-        FakePart.Position = targetCharacter.Head.Position
-        FakePart.Anchored = true 
-        FakePart.CanCollide = false 
-    
-        SonicRings.Parent = FakePart
-        task.wait(0.5)
-        SonicRings.Parent = workspace
-        FakePart:Destroy()
-    end,
-
-    ["BlackHole"] = function(targetCharacter)
-        BlackHole.Parent = workspace
-        BlackHole.Position = targetCharacter:FindFirstChild("UpperTorso").Position + Vector3.new(0,1,0)
-        BlackHole.open:Play()
-        ShakeModule.StartShake(7, 0.5)
-
-        
-        for _, emitter in pairs(BlackHole:GetDescendants()) do 
-            if emitter:IsA("ParticleEmitter") or emitter:IsA("Beam") then 
-                emitter.Enabled = true  
-            end 
-        end 
-
-        task.wait(1.5)
-        task.spawn(function()
-            BlackHole.wind:Play()
-            BlackHole.bring:Play()
-
-            for _, part in pairs(targetCharacter:GetChildren()) do 
-                if not part:IsA("BasePart") then continue end 
-                TweenService:Create(part,TweenInfo.new(1.4),{
-                    Position = BlackHole.Event.WorldPosition
-                }):Play()
-            end 
-            task.wait(1.5)
-            targetCharacter:Destroy()
-        end)
-
-        task.wait(3)
-        TweenService:Create(BlackHole.wind,TweenInfo.new(0.5),{
-            Volume = 0
-        }):Play()
-
-        for _, emitter in pairs(BlackHole:GetDescendants()) do 
-            if emitter:IsA("ParticleEmitter") or emitter:IsA("Beam") then 
-                emitter.Enabled = false 
-            end 
-        end 
-
-        task.wait(2)
-        BlackHole.Parent = ReplicatedStorage
-    end,
-
-    ["Spirit"] = function(targetCharacter)
-        Spirit.Stomp:Play()
-        Aura.Transparency = 0
-        Aura.Position = targetCharacter:FindFirstChild("UpperTorso").Position 
-
-        ShakeModule.StartShake(7, 0.5)
-
-        TweenService:Create(Aura,TweenInfo.new(2),{
-            Position = targetCharacter:FindFirstChild("UpperTorso").Position + Vector3.new(0,50,0),
-            Size = Vector3.new(120, 90, 120),
-            Transparency = 1
-        }):Play()
-        local Sound = Instance.new("Sound",workspace)
-        Sound.SoundId = "rbxassetid://6290067239"
-        Sound.PlayOnRemove = true 
-        Sound:Destroy()
-
-        for _, asset in pairs(targetCharacter:GetDescendants()) do 
-            if not asset:IsA("BasePart") or not asset:IsA("Decal") then continue end 
-
-            TweenService:Create(asset,TweenInfo.new(0.5),{
-                Transparency = 1
-            }):Play()
-        end 
-    end,
-
-    ["Charm"] = function(targetCharacter)
-        local Stomp = Charm.FX.Stomp 
-        local Sound = Charm.SFX:FindFirstChild("Explosive Hit 5")
-        local TargetPos = targetCharacter:FindFirstChild("UpperTorso").Position
-
-        local Emitters = {}
-
-        local PartOne = Stomp.PartOne:Clone()
-        local Part    = Stomp.Part:Clone()
-
-        Charm.Parent = workspace
-
-        PartOne.Position = TargetPos
-        PartOne.Anchored = true 
-        PartOne.Parent = workspace
-
-        Part.Position = TargetPos
-        Part.Anchored = true 
-        Part.Parent = workspace
-
-        for _, emitter in pairs(PartOne:GetDescendants()) do 
-            if emitter:IsA("ParticleEmitter") then 
-                table.insert(Emitters,emitter)
-            end 
-        end 
-
-        for _, emitter in pairs(Part:GetDescendants()) do 
-            if emitter:IsA("ParticleEmitter") then 
-                table.insert(Emitters,emitter)
-            end 
-        end
-
-        for _, emitter in pairs(Emitters) do 
-            emitter.Enabled = true   
-        end 
-
-        local old_color = LightingService.FogColor
-        Sound:Play()
-        for _, asset in pairs(targetCharacter:GetDescendants()) do 
-            if not asset:IsA("BasePart") or not asset:IsA("Decal") then continue end 
-
-            TweenService:Create(asset,TweenInfo.new(0.5),{
-                Transparency = 1
-            }):Play()
-        end 
-        TweenService:Create(LightingService,TweenInfo.new(0.5),{
-            FogColor = Color3.fromRGB(255, 42, 191)
-        }):Play()
-
-        task.wait(0.8)
-        Part:Destroy()
-        PartOne:Destroy()
-
-        TweenService:Create(LightingService,TweenInfo.new(0.5),{
-            FogColor = old_color
-        }):Play()
-        Charm.Parent = ReplicatedStorage
-    end,
-
-    ["Thanos"] = function(targetCharacter)
-        local Sound = Instance.new("Sound",workspace)
-        Sound.SoundId = "rbxassetid://3050376525"
-        Sound:Play()
-
-        for _, part in pairs(targetCharacter:GetDescendants()) do 
-            if part:IsA("BasePart") or part:IsA("MeshPart") then 
-                local Thanos_Effect = Thanos:Clone() 
-                Thanos_Effect.Parent = part 
-                Thanos_Effect.Color =  ColorSequence.new({ ColorSequenceKeypoint.new(0, part.Color), ColorSequenceKeypoint.new(0.6, Color3.fromRGB(65, 33, 18)), ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)) })
-
-                TweenService:Create(part,TweenInfo.new(0.5),{
-                    Transparency = 1
-                }):Play()
-
-                task.delay(0.5,function()
-                    Thanos_Effect.Enabled = false 
-                end)
-                task.wait(.1)
-            end 
-        end
-        repeat task.wait() until Sound.TimeLength == 0
-        Sound:Destroy()
-    end,
-
-    ["Afterslash"] = function(targetCharacter)
-        local AfterSlashEfx = AfterSlash:Clone()
-        local UpperTorso = targetCharacter:FindFirstChild("UpperTorso")
-
-        local Part = AfterSlashEfx.Part
-        Part.Position = UpperTorso.Position
-        Part.Parent = UpperTorso
-        Part.Size = Vector3.new(5,7,5)
-
-        for _ = 1, 25 do 
-            task.wait(math.random(1,9) / 100)
-            local Sound = Instance.new("Sound",Part)
-            Sound.SoundId = "rbxassetid://5989945551"
-            local DistortionSoundEffect = Instance.new("DistortionSoundEffect",Sound)
-            Sound.PlayOnRemove = true 
-            Sound:Destroy()
-            Part.Position = UpperTorso.Position
-        end
-
-        UpperTorso.Position = (CFrame.new(UpperTorso.Position) * CFrame.new(0, -5, 0)).Position
-        for _, emitter in pairs(Part:GetDescendants()) do
-            if emitter:IsA("ParticleEmitter") then
-                emitter.Enabled = false
-            end
-        end
-
-        task.wait(0.25)
-        local Attachment = Instance.new("Attachment",workspace.Terrain)
-        Attachment.WorldPosition = UpperTorso.Position
-
-        local Sound = Instance.new("Sound",Part)
-        Sound.SoundId = "rbxassetid://4471648128" 
-        Sound.PlayOnRemove = true
-        Sound:Destroy()
-
-        for _, emitter in pairs(AfterSlashEfx.Burst:GetDescendants()) do 
-            if emitter:IsA("ParticleEmitter") then 
-                emitter.Parent = Attachment
-                emitter:Emit(emitter:GetAttribute("EmitCount"))
-            end 
-        end 
-
-        for _, part in pairs(targetCharacter:GetDescendants()) do
-            if part:IsA("BasePart") then
-                TweenService:Create(part, TweenInfo.new(0.5, Enum.EasingStyle.Sine), {
-                    Transparency = 1
-                }):Play()
-            end
-        end 
-    end,
-
-    ["Rune"] = function(targetCharacter)
-        local Rune_fx = Rune:Clone()
-            
-        local UpperTorso = targetCharacter:FindFirstChild("UpperTorso")
-        local OutPosition = UpperTorso.Position + Vector3.new(0,120,0)
-
-        local Effects = {}
-
-        Rune_fx.Parent = workspace
-
-        for i = 5,1, -1 do 
-            if i == 1 then 
-                local Part = Rune_fx["1"]
-                Part.Position = OutPosition
-                Part.Sound:Play()
-
-                TweenService:Create(Part,TweenInfo.new(1.25, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut, 0), {
-                    Size = Vector3.new(60,0,60),
-                    Position = OutPosition
-                }):Play()
-
-                table.insert(Effects,Part)
-
-                for _, decal in pairs(Part:GetChildren()) do 
-                    if decal:IsA("Decal") then 
-                        TweenService:Create(decal,TweenInfo.new(0.75, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-                            Transparency = 0
-                        }):Play()
-                    end 
-                end 
-            elseif i <= 4 then 
-                local Part = Rune_fx[tostring(i)]
-                Part.Position = OutPosition
-                Part.Sound:Play()
-
-                TweenService:Create(Part,TweenInfo.new(1.25, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut, 0), {
-                    Size = Vector3.new(20 * i,0,20 * i),
-                    Position = OutPosition
-                }):Play()
-
-                table.insert(Effects,Part)
-
-                for _, decal in pairs(Part:GetChildren()) do 
-                    if decal:IsA("Decal") then
-                        TweenService:Create(decal,TweenInfo.new(0.75, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-                            Transparency = 0
-                        }):Play()
-                    end 
-                end 
-            elseif i == 5 then 
-                local Part = Rune_fx.Part3
-                Part.Position = OutPosition
-                table.insert(Effects,Part)
-
-                TweenService:Create(Part,TweenInfo.new(1.25, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut, 0), {
-                    Size = Vector3.new(89,0,89),
-                    Position = OutPosition
-                }):Play()
-
-                for _, decal in pairs(Part:GetChildren()) do 
-                    if decal:IsA("Decal") then 
-                        TweenService:Create(decal,TweenInfo.new(0.75, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-                            Transparency = 0
-                        }):Play()
-                    end 
-                end
-            end 
-            OutPosition = OutPosition - Vector3.new(0,15,0)
-            task.wait(i / 6)
-        end
-        
-        task.wait(1)
-        for index, effect in pairs(Effects) do 
-            TweenService:Create(effect,TweenInfo.new(0.7 + index / 4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0),{
-                Size = effect.Size + Vector3.new(effect.Size.Z / 2 + 80 + index * 3,0, effect.Size.Z / 2 + 80 + index * 3),
-                Position = effect.Position + Vector3.new(0,effect.Position.Y + 20 + index * 5,0)
-            })
-
-            for i, decal in pairs(effect:GetChildren()) do 
-                if decal:IsA("Decal") then 
-                    TweenService:Create(decal,TweenInfo.new(0.7 + i / 4, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut), {
-                        Transparency = 1
-                    }):Play()
-                end 
-            end
-        end 
-
-        local CYLD = Rune_fx.CYLD
-        CYLD.Anchored = true 
-        CYLD.CanCollide = false 
-        CYLD.Color = Color3.fromRGB(20,122,255)
-        CYLD.Transparency = 0.2
-        CYLD.Material = Enum.Material.Neon
-        CYLD.Shape = Enum.PartType.Cylinder 
-
-        local Sound = Instance.new("Sound",workspace)
-        Sound.SoundId = "rbxassetid://6808975002"
-        Sound:Play()
-
-        local UpperTorsoPos = UpperTorso.Position
-        local rayOrigin = Vector3.new(UpperTorsoPos.X,UpperTorsoPos.Y + 400,UpperTorsoPos.Z)
-        local rayDirection = Vector3.new(UpperTorsoPos.X,UpperTorsoPos.Y - 20 ,UpperTorsoPos.Z)
-
-        local hitPart,hitPosition = workspace:FindPartOnRayWithIgnoreList(
-            Ray.new(rayOrigin, ( rayDirection - rayOrigin ).unit * 500),
-            { workspace.Ignored, workspace.Players }
-        )
-        local Magnitude = ( rayOrigin - hitPosition ).Magnitude
-        CYLD.Size = Vector3.new(Magnitude,0.5,0.5)
-        CYLD.CFrame = CFrame.new(rayOrigin,rayDirection) * CFrame.new(0,0, -Magnitude / 2) * CFrame.Angles(0, 1.5707963267948966, 0)
-
-        coroutine.wrap(function()
-            task.spawn(function()
-                while task.wait() do 
-                    for _, beam in pairs(CYLD:GetChildren()) do
-                        if beam:IsA("Beam") then
-                            CYLD.Attachment.WorldPosition = CYLD.Position + Vector3.new(0, CYLD.Size.X, 0);
-                            CYLD.ATT.WorldPosition = CYLD.Position + Vector3.new(0, -CYLD.Size.X, 0);
-                            beam.Width0 = CYLD.Size.Z / 1.5;
-                            beam.Width1 = CYLD.Size.Z / 1.5;
-                        end
-                    end
-                    if CYLD.Parent == nil then 
-                        break 
-                    end 
-                end
-            end) 
-
-            local Tween = TweenService:Create(CYLD,TweenInfo.new(0.5),{
-                Transparency = 0.8,
-                Size = Vector3.new(Magnitude,30,30)
-            })
-            Tween:Play()
-            Tween.Completed:Wait()
-
-            TweenService:Create(CYLD,TweenInfo.new(2), {
-                Transparency = 1,
-                Size = Vector3.new(Magnitude,0,0)
-            }):Play()
-        end)()
-        local Shock_fx = Shock:Clone()
-        Shock_fx.Parent = targetCharacter
-        Shock_fx.Position = UpperTorsoPos
-        TweenService:Create(Shock_fx,TweenInfo.new(2.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In),{
-            Transparency = 1,
-            Size = Shock_fx.Size + Vector3.new(100,20,100),
-            Orientation = Vector3.new(0,200,0),
-            Position = UpperTorsoPos
-        }):Play()
-
-        local Wind_fx = Wind:Clone()
-        Wind_fx.Parent = targetCharacter
-        Wind_fx.Position = UpperTorsoPos
-
-        TweenService:Create(Wind_fx,TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.In),{
-            Transparency = 1,
-            Size = Wind_fx.Size + Vector3.new(100,5,100),
-            Orientation = Vector3.new(0,-200,0),
-            Position = UpperTorsoPos
-        }):Play()
-
-        local Root_fx = Root:Clone()
-        Root_fx.Parent = targetCharacter
-        Root_fx.Position = UpperTorsoPos
-
-        TweenService:Create(Root_fx,TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.In),{
-            Transparency = 1,
-            Size = Root_fx.Size + Vector3.new(100,100,100),
-            Orientation = Vector3.new(0,-200,0),
-            Position = UpperTorsoPos
-        }):Play()
-        ShakeModule.StartShake(7, 0.5)
-
-        local Sound = Instance.new("Sound",targetCharacter)
-        Sound.SoundId = "rbxassetid://6554844728"
-        Sound:Play()
-
-        local Sound = Instance.new("Sound",targetCharacter)
-        Sound.SoundId = "rbxassetid://6230611917"
-        Sound:Play()
-
-        task.wait(2.5)
-        Shock_fx:Destroy()
-        task.wait(0.5)
-        Rune_fx:Destroy()
-        Root_fx:Destroy()
-        Wind_fx:Destroy()      
-    end,
-
-    ["HollowPurple"] = function(targetCharacter)
-        local HollowPurple_fx = HollowPurple:Clone()
-        HollowPurple_fx.Parent = workspace
-
-        local HollowRed = HollowPurple_fx.HollowRed
-        HollowRed.spawn:Play()
-
-        for _, emitter in pairs(HollowRed:GetDescendants()) do 
-            if emitter:IsA("ParticleEmitter") then 
-                emitter:Emit(emitter:GetAttribute("EmitCount"))
-            end 
-        end 
-
-        local HumanoidRootPart = LocalPlayer.Character.HumanoidRootPart
-        local UpperTorso = targetCharacter.UpperTorso
-
-        DhLibrary:AddConnection("Hollow_Red_Tp",RunService.Heartbeat:Connect(function()
-            HollowRed.CFrame = CFrame.lookAt(HumanoidRootPart.Position,UpperTorso.Position) * CFrame.new(-8,2,-8)
-        end))
-
-        task.wait(.65)
-
-        local HollowBlue = HollowPurple_fx.HollowBlue
-        HollowBlue.spawn:Play()
-
-        DhLibrary:AddConnection("Hollow_Blue_Tp",RunService.Heartbeat:Connect(function()
-            HollowBlue.CFrame = CFrame.lookAt(HumanoidRootPart.Position,UpperTorso.Position) * CFrame.new(8,2,-8)
-        end))
-
-        for _, emitter in pairs(HollowBlue:GetDescendants()) do 
-            if emitter:IsA("ParticleEmitter") then 
-                emitter:Emit(emitter:GetAttribute("EmitCount"))
-            end 
-        end
-
-        task.wait(.65)
-        DhLibrary:RemoveConnection("Hollow_Blue_Tp")
-        DhLibrary:RemoveConnection("Hollow_Red_Tp")
-
-        local time = os.clock() + 1
-
-        DhLibrary:AddConnection("Hollow_Red_Tp",RunService.Heartbeat:Connect(function()
-            HollowRed.CFrame = (CFrame.lookAt(HumanoidRootPart.Position,UpperTorso.Position) * CFrame.new(-8,2,-8)):Lerp(
-                CFrame.lookAt(
-                    HumanoidRootPart.Position, 
-                    UpperTorso.Position
-                ) * CFrame.new(0, 2, -8), 1 - math.clamp(time - os.clock(), 0.001, 1)
-            )
-        end))
-
-        DhLibrary:AddConnection("Hollow_Blue_Tp",RunService.Heartbeat:Connect(function()
-            HollowBlue.CFrame = (CFrame.lookAt(HumanoidRootPart.Position, UpperTorso.Position) * CFrame.new(8, 2, -8)):Lerp(
-                CFrame.lookAt(
-                    HumanoidRootPart.Position, 
-                    UpperTorso.Position
-                ) * CFrame.new(0, 2, -8), 1 - math.clamp(time - os.clock(), 0.001, 1)
-            )
-        end))
-
-        local HollowPurple_p = HollowPurple_fx.Purple 
-        HollowPurple_p.Anchored = true 
-        local SpawnSound = HollowPurple_p.Spawn
-        SpawnSound.Parent = HumanoidRootPart
-        SpawnSound:Play()
-        task.wait(.7)
-
-        for _, emitter in pairs(HollowBlue:GetDescendants()) do 
-            if emitter:IsA("ParticleEmitter") then 
-                emitter.Enabled = false
-            end 
-        end
-
-        for _, emitter in pairs(HollowRed:GetDescendants()) do 
-            if emitter:IsA("ParticleEmitter") then 
-                emitter.Enabled = false
-            end 
-        end 
-        DhLibrary:AddConnection("HollowPurpleTP",RunService.Heartbeat:Connect(function(time)
-            HollowPurple_p.CFrame = CFrame.lookAt(HumanoidRootPart.Position,UpperTorso.Position) * CFrame.new(0,2,-8)
-        end))
-        task.wait(.9)
-        DhLibrary:RemoveConnection("HollowPurpleTP")
-        DhLibrary:RemoveConnection("Hollow_Blue_Tp")
-        DhLibrary:RemoveConnection("Hollow_Red_Tp")
-        -- Launch Sound
-        local Sound = HollowPurple_p:FindFirstChildOfClass("Sound")
-        Sound.Parent = HumanoidRootPart
-        Sound:Play()
-        ShakeModule.StartShake(7, 0.5)
-
-        HollowPurple_p.Smoke.Dust.Enabled = true 
-        HollowPurple_p.Smoke.Rocks.Enabled = true 
-
-        for _, emitter in pairs(HollowPurple_p.Wind:GetDescendants()) do 
-            if emitter:IsA("ParticleEmitter") then 
-                emitter.Enabled = true 
-            end 
-        end 
-
-        for _, emitter in pairs(HollowPurple_p.Launch:GetDescendants()) do 
-            if emitter:IsA("ParticleEmitter") then 
-                emitter:Emit(emitter:GetAttribute("EmitCount"))
-            end 
-        end
-
-        local LookVector = CFrame.lookAt(HumanoidRootPart.Position,UpperTorso.Position).LookVector.Unit * 140 * Vector3.new(1,0,1)
-        DhLibrary:AddConnection("HollowPurpleTP",RunService.Heartbeat:Connect(function(time)
-            HollowPurple_p.Position = HollowPurple_p.Position + LookVector * time 
-        end))
-
-        DhLibrary:AddConnection("TeleportPlayer",RunService.Heartbeat:Connect(function()
-            for _, part in pairs(targetCharacter:GetChildren()) do 
-                if part:IsA("BasePart") then 
-                    part.CFrame = CFrame.new(HollowPurple_p.Position)
-                end 
-            end 
-        end))
-
-
-        local Blur = HollowPurple_fx.Blur 
-        local ColorCorrection = HollowPurple_fx.ColorCorrection
-
-        Blur.Parent = Camera 
-        ColorCorrection.Parent = Camera 
-
-        TweenService:Create(Blur,TweenInfo.new(0.15),{
-            Size = 24
-        }):Play()
-
-        TweenService:Create(ColorCorrection,TweenInfo.new(0.15),{
-            Contrast = 6
-        }):Play()
-
-        task.delay(0.05,function()  
-            TweenService:Create(Blur,TweenInfo.new(0.15),{
-                Size = 0
-            }):Play()
-
-            TweenService:Create(ColorCorrection,TweenInfo.new(0.15),{
-                Contrast = 0
-            }):Play()
-            task.wait(0.5)
-        end)
-
-        task.wait(3)
-
-        for _, emitter in pairs(HollowPurple_p:GetDescendants()) do 
-            if emitter:IsA("ParticleEmitter") then 
-                emitter.Enabled = false  
-            end 
-        end 
-
-        task.wait(3)
-        HollowPurple_fx:Destroy()
-        DhLibrary:RemoveConnection("HollowPurpleTP")
-        DhLibrary:RemoveConnection("TeleportPlayer")        
-    end,
-}
--- local function cause global is useless
-local function effect(targetCharacter)
-    local currentTime = tick()
-    if currentTime - StompModule.lastStompTime < StompModule.StompCooldown then 
-        return 
-    end
-    StompModule.lastStompTime = currentTime
-    if Effects[StompModule.StompEffect] then 
-        Effects[StompModule.StompEffect](targetCharacter,LocalPlayer.Character)
-    end 
-end 
-
-function StompModule:AddStompEffect(options)
-    local Name: String = options.Name
-    local Callack:  (...any) -> ...any = options.Callback
-    
-    Effects[Name] = Callback
-    table.insert(StompModule.CurrentEffects,Name)
-end 
-
-function StompModule:Toggle(state)
-    if not state then 
-        DhLibrary:RemoveConnection("StompEffect")
-        return 
-    end 
-
-    DhLibrary:AddConnection("StompEffect", RunService.Heartbeat:Connect(function()
-        local playerCharacter = LocalPlayer.Character
-        if not playerCharacter or not playerCharacter:FindFirstChild("LowerTorso") or not playerCharacter:FindFirstChild("UpperTorso") then
-            return
-        end
-        
-        local rayOrigin = playerCharacter.LowerTorso.Position
-        local rayDirection = Vector3.new(0, -playerCharacter.UpperTorso.Size.y * 4.5, 0)
-        
-        local whitelist = {}
-        for _, player in ipairs(Services.Players:GetPlayers()) do
-            if player ~= Services.LocalPlayer and player.Character and not  whitelist[player.Character] then
-                table.insert(whitelist, player.Character)
-            end
-        end
-        
-        if #whitelist > 0 then
-            local hitPart, hitPosition, hitNormal = workspace:FindPartOnRayWithWhitelist(
-                Ray.new(rayOrigin, rayDirection),
-                whitelist,
-                false,
-                true
-            )
-            
-            if hitPart then
-                local stompedCharacter = hitPart:FindFirstAncestorOfClass("Model")
-                if stompedCharacter and stompedCharacter:FindFirstChild("HumanoidRootPart") and stompedCharacter:FindFirstChild("BodyEffects") and stompedCharacter.BodyEffects.SDeath.Value and DhLibrary:IsAnimPlaying(playerCharacter,2816431506) then
-                    effect(stompedCharacter)
-                end
-            end
-        end
-    end))
-end 
-
-for name, func in pairs(Effects) do 
-    table.insert(StompModule.CurrentEffects,name)
-end 
-
-return StompModule,DhLibrary
+local function emitAll(inst)
+	for _, d in ipairs(inst:GetDescendants()) do
+		if d:IsA("ParticleEmitter") then
+			d.Color = ColorSequence.new(effectColor)
+			table.insert(activeEmitters, d)
+
+			local count = d:GetAttribute("EmitCount") or d.Rate or 10
+			d:Emit(count)
+		end
+	end
+end
+
+
+function HitEffects:SetSelectedEffects(list)
+	selectedEffects = {}
+	for _, name in ipairs(list or {}) do
+		selectedEffects[name] = true
+	end
+end
+
+function HitEffects:AddEffect(name)
+	selectedEffects[name] = true
+end
+
+function HitEffects:RemoveEffect(name)
+	selectedEffects[name] = nil
+end
+
+function HitEffects:ClearEffects()
+	selectedEffects = {}
+end
+
+function HitEffects:SetColor(color)
+	effectColor = color
+
+	for i = #activeEmitters, 1, -1 do
+		local emitter = activeEmitters[i]
+		if emitter and emitter.Parent then
+			emitter.Color = ColorSequence.new(color)
+		else
+			table.remove(activeEmitters, i)
+		end
+	end
+end
+
+function HitEffects:SetLifetime(seconds)
+	effectLifetime = seconds
+end
+
+
+
+function HitEffects:Play(character)
+	if not character then return end
+
+	createEffectTemplates()
+
+	local root =
+		character:FindFirstChild("HumanoidRootPart")
+		or character:FindFirstChild("Torso")
+		or character:FindFirstChild("UpperTorso")
+
+	if not root then return end
+
+	for effectName in pairs(selectedEffects) do
+		local template = effectTemplates[effectName]
+		if template then
+			local effect = template:Clone()
+			applyColor(effect, effectColor)
+			effect.Parent = root
+
+			for _, d in ipairs(effect:GetDescendants()) do
+				if d:IsA("ParticleEmitter") then
+					d.Lifetime = NumberRange.new(0, effectLifetime)
+				end
+			end
+
+			emitAll(effect)
+
+			task.delay(effectLifetime, function()
+				if effect then
+					effect:Destroy()
+				end
+			end)
+		end
+	end
+end
+
+
+return HitEffects
