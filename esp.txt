@@ -1,5 +1,5 @@
 
---------
+
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -335,7 +335,7 @@ tool = create("Text", {
 
         boxOutline = create("Square", { Thickness = 3, Color = color3New() }),
         box = create("Square", { Thickness = 1 }),
-        healthBarOutline = create("Square", { Thickness = 1, Color = color3New(), Filled = false }),
+        healthBarOutline = create("Square", { Thickness = 0.1, Color = color3New(), Filled = false }),
         healthBar = create("Square", { Thickness = 1, Filled = true }),
         line = create("Line")
     }
