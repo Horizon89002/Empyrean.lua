@@ -1,4 +1,4 @@
---
+
 
 local espLibrary = {
     instances = {},
@@ -91,6 +91,10 @@ local espLibrary = {
 
 
 espLibrary.__index = espLibrary;
+
+_G.HGradientColor1 =  Color3.new(1,1,1)
+_G.HGradientColor2 =  Color3.new(1,1,1)
+_G.HGradientColor3 =  Color3.new(1,1,1)
 
 -- variables
 local getService = game.GetService;
@@ -344,7 +348,7 @@ if typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") t
     gradient.Parent = objects.boxFill
 end
 
--- Inside addEsp function, where you create objects
+
 objects.healthBarGradientFrame = (function()
     local frame = Instance.new("Frame")
     frame.Name = "HealthGradientFrame"
@@ -355,11 +359,10 @@ objects.healthBarGradientFrame = (function()
     local gradient = Instance.new("UIGradient")
     gradient.Name = "HealthGradient"
     gradient.Rotation = 90
-    -- Green (Top) -> Yellow (Middle) -> Red (Bottom)
     gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.new(0, 1, 0)),   -- Green
-        ColorSequenceKeypoint.new(0.5, Color3.new(1, 1, 0)), -- Yellow
-        ColorSequenceKeypoint.new(1, Color3.new(1, 0, 0))    -- Red
+        ColorSequenceKeypoint.new(0, Color3.new(0, 1, 0)),   
+        ColorSequenceKeypoint.new(0.5, Color3.new(1, 1, 0)), 
+        ColorSequenceKeypoint.new(1, Color3.new(1, 0, 0))   
     })
     gradient.Parent = frame
     
@@ -785,21 +788,33 @@ else
     end
 end
 
--- Inside the render loop, after calculating healthBarSize and healthBarPosition
+
 local healthBarGrad = objects.healthBarGradientFrame
 
 if healthBarGrad and show and self.options.healthBars then
     healthBarGrad.Visible = true
     healthBarGrad.Size = UDim2.new(0, healthBarSize.X, 0, math.abs(healthBarSize.Y))
+    healthBarGrad.Transparency = 1 - self.options.healthBarsTransparency
     
-    -- We position it at the current calculated health bar position
-    -- healthBarSize.Y is negative in your code to draw "upwards", so we adjust:
+  
     healthBarGrad.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y + healthBarSize.Y)
     
-    -- Hide the original flat-color drawing health bar so they don't overlap
+
+    local gradTool = healthBarGrad:FindFirstChildOfClass("UIGradient")
+    if gradTool then
+        gradTool.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, _G.HGradientColor1),
+            ColorSequenceKeypoint.new(0.5, _G.HGradientColor2),
+            ColorSequenceKeypoint.new(1, _G.HGradientColor3)
+        })
+    end
+
+ 
     objects.healthBar.Visible = false 
 else
-    if healthBarGrad then healthBarGrad.Visible = false end
+    if healthBarGrad then 
+        healthBarGrad.Visible = false 
+    end
 end
 
 
