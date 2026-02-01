@@ -1,4 +1,4 @@
-
+-----------------------------------
 
 local espLibrary = {
     instances = {},
@@ -793,60 +793,26 @@ end
 
 
 
--- Inside the render loop
-local healthBarGrad = objects.healthBarGradientFrame
 
-if show and self.options.healthBars then
-    -- 1. Sync the Black Background (Outline) to the Health Height
-    -- This prevents the "extra" black pixels at the top
-    objects.healthBarOutline.Visible = true
-    objects.healthBarOutline.Filled = true -- Keep it as the background
-    objects.healthBarOutline.Color = Color3.new(0, 0, 0) -- Pure black background
-    objects.healthBarOutline.Transparency = self.options.healthBarsTransparency
-    
-    -- We force the outline to be the exact same height as the health calculation
-    objects.healthBarOutline.Size = round(vector2New(self.options.healthBarsSize + 2, healthBarSize.Y))
-    objects.healthBarOutline.Position = healthBarPosition - vector2New(1, 0)
-
-    -- 2. Sync the Gradient Frame
-    if healthBarGrad then
-        healthBarGrad.Visible = true
-        healthBarGrad.BackgroundColor3 = Color3.new(1, 1, 1)
-        healthBarGrad.BackgroundTransparency = 1 - self.options.healthBarsTransparency
-        
-        -- Size it to fit perfectly inside the black background
-        healthBarGrad.Size = UDim2.new(0, self.options.healthBarsSize, 0, math.abs(healthBarSize.Y))
-        healthBarGrad.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y + healthBarSize.Y)
-        healthBarGrad.ZIndex = 11 -- Higher than the background
-
-        -- Update Colors
-        local gradTool = healthBarGrad:FindFirstChildOfClass("UIGradient")
-        if gradTool then
-            gradTool.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, _G.HGradientColor1 or Color3.new(0, 1, 0)),
-                ColorSequenceKeypoint.new(0.5, _G.HGradientColor2 or Color3.new(1, 1, 0)),
-                ColorSequenceKeypoint.new(1, _G.HGradientColor3 or Color3.new(1, 0, 0))
-            })
-        end
-    end
-
-    -- Hide the original green bar (Drawing object)
-    objects.healthBar.Visible = false 
-else
-    if healthBarGrad then healthBarGrad.Visible = false end
-    objects.healthBarOutline.Visible = false
-    objects.healthBar.Visible = false
-end
 
 
                 objects.healthBar.Transparency = self.options.healthBarsTransparency;
                 objects.healthBar.Size = healthBarSize;
                 objects.healthBar.Position = healthBarPosition;
 
-                objects.healthBarOutline.Visible = show and self.options.healthBars;
-                objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
-                objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
-                objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1);
+                objects.healthBarOutline.Visible = show and self.options.healthBars
+objects.healthBarOutline.Transparency = self.options.healthBarsTransparency
+
+-- exact match to fill height
+objects.healthBarOutline.Size = Vector2.new(
+    healthBarSize.X + 2,      -- outline thickness on X
+    healthBarSize.Y           -- SAME height as fill
+)
+
+objects.healthBarOutline.Position = Vector2.new(
+    healthBarPosition.X - 1,
+    healthBarPosition.Y
+)
 
                 objects.line.Visible = show and self.options.tracers;
                 objects.line.Color = color or self.options.tracerColor;
