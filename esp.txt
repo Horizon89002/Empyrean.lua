@@ -1,4 +1,4 @@
------------------------------------
+
 
 local espLibrary = {
     instances = {},
@@ -794,6 +794,42 @@ end
 
 
 
+            
+if show and self.options.healthBars then
+    local healthBarGrad = objects.healthBarGradientFrame
+    
+    if healthBarGrad then
+      
+        healthBarGrad.Visible = true
+        healthBarGrad.Size = UDim2.new(0, healthBarSize.X, 0, math.abs(healthBarSize.Y))
+        healthBarGrad.Transparency = 1 - self.options.healthBarsTransparency
+        healthBarGrad.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y + healthBarSize.Y)
+        healthBarGrad.ZIndex = 5 
+
+        local gradTool = healthBarGrad:FindFirstChildOfClass("UIGradient")
+        if gradTool then
+            gradTool.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, _G.HGradientColor1),
+                ColorSequenceKeypoint.new(0.5, _G.HGradientColor2),
+                ColorSequenceKeypoint.new(1, _G.HGradientColor3)
+            })
+        end
+        
+      
+        objects.healthBar.Visible = false
+    else
+       
+        objects.healthBar.Visible = true
+        objects.healthBar.Color = color or self.options.healthBarsColor;
+        objects.healthBar.Transparency = self.options.healthBarsTransparency;
+        objects.healthBar.Size = healthBarSize;
+        objects.healthBar.Position = healthBarPosition;
+    end
+else
+    
+    if objects.healthBarGradientFrame then objects.healthBarGradientFrame.Visible = false end
+    objects.healthBar.Visible = false
+end
 
 
                 objects.healthBar.Transparency = self.options.healthBarsTransparency;
