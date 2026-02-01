@@ -1,6 +1,6 @@
 local espLibrary = {
     instances = {},
-    espCache = {},
+    espCache = {}, -- e
     chamsCache = {},
     objectCache = {},
     conns = {},
@@ -49,7 +49,7 @@ local espLibrary = {
         healthBarsSize = 1,
         healthBarsTransparency = 1,
         healthBarsColor = Color3.new(0, 1, 0),
-        -- NEW OPTION ADDED HERE
+        -- Options
         healthBarsGradient = true, 
         toolNameTransparency = 1,
         toolNameColor = Color3.new(1, 1, 1),
@@ -266,6 +266,30 @@ function espLibrary.addEsp(player)
         container.Parent = game:GetService("CoreGui")
     end
 
+    -- Create Health Bar Container (The "Outline")
+    local hbContainer = Instance.new("Frame")
+    hbContainer.Name = "HealthBarContainer"
+    hbContainer.BorderSizePixel = 0
+    hbContainer.BackgroundColor3 = Color3.new(0, 0, 0) -- Black outline
+    hbContainer.Visible = false
+    hbContainer.Parent = container
+
+    -- Create Health Bar Gradient Frame (The "Bar")
+    local hbFrame = Instance.new("Frame")
+    hbFrame.Name = "HealthBarGradient"
+    hbFrame.BorderSizePixel = 0
+    hbFrame.BackgroundColor3 = Color3.new(1, 1, 1) -- Must be white for gradient
+    hbFrame.Parent = hbContainer -- Parented to container
+    
+    local gradient = Instance.new("UIGradient")
+    gradient.Rotation = 90 -- Top to Bottom
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0.0, Color3.new(0, 1, 0)), -- Green Top
+        ColorSequenceKeypoint.new(0.5, Color3.new(1, 1, 0)), -- Yellow Middle
+        ColorSequenceKeypoint.new(1.0, Color3.new(1, 0, 0))  -- Red Bottom
+    }
+    gradient.Parent = hbFrame
+
     local objects = {
         arrow = create("Triangle", { Thickness = 1 }),
         arrowOutline = create("Triangle", { Thickness = 1 }),
@@ -297,26 +321,9 @@ function espLibrary.addEsp(player)
         healthBar = create("Square", { Thickness = 1, Filled = true }),
         line = create("Line"),
 
-        -- NEW: Health Bar Gradient Frame
-        healthBarGradientFrame = (function()
-            local frame = Instance.new("Frame")
-            frame.Name = "HealthBarGradient"
-            frame.BorderSizePixel = 0
-            frame.BackgroundColor3 = Color3.new(1,1,1)
-            frame.Visible = false
-            frame.Parent = container
-            
-            local gradient = Instance.new("UIGradient")
-            gradient.Rotation = 90 -- Top to Bottom
-            gradient.Color = ColorSequence.new{
-                ColorSequenceKeypoint.new(0.0, Color3.new(0, 1, 0)), -- Green Top
-                ColorSequenceKeypoint.new(0.5, Color3.new(1, 1, 0)), -- Yellow Middle
-                ColorSequenceKeypoint.new(1.0, Color3.new(1, 0, 0))  -- Red Bottom
-            }
-            gradient.Parent = frame
-            
-            return frame
-        end)()
+        -- Store the GUI frames in objects
+        healthBarContainer = hbContainer,
+        healthBarGradientFrame = hbFrame
     }
 
     local gradient = Instance.new("UIGradient")
@@ -725,32 +732,72 @@ function espLibrary:Load(renderValue)
                 end
 
                 -- Health Bars Logic Updated
-                if self.options.healthBarsGradient and objects.healthBarGradientFrame then
-                    -- Use Gradient Frame
-                    objects.healthBar.Visible = false -- Hide Drawing
+                if self.options.healthBarsGradient and objects.healthBarContainer and objects.healthBarGradientFrame then
+                    -- Hide Drawing objects (IMPORTANT: Drawing covers GUI)
+                    objects.healthBar.Visible = false 
+                    objects.healthBarOutline.Visible = false 
                     
-                    objects.healthBarGradientFrame.Visible = show and self.options.healthBars
-                    objects.healthBarGradientFrame.BackgroundTransparency = self.options.healthBarsTransparency
+                    -- Use Gradient Frames
+                    objects.healthBarContainer.Visible = show and self.options.healthBars
+                    objects.healthBarContainer.BackgroundTransparency = self.options.healthBarsTransparency
                     
-                    -- Update Frame Position/Size from Drawing calculations
-                    -- healthBarSize is Vector2(width, -height) so we check signs
-                    objects.healthBarGradientFrame.Size = UDim2.new(0, math.abs(healthBarSize.X), 0, math.abs(healthBarSize.Y))
-                    objects.healthBarGradientFrame.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y)
+                    -- Container Size (Full Outline)
+                    -- healthBarOutline size was: round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2))
+                    -- But simpler: 1px padding around the bar.
+                    local barWidth = math.abs(healthBarSize.X)
+                    local barHeight = math.abs(healthBarSize.Y) -- Dynamic height based on health
+                    local fullHeight = size.Y -- Total possible height
+                    
+                    -- Position Frame (Container acts as the black outline)
+                    -- Drawing Pos: healthBarPosition - vector2New(1, -1)
+                    local outlinePos = healthBarPosition - vector2New(1, -1)
+                    local outlineSize = vector2New(barWidth + 2, fullHeight + 2)
+                    
+                    objects.healthBarContainer.Position = UDim2.new(0, outlinePos.X, 0, outlinePos.Y)
+                    objects.healthBarContainer.Size = UDim2.new(0, outlineSize.X, 0, outlineSize.Y)
+                    
+                    -- Gradient Bar inside Container
+                    -- AnchorPoint 0,1 (Bottom Left) inside container to grow upwards? 
+                    -- Or just position it relative to top-left of container.
+                    -- The original ESP calculates healthBarPosition as the TOP of the current health bar.
+                    
+                    -- Calculate offset inside the container
+                    -- The container is at outlinePos.
+                    -- The bar is at healthBarPosition.
+                    -- Offset = healthBarPosition - outlinePos = (1, -1) ... wait Y is inverted in drawing usually.
+                    
+                    -- Let's stick to absolute positioning for simplicity if we can, or relative.
+                    -- Relative is safer for rotation/hierarchy.
+                    
+                    -- If container is black background, we place the colored bar inside it.
+                    -- The bar should be at the bottom of the container if health < 100? 
+                    -- In standard ESP:
+                    -- healthBarPosition is the Top-Left of the *filled* bar.
+                    -- If health drops, Y increases (moves down) and Height decreases.
+                    
+                    -- So relative to Container (0,0):
+                    local relX = 1
+                    local relY = (healthBarPosition.Y - outlinePos.Y)
+                    
+                    objects.healthBarGradientFrame.Position = UDim2.new(0, relX, 0, relY)
+                    objects.healthBarGradientFrame.Size = UDim2.new(0, barWidth, 0, barHeight)
+                    objects.healthBarGradientFrame.Visible = true
+
                 else
                     -- Use Standard Drawing
-                    if objects.healthBarGradientFrame then objects.healthBarGradientFrame.Visible = false end
+                    if objects.healthBarContainer then objects.healthBarContainer.Visible = false end
                     
                     objects.healthBar.Visible = show and self.options.healthBars;
                     objects.healthBar.Color = color or self.options.healthBarsColor;
                     objects.healthBar.Transparency = self.options.healthBarsTransparency;
                     objects.healthBar.Size = healthBarSize;
                     objects.healthBar.Position = healthBarPosition;
+                    
+                    objects.healthBarOutline.Visible = show and self.options.healthBars;
+                    objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
+                    objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
+                    objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1);
                 end
-
-                objects.healthBarOutline.Visible = show and self.options.healthBars;
-                objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
-                objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2));
-                objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1);
 
                 objects.line.Visible = show and self.options.tracers;
                 objects.line.Color = color or self.options.tracerColor;
