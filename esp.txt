@@ -1,4 +1,6 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/sonic-x64/aether/refs/heads/main/AI_DRAWING_LIBV54.lua"))()
 
+Drawing = DrawingLib
 
 
 local espLibrary = {
