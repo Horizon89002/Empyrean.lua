@@ -1,5 +1,4 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Horizon89002/Empyrean.lua/refs/heads/main/drawing.txt", true))()
-Drawing = DrawingLib
+
 
 local espLibrary = {
     instances = {},
