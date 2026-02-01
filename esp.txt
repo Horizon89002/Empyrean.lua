@@ -1,5 +1,5 @@
 
-
+--
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -353,16 +353,18 @@ objects.healthBarGradientFrame = (function()
     local frame = Instance.new("Frame")
     frame.Name = "HealthGradientFrame"
     frame.BorderSizePixel = 0
+    frame.BackgroundColor3 = Color3.new(1, 1, 1)
     frame.BackgroundTransparency = 0
     frame.Visible = false
+    frame.ZIndex = 10 
     
     local gradient = Instance.new("UIGradient")
     gradient.Name = "HealthGradient"
     gradient.Rotation = 90
     gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.new(0, 1, 0)),   
-        ColorSequenceKeypoint.new(0.5, Color3.new(1, 1, 0)), 
-        ColorSequenceKeypoint.new(1, Color3.new(1, 0, 0))   
+        ColorSequenceKeypoint.new(0, _G.HGradientColor1 or Color3.new(0,1,0)),
+        ColorSequenceKeypoint.new(0.5, _G.HGradientColor2 or Color3.new(1,1,0)),
+        ColorSequenceKeypoint.new(1, _G.HGradientColor3 or Color3.new(1,0,0))
     })
     gradient.Parent = frame
     
@@ -370,7 +372,6 @@ objects.healthBarGradientFrame = (function()
     frame.Parent = container
     return frame
 end)()
-
 
     if espLibrary.options.glowImage and espLibrary.options.boxes then
         local glow = Instance.new("ImageLabel")
