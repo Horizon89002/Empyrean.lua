@@ -1,5 +1,5 @@
 
-
+--------
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -335,7 +335,7 @@ tool = create("Text", {
 
         boxOutline = create("Square", { Thickness = 3, Color = color3New() }),
         box = create("Square", { Thickness = 1 }),
-        healthBarOutline = create("Square", { Thickness = 1, Color = color3New(), Filled = true }),
+        healthBarOutline = create("Square", { Thickness = 1, Color = color3New(), Filled = false }),
         healthBar = create("Square", { Thickness = 1, Filled = true }),
         line = create("Line")
     }
@@ -793,43 +793,42 @@ end
 
 
 
--- Unified Health Bar Logic
-local healthBarGrad = objects.healthBarGradientFrame
-local useGradient = self.options.healthBars -- Toggle for the new style
 
-if show and useGradient then
-    -- 1. Handle the Gradient Frame (Instance)
+            
+if show and self.options.healthBars then
+    local healthBarGrad = objects.healthBarGradientFrame
+    
     if healthBarGrad then
+      
         healthBarGrad.Visible = true
-        healthBarGrad.BackgroundColor3 = Color3.new(1, 1, 1) -- Fixes the black color
-        healthBarGrad.BackgroundTransparency = 1 - self.options.healthBarsTransparency
         healthBarGrad.Size = UDim2.new(0, healthBarSize.X, 0, math.abs(healthBarSize.Y))
+        healthBarGrad.Transparency = 1 - self.options.healthBarsTransparency
         healthBarGrad.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y + healthBarSize.Y)
-        healthBarGrad.ZIndex = 10
+        healthBarGrad.ZIndex = 5 
 
         local gradTool = healthBarGrad:FindFirstChildOfClass("UIGradient")
         if gradTool then
             gradTool.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, _G.HGradientColor1 or Color3.new(0, 1, 0)),
-                ColorSequenceKeypoint.new(0.5, _G.HGradientColor2 or Color3.new(1, 1, 0)),
-                ColorSequenceKeypoint.new(1, _G.HGradientColor3 or Color3.new(1, 0, 0))
+                ColorSequenceKeypoint.new(0, _G.HGradientColor1),
+                ColorSequenceKeypoint.new(0.5, _G.HGradientColor2),
+                ColorSequenceKeypoint.new(1, _G.HGradientColor3)
             })
         end
+        
+      
+        objects.healthBar.Visible = false
+    else
+       
+        objects.healthBar.Visible = true
+        objects.healthBar.Color = color or self.options.healthBarsColor;
+        objects.healthBar.Transparency = self.options.healthBarsTransparency;
+        objects.healthBar.Size = healthBarSize;
+        objects.healthBar.Position = healthBarPosition;
     end
-
-    -- 2. Handle the Outline (Drawing Object)
-    -- We keep the outline but ensure the "inner" green bar is hidden
-    objects.healthBar.Visible = false 
-    objects.healthBarOutline.Visible = show and self.options.healthBars
-    objects.healthBarOutline.Transparency = self.options.healthBarsTransparency
-    objects.healthBarOutline.Size = round(vector2New(healthBarSize.X, -size.Y) + vector2New(2, -2))
-    objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1)
-    
 else
-    -- Clean up if not showing
-    if healthBarGrad then healthBarGrad.Visible = false end
+    
+    if objects.healthBarGradientFrame then objects.healthBarGradientFrame.Visible = false end
     objects.healthBar.Visible = false
-    objects.healthBarOutline.Visible = false
 end
 
 
