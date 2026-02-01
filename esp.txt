@@ -1,4 +1,4 @@
-
+----
 
 local espLibrary = {
     instances = {},
@@ -793,42 +793,43 @@ end
 
 
 
+-- Inside the render loop
+local healthBarGrad = objects.healthBarGradientFrame
 
-            
 if show and self.options.healthBars then
-    local healthBarGrad = objects.healthBarGradientFrame
-    
-    if healthBarGrad then
-      
-        healthBarGrad.Visible = true
-        healthBarGrad.Size = UDim2.new(0, healthBarSize.X, 0, math.abs(healthBarSize.Y))
-        healthBarGrad.Transparency = 1 - self.options.healthBarsTransparency
-        healthBarGrad.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y + healthBarSize.Y)
-        healthBarGrad.ZIndex = 5 
+    -- 1. Calculate the exact height (Health % of the Box Height)
+    -- We use math.abs because your library calculates Y as a negative offset
+    local exactHeight = math.abs(healthBarSize.Y) 
+    local exactWidth = self.options.healthBarsSize
 
-        local gradTool = healthBarGrad:FindFirstChildOfClass("UIGradient")
-        if gradTool then
-            gradTool.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, _G.HGradientColor1),
-                ColorSequenceKeypoint.new(0.5, _G.HGradientColor2),
-                ColorSequenceKeypoint.new(1, _G.HGradientColor3)
-            })
-        end
+    if healthBarGrad then
+        healthBarGrad.Visible = true
+        healthBarGrad.BackgroundColor3 = Color3.new(1, 1, 1)
+        healthBarGrad.BackgroundTransparency = 1 - self.options.healthBarsTransparency
         
-      
-        objects.healthBar.Visible = false
-    else
-       
-        objects.healthBar.Visible = true
-        objects.healthBar.Color = color or self.options.healthBarsColor;
-        objects.healthBar.Transparency = self.options.healthBarsTransparency;
-        objects.healthBar.Size = healthBarSize;
-        objects.healthBar.Position = healthBarPosition;
+        -- Set size to the EXACT health height, no more, no less
+        healthBarGrad.Size = UDim2.new(0, exactWidth, 0, exactHeight)
+        
+        -- Position it correctly at the bottom of the box, growing upwards
+        healthBarGrad.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y + healthBarSize.Y)
+        healthBarGrad.ZIndex = 10
     end
-else
+
+    -- 2. Fix the Outline (The black part)
+    -- We make the outline match the HEALTH size, not the BOX size
+    objects.healthBarOutline.Visible = true
+    objects.healthBarOutline.Filled = false -- Your fix!
+    objects.healthBarOutline.Transparency = self.options.healthBarsTransparency
     
-    if objects.healthBarGradientFrame then objects.healthBarGradientFrame.Visible = false end
-    objects.healthBar.Visible = false
+    -- This makes the outline wrap ONLY the colored part of the bar
+    objects.healthBarOutline.Size = vector2New(exactWidth + 2, healthBarSize.Y - 2)
+    objects.healthBarOutline.Position = healthBarPosition - vector2New(1, -1)
+
+    -- Hide the old solid green bar
+    objects.healthBar.Visible = false 
+else
+    if healthBarGrad then healthBarGrad.Visible = false end
+    objects.healthBarOutline.Visible = false
 end
 
 
