@@ -1,4 +1,4 @@
-
+--
 
 local espLibrary = {
     instances = {},
@@ -23,6 +23,8 @@ local espLibrary = {
         fontSize = 13,
         limitDistance = false,
         maxDistance = 1000,
+        healthBars = true,
+        healthBarsTransparency = 1,
         visibleOnly = false,
         teamCheck = false,
         teamColor = false,
@@ -342,6 +344,30 @@ if typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") t
     gradient.Parent = objects.boxFill
 end
 
+-- Inside addEsp function, where you create objects
+objects.healthBarGradientFrame = (function()
+    local frame = Instance.new("Frame")
+    frame.Name = "HealthGradientFrame"
+    frame.BorderSizePixel = 0
+    frame.BackgroundTransparency = 0
+    frame.Visible = false
+    
+    local gradient = Instance.new("UIGradient")
+    gradient.Name = "HealthGradient"
+    gradient.Rotation = 90
+    -- Green (Top) -> Yellow (Middle) -> Red (Bottom)
+    gradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.new(0, 1, 0)),   -- Green
+        ColorSequenceKeypoint.new(0.5, Color3.new(1, 1, 0)), -- Yellow
+        ColorSequenceKeypoint.new(1, Color3.new(1, 0, 0))    -- Red
+    })
+    gradient.Parent = frame
+    
+    local container = coreGui:FindFirstChild("espContainerGui") or screenGui
+    frame.Parent = container
+    return frame
+end)()
+
 
     if espLibrary.options.glowImage and espLibrary.options.boxes then
         local glow = Instance.new("ImageLabel")
@@ -371,6 +397,9 @@ function espLibrary.removeEsp(player)
 
     if (espCache) then
         espLibrary.espCache[player] = nil;
+        if espCache.healthBarGradientFrame then
+            espCache.healthBarGradientFrame:Destroy()
+        end
 
         for index, object in next, espCache do
             espCache[index] = nil;
@@ -754,6 +783,23 @@ else
     if objects.teamText then
         objects.teamText.Visible = false
     end
+end
+
+-- Inside the render loop, after calculating healthBarSize and healthBarPosition
+local healthBarGrad = objects.healthBarGradientFrame
+
+if healthBarGrad and show and self.options.healthBars then
+    healthBarGrad.Visible = true
+    healthBarGrad.Size = UDim2.new(0, healthBarSize.X, 0, math.abs(healthBarSize.Y))
+    
+    -- We position it at the current calculated health bar position
+    -- healthBarSize.Y is negative in your code to draw "upwards", so we adjust:
+    healthBarGrad.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y + healthBarSize.Y)
+    
+    -- Hide the original flat-color drawing health bar so they don't overlap
+    objects.healthBar.Visible = false 
+else
+    if healthBarGrad then healthBarGrad.Visible = false end
 end
 
 
