@@ -1,13 +1,11 @@
-
-
 local espLibrary = {
     instances = {},
     espCache = {},
     chamsCache = {},
     objectCache = {},
     conns = {},
-    whitelist = {}, -- insert string that is the player's name you want to whitelist (turns esp color to whitelistColor in options)
-    blacklist = {}, -- insert string that is the player's name you want to blacklist (removes player from esp)
+    whitelist = {}, 
+    blacklist = {}, 
     options = {
         enabled = false,
         minScaleFactorX = 3,
@@ -16,7 +14,7 @@ local espLibrary = {
         maxScaleFactorY = 5,
         scaleFactorX = 5,
         scaleFactorY = 6,
-        boundingBox = false, -- WARNING | Significant Performance Decrease when true
+        boundingBox = false, 
         boundingBoxDescending = true,
         excludedPartNames = {},
         font = 2,
@@ -49,10 +47,12 @@ local espLibrary = {
         boxFillColor = Color3.new(1, 0, 0),
         healthBars = true,
         healthBarsSize = 1,
-        toolNameTransparency = 1,
-        toolNameColor = Color3.new(1, 1, 1),
         healthBarsTransparency = 1,
         healthBarsColor = Color3.new(0, 1, 0),
+        -- NEW OPTION ADDED HERE
+        healthBarsGradient = true, 
+        toolNameTransparency = 1,
+        toolNameColor = Color3.new(1, 1, 1),
         healthText = false,
         healthTextTransparency = 1,
         healthTextSuffix = "%",
@@ -64,7 +64,7 @@ local espLibrary = {
         tracers = false,
         tracerTransparency = 1,
         tracerColor = Color3.new(1, 1, 1),
-        tracerOrigin = "Bottom", -- Available [Mouse, Top, Bottom]
+        tracerOrigin = "Bottom", 
         chams = true,
         chamsFillColor = Color3.new(1, 0, 0),
         chamsFillTransparency = 0.5,
@@ -80,13 +80,8 @@ local espLibrary = {
         teamEspEnabled = true,
         teamMyColor = Color3.new(0, 1, 0),
         teamEnemyColor = Color3.new(1, 0, 0),
-        
-
-
     },
 };
-
-
 
 espLibrary.__index = espLibrary;
 
@@ -248,27 +243,27 @@ function espLibrary.visibleCheck(character, position)
     return (not raycast(workspace, origin, position - origin, params));
 end
 
-
-
-
 local CoreGui = game:GetService("CoreGui")
 local espGui = Instance.new("ScreenGui")
 espGui.Name = "EspGui"
 espGui.ResetOnSpawn = false
 espGui.Parent = CoreGui
 
-local boxFillGui = Instance.new("ImageLabel")
-boxFillGui.BackgroundTransparency = 1
-boxFillGui.Visible = false
-boxFillGui.Image = espLibrary.options.imageAssetPath or "" 
-boxFillGui.Parent = espGui
-
-
 _G.glowcolor =  Color3.new(1,1,1)
 
 function espLibrary.addEsp(player)
     if player == localPlayer then
         return
+    end
+
+    -- Ensure container exists for ImageLabels/Frames
+    local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
+    if not container then
+        container = Instance.new("ScreenGui")
+        container.Name = "espContainerGui"
+        container.ResetOnSpawn = false
+        container.IgnoreGuiInset = true
+        container.Parent = game:GetService("CoreGui")
     end
 
     local objects = {
@@ -278,28 +273,8 @@ function espLibrary.addEsp(player)
         side = create("Text", { Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         bottom = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         stateText = create("Text",{Center=false,Size=espLibrary.options.fontSize,Font=espLibrary.options.font,Outline=true,OutlineColor=color3New(),Visible=false,Color=espLibrary.options.statesColor,Text=""}),
-
-
-
-        teamText = create("Text", {
-    Center = false,
-    Size = espLibrary.options.fontSize,
-    Font = espLibrary.options.font,
-    Outline = true,
-    OutlineColor = color3New(),
-    Visible = false,
-    Text = ""
-}),
-
-tool = create("Text", {
-    Center = true,
-    Size = 13,
-    Outline = true,
-    OutlineColor = color3New(),
-    Font = 2
-}),
-
-
+        teamText = create("Text", { Center = false, Size = espLibrary.options.fontSize, Font = espLibrary.options.font, Outline = true, OutlineColor = color3New(), Visible = false, Text = "" }),
+        tool = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
 
         boxFill = espLibrary.options.image and espLibrary.options.boxes and (function()
             local img = Instance.new("ImageLabel")
@@ -312,17 +287,6 @@ tool = create("Text", {
             img.ScaleType = Enum.ScaleType.Stretch
             img.Size = UDim2.new(1, 0, 1, 0)
             img.Position = UDim2.new(0, 0, 0, 0)
-
-
-            local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
-            if not container then
-                container = Instance.new("ScreenGui")
-                container.Name = "espContainerGui"
-                container.ResetOnSpawn = false
-                container.IgnoreGuiInset = true
-                container.Parent = game:GetService("CoreGui")
-            end
-
             img.Parent = container
             return img
         end)() or create("Square", { Thickness = 1, Filled = true, Visible = false, Color = Color3.new(1, 1, 1) }),
@@ -331,17 +295,37 @@ tool = create("Text", {
         box = create("Square", { Thickness = 1 }),
         healthBarOutline = create("Square", { Thickness = 1, Color = color3New(), Filled = true }),
         healthBar = create("Square", { Thickness = 1, Filled = true }),
-        line = create("Line")
+        line = create("Line"),
+
+        -- NEW: Health Bar Gradient Frame
+        healthBarGradientFrame = (function()
+            local frame = Instance.new("Frame")
+            frame.Name = "HealthBarGradient"
+            frame.BorderSizePixel = 0
+            frame.BackgroundColor3 = Color3.new(1,1,1)
+            frame.Visible = false
+            frame.Parent = container
+            
+            local gradient = Instance.new("UIGradient")
+            gradient.Rotation = 90 -- Top to Bottom
+            gradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0.0, Color3.new(0, 1, 0)), -- Green Top
+                ColorSequenceKeypoint.new(0.5, Color3.new(1, 1, 0)), -- Yellow Middle
+                ColorSequenceKeypoint.new(1.0, Color3.new(1, 0, 0))  -- Red Bottom
+            }
+            gradient.Parent = frame
+            
+            return frame
+        end)()
     }
 
     local gradient = Instance.new("UIGradient")
-gradient.Name = "BoxGradient"
-gradient.Rotation = 90
+    gradient.Name = "BoxGradient"
+    gradient.Rotation = 90
 
-if typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
-    gradient.Parent = objects.boxFill
-end
-
+    if typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
+        gradient.Parent = objects.boxFill
+    end
 
     if espLibrary.options.glowImage and espLibrary.options.boxes then
         local glow = Instance.new("ImageLabel")
@@ -360,11 +344,8 @@ end
         objects.glow = glow 
     end
 
-
-
     espLibrary.espCache[player] = objects
 end
-
 
 function espLibrary.removeEsp(player)
     local espCache = espLibrary.espCache[player];
@@ -373,15 +354,15 @@ function espLibrary.removeEsp(player)
         espLibrary.espCache[player] = nil;
 
         for index, object in next, espCache do
+            if typeof(object) == "Instance" then
+                object:Destroy()
+            else
+                object:Remove();
+            end
             espCache[index] = nil;
-            object:Remove();
-
-        
         end
     end
 end
-
-
 
 function espLibrary.addChams(player)
     if (player == localPlayer) then
@@ -465,10 +446,18 @@ function espLibrary:Unload()
     end
 
     for _, object in next, self.instances do
-        object:Destroy();
+        if typeof(object) == "Instance" then
+            object:Destroy()
+        else
+            object:Remove();
+        end
     end
 
     screenGui:Destroy();
+    
+    local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
+    if container then container:Destroy() end
+
     runService:UnbindFromRenderStep("esp_rendering");
 end
 
@@ -485,22 +474,17 @@ function espLibrary:Load(renderValue)
 
     espLibrary.options.glowImage = true
 
-
     for _, player in next, players:GetPlayers() do
         self.addEsp(player);
         self.addChams(player);
     end
 
+    _G.GradientColor1 =  Color3.new(1,1,1)
+    _G.GradientColor2 =  Color3.new(1,1,1)
+    _G.GradientColor3 =  Color3.new(1,1,1)
 
- 
-
-_G.GradientColor1 =  Color3.new(1,1,1)
-_G.GradientColor2 =  Color3.new(1,1,1)
-_G.GradientColor3 =  Color3.new(1,1,1)
-
-_G.GradientSpin = false
-_G.GradientSpinSpeed =  180
-
+    _G.GradientSpin = false
+    _G.GradientSpinSpeed =  180
 
     runService:BindToRenderStep("esp_rendering", renderValue or (Enum.RenderPriority.Camera.Value + 1), function()
         for player, objects in next, self.espCache do
@@ -597,30 +581,29 @@ _G.GradientSpinSpeed =  180
                 objects.bottom.Color = color or self.options.nameColor;
                 objects.bottom.Text = "[" .. tostring(round(distance)) .. self.options.distanceSuffix .. "]";
                 objects.bottom.Position = round(position + vector2New(size.X * 0.5, size.Y + 1));
-               
+                
                 local tName = ""
                 local char = player.Character
 
                 if char then
-                     local tl = char:FindFirstChildOfClass("Tool")
-                if tl then
-                    tName = tl.Name
+                    local tl = char:FindFirstChildOfClass("Tool")
+                    if tl then
+                        tName = tl.Name
+                    end
                 end
-            end
 
-            objects.tool.Visible = show and self.options.toolName and tName ~= ""
-            objects.tool.Font = self.options.font
-            objects.tool.Size = self.options.fontSize
-            objects.tool.Transparency = self.options.toolNameTransparency
-            objects.tool.Color = self.options.toolNameColor
-            objects.tool.Text = tName
-            objects.tool.Position = round(
-                  position + vector2New(
-                   size.X * 0.5,
-                     size.Y + 1 + objects.bottom.TextBounds.Y + 1
+                objects.tool.Visible = show and self.options.toolName and tName ~= ""
+                objects.tool.Font = self.options.font
+                objects.tool.Size = self.options.fontSize
+                objects.tool.Transparency = self.options.toolNameTransparency
+                objects.tool.Color = self.options.toolNameColor
+                objects.tool.Text = tName
+                objects.tool.Position = round(
+                    position + vector2New(
+                        size.X * 0.5,
+                        size.Y + 1 + objects.bottom.TextBounds.Y + 1
+                    )
                 )
-            )
-
 
                 objects.box.Visible = show and self.options.boxes;
                 objects.box.Color = color or self.options.boxesColor;
@@ -635,134 +618,134 @@ _G.GradientSpinSpeed =  180
 
                 local boxFill = espLibrary.espCache[player] and espLibrary.espCache[player].boxFill
 
+                if boxFill and show and self.options.boxFill then
+                    if self.options.image and typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
+                        boxFill.Visible = true
+                        boxFill.Size = UDim2.new(0, size.X, 0, size.Y)
+                        boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
+                        boxFill.ImageTransparency = 1
+                        boxFill.ImageColor3 = color or self.options.boxFillColor
+                    end
+                else
+                    if boxFill then
+                        if typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
+                            boxFill.Visible = false
+                        end
+                    end
+                end
 
-if boxFill and show and self.options.boxFill then
-    if self.options.image and typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
-        boxFill.Visible = true
-        boxFill.Size = UDim2.new(0, size.X, 0, size.Y)
-        boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
-        boxFill.ImageTransparency = 1
-        boxFill.ImageColor3 = color or self.options.boxFillColor
+                for player, objects in pairs(espLibrary.espCache) do
+                    if objects.glow then
+                        objects.glow.Visible = espLibrary.options.glowImage
+                        objects.glow.ImageColor3 = _G.glowcolor 
+                    end
+                end
 
-    end
-else
-    if boxFill then
-        if typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
-            boxFill.Visible = false
-        end
-    end
-end
+                if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
+                    objects.boxFill.Visible = show and self.options.boxFill
 
-for player, objects in pairs(espLibrary.espCache) do
-    if objects.glow then
-        objects.glow.Visible = espLibrary.options.glowImage
-        objects.glow.ImageColor3 = _G.glowcolor 
-    end
-end
+                    local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
+                    if gradient then
+                        gradient.Color = ColorSequence.new({
+                            ColorSequenceKeypoint.new(0, _G.GradientColor1),
+                            ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
+                            ColorSequenceKeypoint.new(1, _G.GradientColor3),
+                        })
+                        if _G.GradientSpin then
+                            gradient.Rotation = (gradient.Rotation + ((_G.GradientSpinSpeed or 0.1) * 0.2)) % 360
+                        else
+                            gradient.Rotation = 90
+                        end
+                    end
+                end
 
-if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
-    objects.boxFill.Visible = show and self.options.boxFill
+                if objects.stateText and character and torso then
+                    local humanoid = findFirstChild(character, "Humanoid")
+                    if humanoid then
+                        local state = humanoid:GetState()
+                        local vel = torso.AssemblyLinearVelocity
+                        local horizontalVel = Vector3.new(vel.X, 0, vel.Z).Magnitude
+                        local verticalVel = vel.Y
+                        local finalState = ""
 
-    local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
-    if gradient then
-        
-    gradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, _G.GradientColor1),
-    ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
-    ColorSequenceKeypoint.new(1, _G.GradientColor3),
-})
-        if _G.GradientSpin then
-            gradient.Rotation = (gradient.Rotation + ((_G.GradientSpinSpeed or 0.1) * 0.2)) % 360
+                        if state == Enum.HumanoidStateType.Jumping then
+                            finalState = "Jumping"
+                        elseif state == Enum.HumanoidStateType.Freefall then
+                            if verticalVel < -60 then
+                                finalState = "Freefalling"
+                            elseif verticalVel < -8 then
+                                finalState = "Falling"
+                            else
+                                finalState = "Jumping"
+                            end
+                        elseif state == Enum.HumanoidStateType.Running then
+                            finalState = horizontalVel <= 0.1 and "Idle" or "Moving"
+                        else
+                            local rename = {
+                                FallingDown = "Falling",
+                                RunningNoPhysics = "Running",
+                                StrafingNoPhysics = "Strafing",
+                                PlatformStanding = "Platform",
+                                GettingUp = "GetUp",
+                                Running = "Moving",
+                            }
+                            finalState = rename[state.Name] or state.Name
+                        end
 
-        else
-            gradient.Rotation = 90
-        end
-    end
-end
+                        objects.stateText.Visible = show and espLibrary.options.statesEnabled
+                        objects.stateText.Font = espLibrary.options.font
+                        objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
+                        objects.stateText.Position = Vector2.new(position.X + size.X + 3, position.Y - 3)
+                        objects.stateText.Text = finalState
+                        objects.stateText.Color = espLibrary.options.statesColor
+                    else
+                        objects.stateText.Visible = false
+                    end
+                end
 
+                if objects.teamText and character and torso then
+                    local myTeam = localPlayer.Team
+                    local targetTeam = player.Team
 
-if objects.stateText and character and torso then
-    local humanoid = findFirstChild(character, "Humanoid")
-    if humanoid then
-        local state = humanoid:GetState()
-        local vel = torso.AssemblyLinearVelocity
-        local horizontalVel = Vector3.new(vel.X, 0, vel.Z).Magnitude
-        local verticalVel = vel.Y
+                    objects.teamText.Visible = show and espLibrary.options.teamEspEnabled
+                    objects.teamText.Font = espLibrary.options.font
+                    objects.teamText.Size = math.max(10, espLibrary.options.fontSize - 3)
+                    objects.teamText.Position = Vector2.new(position.X + size.X + 3, position.Y - 3 + math.min(size.Y * 0.5, 15) - ((size.Y > 15) and 3 or 0))
+                    objects.teamText.Text = targetTeam and targetTeam.Name or "None"
 
-        local finalState = ""
+                    if targetTeam == myTeam then
+                        objects.teamText.Color = espLibrary.options.teamMyColor
+                    else
+                        objects.teamText.Color = espLibrary.options.teamEnemyColor
+                    end
+                else
+                    if objects.teamText then
+                        objects.teamText.Visible = false
+                    end
+                end
 
-        if state == Enum.HumanoidStateType.Jumping then
-            finalState = "Jumping"
-
-        elseif state == Enum.HumanoidStateType.Freefall then
-            if verticalVel < -60 then
-                finalState = "Freefalling"
-            elseif verticalVel < -8 then
-                finalState = "Falling"
-            else
-                finalState = "Jumping"
-            end
-
-        elseif state == Enum.HumanoidStateType.Running then
-            finalState = horizontalVel <= 0.1 and "Idle" or "Moving"
-
-        else
-            local rename = {
-                FallingDown = "Falling",
-                RunningNoPhysics = "Running",
-                StrafingNoPhysics = "Strafing",
-                PlatformStanding = "Platform",
-                GettingUp = "GetUp",
-                Running = "Moving",
-            }
-            finalState = rename[state.Name] or state.Name
-        end
-
-        objects.stateText.Visible = show and espLibrary.options.statesEnabled
-        objects.stateText.Font = espLibrary.options.font
-        objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
-        objects.stateText.Position = Vector2.new(position.X + size.X + 3, position.Y - 3)
-
-
-
-        objects.stateText.Text = finalState
-        objects.stateText.Color = espLibrary.options.statesColor
-    else
-        objects.stateText.Visible = false
-    end
-end
-
-if objects.teamText and character and torso then
-    local myTeam = localPlayer.Team
-    local targetTeam = player.Team
-
-    objects.teamText.Visible = show and espLibrary.options.teamEspEnabled
-    objects.teamText.Font = espLibrary.options.font
-    objects.teamText.Size = math.max(10, espLibrary.options.fontSize - 3)
-
-    objects.teamText.Position = Vector2.new(position.X + size.X + 3, position.Y - 3 + math.min(size.Y * 0.5, 15) - ((size.Y > 15) and 3 or 0))
-
-
-    objects.teamText.Text = targetTeam and targetTeam.Name or "None"
-
-    if targetTeam == myTeam then
-        objects.teamText.Color = espLibrary.options.teamMyColor
-    else
-        objects.teamText.Color = espLibrary.options.teamEnemyColor
-    end
-else
-    if objects.teamText then
-        objects.teamText.Visible = false
-    end
-end
-
-
-
-                objects.healthBar.Visible = show and self.options.healthBars;
-                objects.healthBar.Color = color or self.options.healthBarsColor;
-                objects.healthBar.Transparency = self.options.healthBarsTransparency;
-                objects.healthBar.Size = healthBarSize;
-                objects.healthBar.Position = healthBarPosition;
+                -- Health Bars Logic Updated
+                if self.options.healthBarsGradient and objects.healthBarGradientFrame then
+                    -- Use Gradient Frame
+                    objects.healthBar.Visible = false -- Hide Drawing
+                    
+                    objects.healthBarGradientFrame.Visible = show and self.options.healthBars
+                    objects.healthBarGradientFrame.BackgroundTransparency = self.options.healthBarsTransparency
+                    
+                    -- Update Frame Position/Size from Drawing calculations
+                    -- healthBarSize is Vector2(width, -height) so we check signs
+                    objects.healthBarGradientFrame.Size = UDim2.new(0, math.abs(healthBarSize.X), 0, math.abs(healthBarSize.Y))
+                    objects.healthBarGradientFrame.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y)
+                else
+                    -- Use Standard Drawing
+                    if objects.healthBarGradientFrame then objects.healthBarGradientFrame.Visible = false end
+                    
+                    objects.healthBar.Visible = show and self.options.healthBars;
+                    objects.healthBar.Color = color or self.options.healthBarsColor;
+                    objects.healthBar.Transparency = self.options.healthBarsTransparency;
+                    objects.healthBar.Size = healthBarSize;
+                    objects.healthBar.Position = healthBarPosition;
+                end
 
                 objects.healthBarOutline.Visible = show and self.options.healthBars;
                 objects.healthBarOutline.Transparency = self.options.healthBarsTransparency;
@@ -779,7 +762,11 @@ end
                 objects.line.To = torsoPosition;
             else
                 for _, object in next, objects do
-                    object.Visible = false;
+                    if typeof(object) == "Instance" then
+                        object.Visible = false
+                    else
+                        object.Visible = false;
+                    end
                 end
             end
         end
@@ -854,8 +841,5 @@ end
         end
     end);
 end
-
-
-
 
 return espLibrary;
