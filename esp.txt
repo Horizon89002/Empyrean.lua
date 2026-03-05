@@ -1,4 +1,4 @@
-
+-----
 
 local espLibrary = {
     instances = {},
@@ -82,9 +82,6 @@ local espLibrary = {
         teamEspEnabled = true,
         teamMyColor = Color3.new(0, 1, 0),
         teamEnemyColor = Color3.new(1, 0, 0),
-        
-
-
     },
 };
 
@@ -207,6 +204,7 @@ function espLibrary.getBoundingBox(character, torso)
         end
 
         local oMin, oMax = vector3New(minX, minY, minZ), vector3New(maxX, maxY, maxZ);
+        -- Return world-space center and world-space size (Vector3)
         return (oMax + oMin) * 0.5, oMax - oMin;
     else
         return torso.Position, vector2New(espLibrary.options.scaleFactorX, espLibrary.options.scaleFactorY);
@@ -222,15 +220,47 @@ function espLibrary.getScaleFactor(fov, depth)
     return 1 / (depth * lastScale) * 1000;
 end
 
+-- FIX: getBoxData now handles both bounding-box mode (Vector3 world size) and
+-- scale-factor mode (Vector2 abstract size) cleanly and pixel-perfectly.
 function espLibrary.getBoxData(position, size)
     local torsoPosition, onScreen, depth = worldToViewportPoint(position);
     local scaleFactor = espLibrary.getScaleFactor(currentCamera.FieldOfView, depth);
 
-    local clampX = clamp(size.X, espLibrary.options.minScaleFactorX, espLibrary.options.maxScaleFactorX);
-    local clampY = clamp(size.Y, espLibrary.options.minScaleFactorY, espLibrary.options.maxScaleFactorY);
-    local size = round(vector2New(clampX * scaleFactor, clampY * scaleFactor));
+    local screenSize;
 
-    return onScreen, size, round(vector2New(torsoPosition.X - (size.X * 0.5), torsoPosition.Y - (size.Y * 0.5))), torsoPosition;
+    if typeof(size) == "Vector3" then
+        -- Bounding box mode: project actual world dimensions into screen pixels.
+        -- We project top and bottom edges of the bounding box to get true screen height,
+        -- and left/right edges for true screen width. This is pixel-perfect.
+        local topScreen,    _, depthTop    = worldToViewportPoint(position + vector3New(0,  size.Y * 0.5, 0));
+        local bottomScreen, _, depthBot    = worldToViewportPoint(position - vector3New(0,  size.Y * 0.5, 0));
+        local leftScreen,   _, depthLeft   = worldToViewportPoint(position - vector3New(size.X * 0.5, 0, 0));
+        local rightScreen,  _, depthRight  = worldToViewportPoint(position + vector3New(size.X * 0.5, 0, 0));
+
+        local screenW = abs(rightScreen.X - leftScreen.X);
+        local screenH = abs(bottomScreen.Y - topScreen.Y);
+
+        -- Minimum clamping so the box never collapses to nothing at extreme distances
+        screenSize = round(vector2New(math.max(screenW, 6), math.max(screenH, 8)));
+    else
+        -- Scale-factor mode (Vector2): clamp and scale as before
+        local clampX = clamp(size.X, espLibrary.options.minScaleFactorX, espLibrary.options.maxScaleFactorX);
+        local clampY = clamp(size.Y, espLibrary.options.minScaleFactorY, espLibrary.options.maxScaleFactorY);
+        screenSize = round(vector2New(clampX * scaleFactor, clampY * scaleFactor));
+    end
+
+    -- FIX: The torso sits at ~42% of the character's total height (not 50%).
+    -- Offsetting by +scaleOffsetY pushes the box down so it wraps the body evenly.
+    -- In scale-factor mode we shift by 10% of box height downward.
+    -- In bounding-box mode the position IS the true world center so no offset needed.
+    local yOffset = (typeof(size) == "Vector3") and 0 or round(screenSize.Y * 0.10);
+
+    local boxPosition = round(vector2New(
+        torsoPosition.X - (screenSize.X * 0.5),
+        torsoPosition.Y - (screenSize.Y * 0.5) + yOffset
+    ));
+
+    return onScreen, screenSize, boxPosition, torsoPosition;
 end
 
 function espLibrary.getHealth(player, character)
@@ -285,27 +315,23 @@ function espLibrary.addEsp(player)
         bottom = create("Text", { Center = true, Size = 13, Outline = true, OutlineColor = color3New(), Font = 2 }),
         stateText = create("Text",{Center=false,Size=espLibrary.options.fontSize,Font=espLibrary.options.font,Outline=true,OutlineColor=color3New(),Visible=false,Color=espLibrary.options.statesColor,Text=""}),
 
-
-
         teamText = create("Text", {
-    Center = false,
-    Size = espLibrary.options.fontSize,
-    Font = espLibrary.options.font,
-    Outline = true,
-    OutlineColor = color3New(),
-    Visible = false,
-    Text = ""
-}),
+            Center = false,
+            Size = espLibrary.options.fontSize,
+            Font = espLibrary.options.font,
+            Outline = true,
+            OutlineColor = color3New(),
+            Visible = false,
+            Text = ""
+        }),
 
-tool = create("Text", {
-    Center = true,
-    Size = 13,
-    Outline = true,
-    OutlineColor = color3New(),
-    Font = 2
-}),
-
-
+        tool = create("Text", {
+            Center = true,
+            Size = 13,
+            Outline = true,
+            OutlineColor = color3New(),
+            Font = 2
+        }),
 
         boxFill = espLibrary.options.image and espLibrary.options.boxes and (function()
             local img = Instance.new("ImageLabel")
@@ -318,7 +344,6 @@ tool = create("Text", {
             img.ScaleType = Enum.ScaleType.Stretch
             img.Size = UDim2.new(1, 0, 1, 0)
             img.Position = UDim2.new(0, 0, 0, 0)
-
 
             local container = game:GetService("CoreGui"):FindFirstChild("espContainerGui")
             if not container then
@@ -341,37 +366,36 @@ tool = create("Text", {
     }
 
     local gradient = Instance.new("UIGradient")
-gradient.Name = "BoxGradient"
-gradient.Rotation = 90
-
-if typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
-    gradient.Parent = objects.boxFill
-end
-
-
-objects.healthBarGradientFrame = (function()
-    local frame = Instance.new("Frame")
-    frame.Name = "HealthGradientFrame"
-    frame.BorderSizePixel = 0
-    frame.BackgroundColor3 = Color3.new(1, 1, 1)
-    frame.BackgroundTransparency = 0
-    frame.Visible = false
-    frame.ZIndex = 10 
-    
-    local gradient = Instance.new("UIGradient")
-    gradient.Name = "HealthGradient"
+    gradient.Name = "BoxGradient"
     gradient.Rotation = 90
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, _G.HGradientColor1 or Color3.new(0,1,0)),
-        ColorSequenceKeypoint.new(0.5, _G.HGradientColor2 or Color3.new(1,1,0)),
-        ColorSequenceKeypoint.new(1, _G.HGradientColor3 or Color3.new(1,0,0))
-    })
-    gradient.Parent = frame
-    
-    local container = coreGui:FindFirstChild("espContainerGui") or screenGui
-    frame.Parent = container
-    return frame
-end)()
+
+    if typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
+        gradient.Parent = objects.boxFill
+    end
+
+    objects.healthBarGradientFrame = (function()
+        local frame = Instance.new("Frame")
+        frame.Name = "HealthGradientFrame"
+        frame.BorderSizePixel = 0
+        frame.BackgroundColor3 = Color3.new(1, 1, 1)
+        frame.BackgroundTransparency = 0
+        frame.Visible = false
+        frame.ZIndex = 10 
+        
+        local gradient = Instance.new("UIGradient")
+        gradient.Name = "HealthGradient"
+        gradient.Rotation = 90
+        gradient.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, _G.HGradientColor1 or Color3.new(0,1,0)),
+            ColorSequenceKeypoint.new(0.5, _G.HGradientColor2 or Color3.new(1,1,0)),
+            ColorSequenceKeypoint.new(1, _G.HGradientColor3 or Color3.new(1,0,0))
+        })
+        gradient.Parent = frame
+        
+        local container = coreGui:FindFirstChild("espContainerGui") or screenGui
+        frame.Parent = container
+        return frame
+    end)()
 
     if espLibrary.options.glowImage and espLibrary.options.boxes then
         local glow = Instance.new("ImageLabel")
@@ -390,8 +414,6 @@ end)()
         objects.glow = glow 
     end
 
-
-
     espLibrary.espCache[player] = objects
 end
 
@@ -408,8 +430,6 @@ function espLibrary.removeEsp(player)
         for index, object in next, espCache do
             espCache[index] = nil;
             object:Remove();
-
-        
         end
     end
 end
@@ -518,21 +538,17 @@ function espLibrary:Load(renderValue)
 
     espLibrary.options.glowImage = true
 
-
     for _, player in next, players:GetPlayers() do
         self.addEsp(player);
         self.addChams(player);
     end
 
+    _G.GradientColor1 =  Color3.new(1,1,1)
+    _G.GradientColor2 =  Color3.new(1,1,1)
+    _G.GradientColor3 =  Color3.new(1,1,1)
 
- 
-
-_G.GradientColor1 =  Color3.new(1,1,1)
-_G.GradientColor2 =  Color3.new(1,1,1)
-_G.GradientColor3 =  Color3.new(1,1,1)
-
-_G.GradientSpin = false
-_G.GradientSpinSpeed =  180
+    _G.GradientSpin = false
+    _G.GradientSpinSpeed =  180
 
 
     runService:BindToRenderStep("esp_rendering", renderValue or (Enum.RenderPriority.Camera.Value + 1), function()
@@ -540,7 +556,12 @@ _G.GradientSpinSpeed =  180
             local character, torso = self.getCharacter(player);
 
             if (character and torso) then
-                local onScreen, size, position, torsoPosition = self.getBoxData(torso.Position, Vector3.new(5, 6));
+                -- FIX: When boundingBox is true, pass the actual world-space Vector3 size
+                -- so getBoxData can project all 4 edges for pixel-perfect alignment.
+                -- When false, pass the Vector2 scale factors as before.
+                local bbCenter, bbSize = self.getBoundingBox(character, torso);
+                local onScreen, size, position, torsoPosition = self.getBoxData(bbCenter, bbSize);
+
                 local distance = (localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") and (localPlayer.Character.HumanoidRootPart.Position - torso.Position).Magnitude) or 0
 
                 local canShow, enabled = onScreen and (size and position), self.options.enabled;
@@ -635,25 +656,24 @@ _G.GradientSpinSpeed =  180
                 local char = player.Character
 
                 if char then
-                     local tl = char:FindFirstChildOfClass("Tool")
-                if tl then
-                    tName = tl.Name
+                    local tl = char:FindFirstChildOfClass("Tool")
+                    if tl then
+                        tName = tl.Name
+                    end
                 end
-            end
 
-            objects.tool.Visible = show and self.options.toolName and tName ~= ""
-            objects.tool.Font = self.options.font
-            objects.tool.Size = self.options.fontSize
-            objects.tool.Transparency = self.options.toolNameTransparency
-            objects.tool.Color = self.options.toolNameColor
-            objects.tool.Text = tName
-            objects.tool.Position = round(
-                  position + vector2New(
-                   size.X * 0.5,
-                     size.Y + 1 + objects.bottom.TextBounds.Y + 1
+                objects.tool.Visible = show and self.options.toolName and tName ~= ""
+                objects.tool.Font = self.options.font
+                objects.tool.Size = self.options.fontSize
+                objects.tool.Transparency = self.options.toolNameTransparency
+                objects.tool.Color = self.options.toolNameColor
+                objects.tool.Text = tName
+                objects.tool.Position = round(
+                    position + vector2New(
+                        size.X * 0.5,
+                        size.Y + 1 + objects.bottom.TextBounds.Y + 1
+                    )
                 )
-            )
-
 
                 objects.box.Visible = show and self.options.boxes;
                 objects.box.Color = color or self.options.boxesColor;
@@ -668,187 +688,159 @@ _G.GradientSpinSpeed =  180
 
                 local boxFill = espLibrary.espCache[player] and espLibrary.espCache[player].boxFill
 
+                if boxFill and show and self.options.boxFill then
+                    if self.options.image and typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
+                        boxFill.Visible = true
+                        boxFill.Size = UDim2.new(0, size.X, 0, size.Y)
+                        boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
+                        boxFill.ImageTransparency = 1
+                        boxFill.ImageColor3 = color or self.options.boxFillColor
+                    end
+                else
+                    if boxFill then
+                        if typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
+                            boxFill.Visible = false
+                        end
+                    end
+                end
 
-if boxFill and show and self.options.boxFill then
-    if self.options.image and typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
-        boxFill.Visible = true
-        boxFill.Size = UDim2.new(0, size.X, 0, size.Y)
-        boxFill.Position = UDim2.new(0, position.X, 0, position.Y)
-        boxFill.ImageTransparency = 1
-        boxFill.ImageColor3 = color or self.options.boxFillColor
+                for player, objects in pairs(espLibrary.espCache) do
+                    if objects.glow then
+                        objects.glow.Visible = espLibrary.options.glowImage
+                        objects.glow.ImageColor3 = _G.glowcolor 
+                    end
+                end
 
-    end
-else
-    if boxFill then
-        if typeof(boxFill) == "Instance" and boxFill:IsA("ImageLabel") then
-            boxFill.Visible = false
-        end
-    end
-end
+                if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
+                    objects.boxFill.Visible = show and self.options.boxFill
 
-for player, objects in pairs(espLibrary.espCache) do
-    if objects.glow then
-        objects.glow.Visible = espLibrary.options.glowImage
-        objects.glow.ImageColor3 = _G.glowcolor 
-    end
-end
+                    local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
+                    if gradient then
+                        gradient.Color = ColorSequence.new({
+                            ColorSequenceKeypoint.new(0, _G.GradientColor1),
+                            ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
+                            ColorSequenceKeypoint.new(1, _G.GradientColor3),
+                        })
+                        if _G.GradientSpin then
+                            gradient.Rotation = (gradient.Rotation + ((_G.GradientSpinSpeed or 0.1) * 0.2)) % 360
+                        else
+                            gradient.Rotation = 90
+                        end
+                    end
+                end
 
-if objects.boxFill and typeof(objects.boxFill) == "Instance" and objects.boxFill:IsA("ImageLabel") then
-    objects.boxFill.Visible = show and self.options.boxFill
+                if objects.stateText and character and torso then
+                    local humanoid = findFirstChild(character, "Humanoid")
+                    if humanoid then
+                        local state = humanoid:GetState()
+                        local vel = torso.AssemblyLinearVelocity
+                        local horizontalVel = Vector3.new(vel.X, 0, vel.Z).Magnitude
+                        local verticalVel = vel.Y
 
-    local gradient = objects.boxFill:FindFirstChildOfClass("UIGradient")
-    if gradient then
-        
-    gradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, _G.GradientColor1),
-    ColorSequenceKeypoint.new(0.5, _G.GradientColor2),
-    ColorSequenceKeypoint.new(1, _G.GradientColor3),
-})
-        if _G.GradientSpin then
-            gradient.Rotation = (gradient.Rotation + ((_G.GradientSpinSpeed or 0.1) * 0.2)) % 360
+                        local finalState = ""
 
-        else
-            gradient.Rotation = 90
-        end
-    end
-end
+                        if state == Enum.HumanoidStateType.Jumping then
+                            finalState = "Jumping"
+                        elseif state == Enum.HumanoidStateType.Freefall then
+                            if verticalVel < -60 then
+                                finalState = "Freefalling"
+                            elseif verticalVel < -8 then
+                                finalState = "Falling"
+                            else
+                                finalState = "Jumping"
+                            end
+                        elseif state == Enum.HumanoidStateType.Running then
+                            finalState = horizontalVel <= 0.1 and "Idle" or "Moving"
+                        else
+                            local rename = {
+                                FallingDown = "Falling",
+                                RunningNoPhysics = "Running",
+                                StrafingNoPhysics = "Strafing",
+                                PlatformStanding = "Platform",
+                                GettingUp = "GetUp",
+                                Running = "Moving",
+                            }
+                            finalState = rename[state.Name] or state.Name
+                        end
 
+                        objects.stateText.Visible = show and espLibrary.options.statesEnabled
+                        objects.stateText.Font = espLibrary.options.font
+                        objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
+                        objects.stateText.Position = Vector2.new(position.X + size.X + 3, position.Y - 3)
+                        objects.stateText.Text = finalState
+                        objects.stateText.Color = espLibrary.options.statesColor
+                    else
+                        objects.stateText.Visible = false
+                    end
+                end
 
-if objects.stateText and character and torso then
-    local humanoid = findFirstChild(character, "Humanoid")
-    if humanoid then
-        local state = humanoid:GetState()
-        local vel = torso.AssemblyLinearVelocity
-        local horizontalVel = Vector3.new(vel.X, 0, vel.Z).Magnitude
-        local verticalVel = vel.Y
+                if objects.teamText and character and torso then
+                    local myTeam = localPlayer.Team
+                    local targetTeam = player.Team
 
-        local finalState = ""
+                    objects.teamText.Visible = show and espLibrary.options.teamEspEnabled
+                    objects.teamText.Font = espLibrary.options.font
+                    objects.teamText.Size = math.max(10, espLibrary.options.fontSize - 3)
+                    objects.teamText.Position = Vector2.new(position.X + size.X + 3, position.Y - 3 + math.min(size.Y * 0.5, 15) - ((size.Y > 15) and 3 or 0))
+                    objects.teamText.Text = targetTeam and targetTeam.Name or "None"
 
-        if state == Enum.HumanoidStateType.Jumping then
-            finalState = "Jumping"
+                    if targetTeam == myTeam then
+                        objects.teamText.Color = espLibrary.options.teamMyColor
+                    else
+                        objects.teamText.Color = espLibrary.options.teamEnemyColor
+                    end
+                else
+                    if objects.teamText then
+                        objects.teamText.Visible = false
+                    end
+                end
 
-        elseif state == Enum.HumanoidStateType.Freefall then
-            if verticalVel < -60 then
-                finalState = "Freefalling"
-            elseif verticalVel < -8 then
-                finalState = "Falling"
-            else
-                finalState = "Jumping"
-            end
+                if show and self.options.healthBars then
+                    local healthBarGrad = objects.healthBarGradientFrame
+                    
+                    if healthBarGrad then
+                        healthBarGrad.Visible = true
+                        healthBarGrad.Size = UDim2.new(0, healthBarSize.X, 0, math.abs(healthBarSize.Y))
+                        healthBarGrad.Transparency = 1 - self.options.healthBarsTransparency
+                        healthBarGrad.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y + healthBarSize.Y)
+                        healthBarGrad.ZIndex = 5 
 
-        elseif state == Enum.HumanoidStateType.Running then
-            finalState = horizontalVel <= 0.1 and "Idle" or "Moving"
-
-        else
-            local rename = {
-                FallingDown = "Falling",
-                RunningNoPhysics = "Running",
-                StrafingNoPhysics = "Strafing",
-                PlatformStanding = "Platform",
-                GettingUp = "GetUp",
-                Running = "Moving",
-            }
-            finalState = rename[state.Name] or state.Name
-        end
-
-        objects.stateText.Visible = show and espLibrary.options.statesEnabled
-        objects.stateText.Font = espLibrary.options.font
-        objects.stateText.Size = math.max(10, espLibrary.options.fontSize - 3)
-        objects.stateText.Position = Vector2.new(position.X + size.X + 3, position.Y - 3)
-
-
-
-        objects.stateText.Text = finalState
-        objects.stateText.Color = espLibrary.options.statesColor
-    else
-        objects.stateText.Visible = false
-    end
-end
-
-if objects.teamText and character and torso then
-    local myTeam = localPlayer.Team
-    local targetTeam = player.Team
-
-    objects.teamText.Visible = show and espLibrary.options.teamEspEnabled
-    objects.teamText.Font = espLibrary.options.font
-    objects.teamText.Size = math.max(10, espLibrary.options.fontSize - 3)
-
-    objects.teamText.Position = Vector2.new(position.X + size.X + 3, position.Y - 3 + math.min(size.Y * 0.5, 15) - ((size.Y > 15) and 3 or 0))
-
-
-    objects.teamText.Text = targetTeam and targetTeam.Name or "None"
-
-    if targetTeam == myTeam then
-        objects.teamText.Color = espLibrary.options.teamMyColor
-    else
-        objects.teamText.Color = espLibrary.options.teamEnemyColor
-    end
-else
-    if objects.teamText then
-        objects.teamText.Visible = false
-    end
-end
-
-
-
-
-
-
-            
-if show and self.options.healthBars then
-    local healthBarGrad = objects.healthBarGradientFrame
-    
-    if healthBarGrad then
-      
-        healthBarGrad.Visible = true
-        healthBarGrad.Size = UDim2.new(0, healthBarSize.X, 0, math.abs(healthBarSize.Y))
-        healthBarGrad.Transparency = 1 - self.options.healthBarsTransparency
-        healthBarGrad.Position = UDim2.new(0, healthBarPosition.X, 0, healthBarPosition.Y + healthBarSize.Y)
-        healthBarGrad.ZIndex = 5 
-
-        local gradTool = healthBarGrad:FindFirstChildOfClass("UIGradient")
-        if gradTool then
-            gradTool.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, _G.HGradientColor1),
-                ColorSequenceKeypoint.new(0.5, _G.HGradientColor2),
-                ColorSequenceKeypoint.new(1, _G.HGradientColor3)
-            })
-        end
-        
-      
-        objects.healthBar.Visible = false
-    else
-       
-        objects.healthBar.Visible = true
-        objects.healthBar.Color = color or self.options.healthBarsColor;
-        objects.healthBar.Transparency = self.options.healthBarsTransparency;
-        objects.healthBar.Size = healthBarSize;
-        objects.healthBar.Position = healthBarPosition;
-    end
-else
-    
-    if objects.healthBarGradientFrame then objects.healthBarGradientFrame.Visible = false end
-    objects.healthBar.Visible = false
-end
-
+                        local gradTool = healthBarGrad:FindFirstChildOfClass("UIGradient")
+                        if gradTool then
+                            gradTool.Color = ColorSequence.new({
+                                ColorSequenceKeypoint.new(0, _G.HGradientColor1),
+                                ColorSequenceKeypoint.new(0.5, _G.HGradientColor2),
+                                ColorSequenceKeypoint.new(1, _G.HGradientColor3)
+                            })
+                        end
+                        
+                        objects.healthBar.Visible = false
+                    else
+                        objects.healthBar.Visible = true
+                        objects.healthBar.Color = color or self.options.healthBarsColor;
+                        objects.healthBar.Transparency = self.options.healthBarsTransparency;
+                        objects.healthBar.Size = healthBarSize;
+                        objects.healthBar.Position = healthBarPosition;
+                    end
+                else
+                    if objects.healthBarGradientFrame then objects.healthBarGradientFrame.Visible = false end
+                    objects.healthBar.Visible = false
+                end
 
                 objects.healthBar.Transparency = self.options.healthBarsTransparency;
                 objects.healthBar.Size = healthBarSize;
                 objects.healthBar.Position = healthBarPosition;
 
                 objects.healthBarOutline.Visible = show and self.options.healthBars
-objects.healthBarOutline.Transparency = self.options.healthBarsTransparency
-
--- exact match to fill height
-objects.healthBarOutline.Size = Vector2.new(
-    healthBarSize.X + 2,      -- outline thickness on X
-    healthBarSize.Y           -- SAME height as fill
-)
-
-objects.healthBarOutline.Position = Vector2.new(
-    healthBarPosition.X - 1,
-    healthBarPosition.Y
-)
+                objects.healthBarOutline.Transparency = self.options.healthBarsTransparency
+                objects.healthBarOutline.Size = Vector2.new(
+                    healthBarSize.X + 2,
+                    healthBarSize.Y
+                )
+                objects.healthBarOutline.Position = Vector2.new(
+                    healthBarPosition.X - 1,
+                    healthBarPosition.Y
+                )
 
                 objects.line.Visible = show and self.options.tracers;
                 objects.line.Color = color or self.options.tracerColor;
