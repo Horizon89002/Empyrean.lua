@@ -1,4 +1,4 @@
-local espLibrary = {
+local espLibrary = { --
     instances = {},
     espCache = {},
     chamsCache = {},
@@ -283,11 +283,13 @@ function espLibrary.getBoxData(position, size)
         local scaleFactor = espLibrary.getScaleFactor(currentCamera.FieldOfView, depth);
         local clampX = clamp(size.X, espLibrary.options.minScaleFactorX, espLibrary.options.maxScaleFactorX);
         local clampY = clamp(size.Y, espLibrary.options.minScaleFactorY, espLibrary.options.maxScaleFactorY);
-        local screenSize = round(vector2New(clampX * scaleFactor, clampY * scaleFactor));
+        -- Trim 4% off the height so the bottom edge meets the feet (not below them)
+        local screenSize = round(vector2New(clampX * scaleFactor, clampY * scaleFactor * 0.96));
 
+        -- Shift down 9% so the top edge meets the head (not above it)
         local boxPosition = round(vector2New(
             torsoPosition.X - (screenSize.X * 0.5),
-            torsoPosition.Y - (screenSize.Y * 0.5) + round(screenSize.Y * 0.07)
+            torsoPosition.Y - (screenSize.Y * 0.5) + round(screenSize.Y * 0.09)
         ));
 
         return onScreen, screenSize, boxPosition, torsoPosition;
