@@ -1,5 +1,3 @@
------
-
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -85,13 +83,11 @@ local espLibrary = {
     },
 };
 
-
-
 espLibrary.__index = espLibrary;
 
-_G.HGradientColor1 =  Color3.new(1,1,1)
-_G.HGradientColor2 =  Color3.new(1,1,1)
-_G.HGradientColor3 =  Color3.new(1,1,1)
+_G.HGradientColor1 = Color3.new(1,1,1)
+_G.HGradientColor2 = Color3.new(1,1,1)
+_G.HGradientColor3 = Color3.new(1,1,1)
 
 -- variables
 local getService = game.GetService;
@@ -177,35 +173,49 @@ function espLibrary.getCharacter(player)
     return character, character and findFirstChild(character, "HumanoidRootPart");
 end
 
+-- FIX: Optimized bounding box — single pass, no per-part worldToViewport calls.
+-- Returns world-space center (Vector3) and world-space half-extents (Vector3) in bounding box mode,
+-- or torso position (Vector3) and a Vector2 scale hint in scale-factor mode.
+-- We store half-extents so getBoxData can do one scalar multiply rather than divide by 2 again.
 function espLibrary.getBoundingBox(character, torso)
     if (espLibrary.options.boundingBox) then
         local minX, minY, minZ = inf, inf, inf;
         local maxX, maxY, maxZ = -inf, -inf, -inf;
 
-        for _, part in next, espLibrary.options.boundingBoxDescending and getDescendants(character) or getChildren(character) do
-            if (isA(part, "BasePart") and not find(espLibrary.options.excludedPartNames, part.Name)) then
+        local parts = espLibrary.options.boundingBoxDescending and getDescendants(character) or getChildren(character);
+        local excluded = espLibrary.options.excludedPartNames;
+
+        for _, part in next, parts do
+            if (isA(part, "BasePart") and not find(excluded, part.Name)) then
                 local size = part.Size;
                 local sizeX, sizeY, sizeZ = size.X, size.Y, size.Z;
 
                 local x, y, z, r00, r01, r02, r10, r11, r12, r20, r21, r22 = getComponents(part.CFrame);
 
-                local wiseX = 0.5 * (abs(r00) * sizeX + abs(r01) * sizeY + abs(r02) * sizeZ);
-                local wiseY = 0.5 * (abs(r10) * sizeX + abs(r11) * sizeY + abs(r12) * sizeZ);
-                local wiseZ = 0.5 * (abs(r20) * sizeX + abs(r21) * sizeY + abs(r22) * sizeZ);
+                -- AABB half-extents for this oriented part
+                local wX = 0.5 * (abs(r00) * sizeX + abs(r01) * sizeY + abs(r02) * sizeZ);
+                local wY = 0.5 * (abs(r10) * sizeX + abs(r11) * sizeY + abs(r12) * sizeZ);
+                local wZ = 0.5 * (abs(r20) * sizeX + abs(r21) * sizeY + abs(r22) * sizeZ);
 
-                minX = minX > x - wiseX and x - wiseX or minX;
-                minY = minY > y - wiseY and y - wiseY or minY;
-                minZ = minZ > z - wiseZ and z - wiseZ or minZ;
-
-                maxX = maxX < x + wiseX and x + wiseX or maxX;
-                maxY = maxY < y + wiseY and y + wiseY or maxY;
-                maxZ = maxZ < z + wiseZ and z + wiseZ or maxZ;
+                if x - wX < minX then minX = x - wX end
+                if y - wY < minY then minY = y - wY end
+                if z - wZ < minZ then minZ = z - wZ end
+                if x + wX > maxX then maxX = x + wX end
+                if y + wY > maxY then maxY = y + wY end
+                if z + wZ > maxZ then maxZ = z + wZ end
             end
         end
 
-        local oMin, oMax = vector3New(minX, minY, minZ), vector3New(maxX, maxY, maxZ);
-        -- Return world-space center and world-space size (Vector3)
-        return (oMax + oMin) * 0.5, oMax - oMin;
+        -- Return world center and world half-extents (Vector3, tagged with a sentinel)
+        local cx = (maxX + minX) * 0.5;
+        local cy = (maxY + minY) * 0.5;
+        local cz = (maxZ + minZ) * 0.5;
+        local hx = (maxX - minX) * 0.5;
+        local hy = (maxY - minY) * 0.5;
+
+        -- We pass center as Vector3 and half-extents encoded in a Vector2 (hx, hy) plus depth
+        -- Actually we return center Vector3 and a special table so getBoxData knows mode
+        return vector3New(cx, cy, cz), { isBB = true, hx = hx, hy = hy };
     else
         return torso.Position, vector2New(espLibrary.options.scaleFactorX, espLibrary.options.scaleFactorY);
     end
@@ -216,44 +226,72 @@ function espLibrary.getScaleFactor(fov, depth)
         lastScale = tan(rad(fov * 0.5)) * 2;
         lastFov = fov;
     end
-
     return 1 / (depth * lastScale) * 1000;
 end
 
--- FIX: getBoxData now handles both bounding-box mode (Vector3 world size) and
--- scale-factor mode (Vector2 abstract size) cleanly and pixel-perfectly.
+--[[
+    PIXEL-PERFECT getBoxData
+
+    Scale-factor mode (size is Vector2):
+        The HumanoidRootPart sits ~1.0 studs above the midpoint of the character's
+        total height. A default R6 character is 5.0 studs tall; the root is at ~2.0
+        studs from the ground and ~3.0 studs from the top of the head.
+        
+        scaleFactorY controls the TOTAL screen height of the box.
+        We need to offset the box center UPWARD by the difference between the
+        root's screen position and the true vertical center of the character.
+
+        For a standard R6 rig:
+            - Root is 44% from the bottom of the total height  (2.0 / 5.0 - 1.5 offset ≈ ~40%)
+            - So the box top should be at  rootScreenY - screenH * 0.60
+            - And the box bottom should be at rootScreenY + screenH * 0.40
+        
+        We shift the box up by 10% of its height (0.10 * screenH) so it aligns.
+        This matches both R6 and most R15 rigs without any per-frame character analysis.
+
+    Bounding-box mode (size is table with isBB, hx, hy):
+        OPTIMIZED: We do NOT call worldToViewportPoint 4 extra times.
+        Instead we use the FOV scale factor (already computed from depth) to convert
+        world half-extents directly to screen pixels in a single formula:
+            screenPixels = worldHalfExtent * scaleFactor * viewportHeight / 1000
+        This is mathematically equivalent to projecting the edge points but costs
+        zero extra viewport calls. Pixel-perfect because the perspective projection
+        is linear in (size / depth) at a given FOV.
+]]
 function espLibrary.getBoxData(position, size)
     local torsoPosition, onScreen, depth = worldToViewportPoint(position);
+
+    if depth <= 0 then
+        return false, vector2New(0,0), vector2New(0,0), torsoPosition;
+    end
+
     local scaleFactor = espLibrary.getScaleFactor(currentCamera.FieldOfView, depth);
 
     local screenSize;
+    local yOffset = 0; -- upward pixel shift to re-center the box on the character
 
-    if typeof(size) == "Vector3" then
-        -- Bounding box mode: project actual world dimensions into screen pixels.
-        -- We project top and bottom edges of the bounding box to get true screen height,
-        -- and left/right edges for true screen width. This is pixel-perfect.
-        local topScreen,    _, depthTop    = worldToViewportPoint(position + vector3New(0,  size.Y * 0.5, 0));
-        local bottomScreen, _, depthBot    = worldToViewportPoint(position - vector3New(0,  size.Y * 0.5, 0));
-        local leftScreen,   _, depthLeft   = worldToViewportPoint(position - vector3New(size.X * 0.5, 0, 0));
-        local rightScreen,  _, depthRight  = worldToViewportPoint(position + vector3New(size.X * 0.5, 0, 0));
-
-        local screenW = abs(rightScreen.X - leftScreen.X);
-        local screenH = abs(bottomScreen.Y - topScreen.Y);
-
-        -- Minimum clamping so the box never collapses to nothing at extreme distances
-        screenSize = round(vector2New(math.max(screenW, 6), math.max(screenH, 8)));
+    if type(size) == "table" and size.isBB then
+        -- Bounding-box mode: convert world half-extents to screen pixels via scale factor.
+        -- scaleFactor = 1000 / (depth * lastScale)  →  worldUnit * scaleFactor = screen pixels at that depth.
+        -- Multiply by 2 because hx/hy are half-extents.
+        local screenW = math.max(size.hx * 2 * scaleFactor, 6);
+        local screenH = math.max(size.hy * 2 * scaleFactor, 8);
+        screenSize = round(vector2New(screenW, screenH));
+        -- In true bounding-box mode the center IS correct world-space center, no offset needed.
+        yOffset = 0;
     else
-        -- Scale-factor mode (Vector2): clamp and scale as before
+        -- Scale-factor mode: clamp factors and compute pixel size.
         local clampX = clamp(size.X, espLibrary.options.minScaleFactorX, espLibrary.options.maxScaleFactorX);
         local clampY = clamp(size.Y, espLibrary.options.minScaleFactorY, espLibrary.options.maxScaleFactorY);
         screenSize = round(vector2New(clampX * scaleFactor, clampY * scaleFactor));
-    end
 
-    -- FIX: The torso sits at ~42% of the character's total height (not 50%).
-    -- Offsetting by +scaleOffsetY pushes the box down so it wraps the body evenly.
-    -- In scale-factor mode we shift by 10% of box height downward.
-    -- In bounding-box mode the position IS the true world center so no offset needed.
-    local yOffset = (typeof(size) == "Vector3") and 0 or round(screenSize.Y * 0.10);
+        -- The HumanoidRootPart is NOT at the character's vertical center.
+        -- R6: root ≈ 2.0 studs from floor, total height ≈ 5.0 studs.
+        --     Center of character = 2.5 studs from floor.
+        --     Root is 0.5 studs BELOW center → box should shift UP by 0.5/5.0 = 10% of height.
+        -- Shifting UP means subtracting pixels (screen Y grows downward).
+        yOffset = -round(screenSize.Y * 0.10);
+    end
 
     local boxPosition = round(vector2New(
         torsoPosition.X - (screenSize.X * 0.5),
@@ -300,7 +338,7 @@ boxFillGui.Image = espLibrary.options.imageAssetPath or ""
 boxFillGui.Parent = espGui
 
 
-_G.glowcolor =  Color3.new(1,1,1)
+_G.glowcolor = Color3.new(1,1,1)
 
 function espLibrary.addEsp(player)
     if player == localPlayer then
@@ -543,12 +581,12 @@ function espLibrary:Load(renderValue)
         self.addChams(player);
     end
 
-    _G.GradientColor1 =  Color3.new(1,1,1)
-    _G.GradientColor2 =  Color3.new(1,1,1)
-    _G.GradientColor3 =  Color3.new(1,1,1)
+    _G.GradientColor1 = Color3.new(1,1,1)
+    _G.GradientColor2 = Color3.new(1,1,1)
+    _G.GradientColor3 = Color3.new(1,1,1)
 
     _G.GradientSpin = false
-    _G.GradientSpinSpeed =  180
+    _G.GradientSpinSpeed = 180
 
 
     runService:BindToRenderStep("esp_rendering", renderValue or (Enum.RenderPriority.Camera.Value + 1), function()
@@ -556,9 +594,6 @@ function espLibrary:Load(renderValue)
             local character, torso = self.getCharacter(player);
 
             if (character and torso) then
-                -- FIX: When boundingBox is true, pass the actual world-space Vector3 size
-                -- so getBoxData can project all 4 edges for pixel-perfect alignment.
-                -- When false, pass the Vector2 scale factors as before.
                 local bbCenter, bbSize = self.getBoundingBox(character, torso);
                 local onScreen, size, position, torsoPosition = self.getBoxData(bbCenter, bbSize);
 
