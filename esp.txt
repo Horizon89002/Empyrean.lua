@@ -1,3 +1,5 @@
+----------------------------
+
 local espLibrary = {
     instances = {},
     espCache = {},
@@ -285,14 +287,9 @@ function espLibrary.getBoxData(position, size)
         local clampY = clamp(size.Y, espLibrary.options.minScaleFactorY, espLibrary.options.maxScaleFactorY);
         local screenSize = round(vector2New(clampX * scaleFactor, clampY * scaleFactor));
 
-        -- HumanoidRootPart sits slightly BELOW the character's true vertical center.
-        -- Shift the box upward by 5% of its height so the top edge meets the head.
-        -- (was 10% — reduced to 5% per user calibration: "bring it down a little")
-        local yOffset = -round(screenSize.Y * 0.05);
-
         local boxPosition = round(vector2New(
             torsoPosition.X - (screenSize.X * 0.5),
-            torsoPosition.Y - (screenSize.Y * 0.5) + yOffset
+            torsoPosition.Y - (screenSize.Y * 0.5)
         ));
 
         return onScreen, screenSize, boxPosition, torsoPosition;
@@ -695,17 +692,33 @@ function espLibrary:Load(renderValue)
                     end
                 end
 
-                objects.tool.Visible = show and self.options.toolName and tName ~= ""
+                -- Wrap in brackets unless already bracketed; always show [none] when no tool
+                local tDisplay
+                if tName == "" then
+                    tDisplay = "[none]"
+                elseif tName:sub(1,1) == "[" and tName:sub(-1) == "]" then
+                    tDisplay = tName
+                else
+                    tDisplay = "[" .. tName .. "]"
+                end
+
+                -- If distance is off, tool takes distance slot (right under box).
+                -- If distance is on, tool goes below the distance text.
+                local toolBaseY
+                if not self.options.distance then
+                    toolBaseY = size.Y + 1
+                else
+                    toolBaseY = size.Y + 1 + objects.bottom.TextBounds.Y + 1
+                end
+
+                objects.tool.Visible = show and self.options.toolName
                 objects.tool.Font = self.options.font
                 objects.tool.Size = self.options.fontSize
                 objects.tool.Transparency = self.options.toolNameTransparency
                 objects.tool.Color = self.options.toolNameColor
-                objects.tool.Text = tName
+                objects.tool.Text = tDisplay
                 objects.tool.Position = round(
-                    position + vector2New(
-                        size.X * 0.5,
-                        size.Y + 1 + objects.bottom.TextBounds.Y + 1
-                    )
+                    position + vector2New(size.X * 0.5, toolBaseY)
                 )
 
                 objects.box.Visible = show and self.options.boxes;
