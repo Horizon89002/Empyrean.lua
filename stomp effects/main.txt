@@ -798,7 +798,8 @@ local function createEffectTemplates()
 	effectTemplates['Meteor'] = meteorAttachment
 
 	local voidAttachment = Instance.new('Attachment')
-	voidAttachment:SetAttribute("AdaptiveLifetime", 1.0)
+	voidAttachment:SetAttribute("AdaptiveLifetime", 1.0) 
+	voidAttachment:SetAttribute("IgnoreColorOverride", true)
 
 	local vfx_1 = Instance.new("ParticleEmitter")
 	vfx_1.Name = "ParticleEmitter"
@@ -821,7 +822,7 @@ local function createEffectTemplates()
 	vfx_1.Rotation = NumberRange.new(0.000000, 360.000000)
 	vfx_1.RotSpeed = NumberRange.new(90, 180)
 	vfx_1.SpreadAngle = Vector2.new(0.000000, 0.000000)
-
+	
 	vfx_1.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 8.500000, 0.000000), NumberSequenceKeypoint.new(1.000000, 6.500000, 0.000000)})
 	vfx_1.Parent = voidAttachment
 	effectTemplates['Void'] = voidAttachment
@@ -829,6 +830,8 @@ end
 
 
 local function applyColor(inst, color)
+	if inst:GetAttribute("IgnoreColorOverride") then return end
+
 	for _, d in ipairs(inst:GetDescendants()) do
 		if d:IsA("ParticleEmitter") then
 			d.Color = ColorSequence.new(color)
@@ -838,9 +841,13 @@ end
 
 
 local function emitAll(inst)
+	local ignoreColor = inst:GetAttribute("IgnoreColorOverride")
+
 	for _, d in ipairs(inst:GetDescendants()) do
 		if d:IsA("ParticleEmitter") then
-			d.Color = ColorSequence.new(effectColor)
+			if not ignoreColor then
+				d.Color = ColorSequence.new(effectColor)
+			end
 			table.insert(activeEmitters, d)
 
 			local count = d:GetAttribute("EmitCount") or d.Rate or 10
@@ -875,7 +882,11 @@ function HitEffects:SetColor(color)
 	for i = #activeEmitters, 1, -1 do
 		local emitter = activeEmitters[i]
 		if emitter and emitter.Parent then
-			emitter.Color = ColorSequence.new(color)
+			local parentPart = emitter.Parent
+			if parentPart and parentPart:GetAttribute("IgnoreColorOverride") then
+			else
+				emitter.Color = ColorSequence.new(color)
+			end
 		else
 			table.remove(activeEmitters, i)
 		end
@@ -914,6 +925,7 @@ function HitEffects:Play(character)
 				for _, d in ipairs(effect:GetDescendants()) do
 					if d:IsA("ParticleEmitter") then
 						d.Lifetime = NumberRange.new(effectLifetime, effectLifetime)
+						
 						local originalMin = d.RotSpeed.Min
 						local originalMax = d.RotSpeed.Max
 						d.RotSpeed = NumberRange.new(originalMin * timeRatio, originalMax * timeRatio)
