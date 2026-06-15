@@ -796,6 +796,31 @@ local function createEffectTemplates()
                     meteorFlash.Enabled = false
                     meteorFlash.Parent = meteorEnd
                     effectTemplates['Meteor'] = meteorAttachment
+
+    
+                    local voidAttachment = Instance.new('Attachment')
+                    local vfx_1 = Instance.new("ParticleEmitter")
+                    vfx_1.Name = "ParticleEmitter"
+                    vfx_1.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 1.000000, 1.000000)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 1.000000, 1.000000))})
+                    vfx_1.Drag = 0
+                    vfx_1.ZOffset = 0
+                    vfx_1.LightInfluence = 0
+                    vfx_1.Lifetime = NumberRange.new(1.000000, 1.000000)
+                    vfx_1.Speed = NumberRange.new(0.000000, 0.000000)
+                    vfx_1.Brightness = 1
+                    vfx_1.Texture = "rbxassetid://8581559101"
+                    vfx_1.Enabled = false
+                    vfx_1.Acceleration = Vector3.new(0.000000, 0.000000, 0.000000)
+                    vfx_1.LockedToPart = false
+                    vfx_1.Rate = 200
+                    vfx_1.VelocityInheritance = 0
+                    vfx_1.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 1.000000, 0.000000)})
+                    vfx_1.LightEmission = 0
+                    vfx_1.Rotation = NumberRange.new(0.000000, 0.000000)
+                    vfx_1.SpreadAngle = Vector2.new(0.000000, 0.000000)
+                    vfx_1.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 10.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 10.000000, 0.000000)})
+                    vfx_1.Parent = voidAttachment
+                    effectTemplates['Void'] = voidAttachment
 end
 
 
