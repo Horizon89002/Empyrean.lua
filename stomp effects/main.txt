@@ -1,5 +1,3 @@
--- e
-
 local HitEffects = {}
 
 local Players = game:GetService("Players")
@@ -259,16 +257,16 @@ local function createEffectTemplates()
 	light3.Parent = lightAttachment
 	effectTemplates['Light'] = lightAttachment
 
-	-- MASSIVE GRAPHICS 1 LIGHTNING & THUNDER STRIKE
+	-- RESTORED & OPTIMIZED LIGHTNING BEAMS WITH HIGH GRAPHICS 1 VISIBILITY
 	local lightningAttachment = Instance.new('Attachment')
-	local startAttachment = Instance.new('Attachment')
+	lightningAttachment:SetAttribute("IgnoreColorOverride", true) -- Prevents void color mixing
 
+	local startAttachment = Instance.new('Attachment')
 	startAttachment.Name = 'Start'
-	startAttachment.CFrame = CFrame.new(0, 65, 0) -- Significantly increased Thunder Strike height (was 20)
+	startAttachment.CFrame = CFrame.new(0, 65, 0) -- High straight-beam lightning strike
 	startAttachment.Parent = lightningAttachment
 
 	local endAttachment = Instance.new('Attachment')
-
 	endAttachment.Name = 'End'
 	endAttachment.CFrame = CFrame.new(0, 0, 0)
 	endAttachment.Parent = lightningAttachment
@@ -277,8 +275,8 @@ local function createEffectTemplates()
 	beam1.FaceCamera = true
 	beam1.ZOffset = 0.3
 	beam1.TextureSpeed = 1.5
-	beam1.Width1 = 15 -- Made thunder strike width significantly thicker (was 5)
-	beam1.Width0 = 8  -- Made thunder strike width significantly thicker (was 2)
+	beam1.Width1 = 12 -- Thick straight beam strike dimensions
+	beam1.Width0 = 6
 	beam1.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
 		NumberSequenceKeypoint.new(0.0112219, 0),
@@ -296,8 +294,8 @@ local function createEffectTemplates()
 	beam2.FaceCamera = true
 	beam2.ZOffset = 0.3
 	beam2.TextureSpeed = 1.5
-	beam2.Width1 = 15 -- Made thunder strike width significantly thicker (was 5)
-	beam2.Width0 = 8  -- Made thunder strike width significantly thicker (was 2)
+	beam2.Width1 = 12
+	beam2.Width0 = 6
 	beam2.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
 		NumberSequenceKeypoint.new(0.0112219, 0),
@@ -320,8 +318,8 @@ local function createEffectTemplates()
 	lightningOne.Speed = NumberRange.new(0.01, 0.01)
 	lightningOne.Brightness = 15
 	lightningOne.ZOffset = 3
-	lightningOne.Size = NumberSequence.new(14) -- Significantly larger electric effect (was 5)
-	lightningOne.Rate = 120 -- Drastically increased emission rate for Graphics 1 visibility
+	lightningOne.Size = NumberSequence.new(10) -- Large electric sparks
+	lightningOne.Rate = 180 -- Ultra high generation to pierce Graphics Quality 1 capping
 	lightningOne:SetAttribute("EmitCount", 60)
 	lightningOne.Texture = 'rbxassetid://14582813693'
 	lightningOne.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
@@ -338,8 +336,8 @@ local function createEffectTemplates()
 	lightningTwo.Speed = NumberRange.new(0.01, 0.01)
 	lightningTwo.Brightness = 15
 	lightningTwo.ZOffset = 3
-	lightningTwo.Size = NumberSequence.new(14) -- Significantly larger electric effect (was 5)
-	lightningTwo.Rate = 120 -- Drastically increased emission rate for Graphics 1 visibility
+	lightningTwo.Size = NumberSequence.new(10)
+	lightningTwo.Rate = 180
 	lightningTwo:SetAttribute("EmitCount", 60)
 	lightningTwo.Texture = 'rbxassetid://14582813693'
 	lightningTwo.Orientation = Enum.ParticleOrientation.VelocityParallel
@@ -358,9 +356,9 @@ local function createEffectTemplates()
 	glow.Speed = NumberRange.new(0.0099825, 0.0099825)
 	glow.Brightness = 5
 	glow.ZOffset = 4
-	glow.Size = NumberSequence.new(15) -- Made ground electric flash impact larger
-	glow.Rate = 35 -- Boosted visibility rate
-	glow:SetAttribute("EmitCount", 15)
+	glow.Size = NumberSequence.new(12) -- Expanded thunder impact ground ring
+	glow.Rate = 40
+	glow:SetAttribute("EmitCount", 20)
 	glow.Texture = 'rbxassetid://13305806509'
 	glow.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
 	glow.Enabled = false
@@ -809,9 +807,9 @@ local function createEffectTemplates()
 	vfx_1.LightInfluence = 0
 	vfx_1.Lifetime = NumberRange.new(1.0)
 	vfx_1.Speed = NumberRange.new(0.0)
-	vfx_1.Brightness = 3.5 -- High exposure for graphics quality 1 visibility overrides
+	vfx_1.Brightness = 3.5 
 	vfx_1.LightEmission = 0.6
-	vfx_1.Texture = "rbxassetid://10822190705" -- Beautiful volumetric space-time spiral galaxy vortex
+	vfx_1.Texture = "rbxassetid://10822190705" 
 	vfx_1.Enabled = false 
 	vfx_1.LockedToPart = true
 	vfx_1.Rate = 45
@@ -823,10 +821,10 @@ local function createEffectTemplates()
 		NumberSequenceKeypoint.new(1, 1)
 	})
 	vfx_1.Rotation = NumberRange.new(0, 360)
-	vfx_1.RotSpeed = NumberRange.new(120, 240) -- Rapid spin cycle
+	vfx_1.RotSpeed = NumberRange.new(120, 240) 
 	vfx_1.Size = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 0),
-		NumberSequenceKeypoint.new(0.2, 10.5), -- Broadened diameter scale
+		NumberSequenceKeypoint.new(0.2, 10.5), 
 		NumberSequenceKeypoint.new(0.8, 10.5),
 		NumberSequenceKeypoint.new(1, 0)
 	})
@@ -889,7 +887,8 @@ function HitEffects:SetColor(color)
 		local emitter = activeEmitters[i]
 		if emitter and emitter.Parent then
 			local parentPart = emitter.Parent
-			if parentPart and parentPart:GetAttribute("IgnoreColorOverride") then
+			-- Check both parent and template container attributes to safeguard lightning beams
+			if parentPart and (parentPart:GetAttribute("IgnoreColorOverride") or parentPart.Parent:GetAttribute("IgnoreColorOverride")) then
 			else
 				emitter.Color = ColorSequence.new(color)
 			end
@@ -940,7 +939,10 @@ function HitEffects:Play(character)
 			else
 				for _, d in ipairs(effect:GetDescendants()) do
 					if d:IsA("ParticleEmitter") then
-						d.Lifetime = NumberRange.new(0, effectLifetime)
+						-- Safely ignore structural beam configurations inside lightning
+						if not effect:GetAttribute("IgnoreColorOverride") then
+							d.Lifetime = NumberRange.new(0, effectLifetime)
+						end
 					end
 				end
 			end
