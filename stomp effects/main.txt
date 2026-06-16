@@ -1,3 +1,5 @@
+--
+
 local HitEffects = {}
 
 local Players = game:GetService("Players")
@@ -47,7 +49,7 @@ local function createEffectTemplates()
 
 	dots2.Name = 'Dots 2'
 	dots2.LightEmission = 1
-	dots2.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+	dots2.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255)) [cite: 2]
 	dots2.LockedToPart = false
 	dots2.ZOffset = 10
 	dots2.Texture = 'rbxassetid://7216849075'
@@ -99,7 +101,7 @@ local function createEffectTemplates()
 	blood01.Name = 'Blood-01'
 	blood01.Lifetime = NumberRange.new(0.5, 0.5)
 	blood01.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
-	blood01.SpreadAngle = Vector2.new(10, 10)
+	blood01.SpreadAngle = Vector2.new(10, 10) [cite: 3]
 	blood01.LockedToPart = true
 	blood01.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
@@ -150,7 +152,7 @@ local function createEffectTemplates()
 	blood05.Lifetime = NumberRange.new(0.75, 0.75)
 	blood05.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
 	blood05.Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(0, 1), [cite: 4]
 		NumberSequenceKeypoint.new(0.5037407, 0),
 		NumberSequenceKeypoint.new(1, 1),
 	})
@@ -203,7 +205,7 @@ local function createEffectTemplates()
 	light1.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
 		NumberSequenceKeypoint.new(0.2066596, 0),
-		NumberSequenceKeypoint.new(0.4947146, 0),
+		NumberSequenceKeypoint.new(0.4947146, 0), [cite: 5]
 		NumberSequenceKeypoint.new(0.7996829, 0),
 		NumberSequenceKeypoint.new(1, 1),
 	})
@@ -262,7 +264,7 @@ local function createEffectTemplates()
 	lightningAttachment:SetAttribute("IsLightningEffect", true) -- Protected from rotation/lifetime distortion
 
 	local startAttachment = Instance.new('Attachment')
-	startAttachment.Name = 'Start'
+	startAttachment.Name = 'Start' [cite: 6]
 	startAttachment.CFrame = CFrame.new(0, 45, 0) -- High vertical offset
 	startAttachment.Parent = lightningAttachment
 
@@ -316,7 +318,7 @@ local function createEffectTemplates()
 	lightningOne.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
 	lightningOne.LockedToPart = true
 	lightningOne.Speed = NumberRange.new(0.01, 0.01)
-	lightningOne.Brightness = 15
+	lightningOne.Brightness = 15 [cite: 7]
 	lightningOne.ZOffset = 3
 	lightningOne.Size = NumberSequence.new(12) -- Increased size slightly
 	lightningOne.Rate = 12 -- Slightly adjusted rate
@@ -363,7 +365,7 @@ local function createEffectTemplates()
 	effectTemplates['Lightning'] = lightningAttachment
 
 	local blackFlashAttachment = Instance.new('Attachment')
-	local pe2 = Instance.new('ParticleEmitter')
+	local pe2 = Instance.new('ParticleEmitter') [cite: 8]
 
 	pe2.Name = '2'
 	pe2.LightInfluence = 0.2
@@ -421,7 +423,7 @@ local function createEffectTemplates()
 	lightning3.Speed = NumberRange.new(0.0077598, 0.0077598)
 	lightning3.ZOffset = 5.3460002
 	lightning3.Size = NumberSequence.new(9.31)
-	lightning3.Rate = 3
+	lightning3.Rate = 3 [cite: 9]
 	lightning3.Texture = 'rbxassetid://14934040881'
 	lightning3.EmissionDirection = Enum.NormalId.Front
 	lightning3.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
@@ -474,7 +476,7 @@ local function createEffectTemplates()
 	flash.Lifetime = NumberRange.new(0.07, 0.2)
 	flash.SpreadAngle = Vector2.new(-360, 360)
 	flash.LockedToPart = true
-	flash.LightEmission = 1
+	flash.LightEmission = 1 [cite: 10]
 	flash.Color = ColorSequence.new(Color3.fromRGB(255, 17, 17))
 	flash.VelocitySpread = -360
 	flash.Squash = NumberSequence.new(0.15)
@@ -526,7 +528,7 @@ local function createEffectTemplates()
 		NumberSequenceKeypoint.new(1, 1),
 	})
 	gradient.LightEmission = 1
-	gradient.Color = ColorSequence.new(Color3.fromRGB(114, 44, 255))
+	gradient.Color = ColorSequence.new(Color3.fromRGB(114, 44, 255)) [cite: 11]
 	gradient.Speed = NumberRange.new(0.0629003, 0.0629003)
 	gradient.Brightness = 4
 	gradient.Size = NumberSequence.new(0, 35.7745705)
@@ -578,7 +580,7 @@ local function createEffectTemplates()
 		NumberSequenceKeypoint.new(0.110303, 4.0975556),
 		NumberSequenceKeypoint.new(1, 0),
 	})
-	specs3.ShapeInOut = Enum.ParticleEmitterShapeInOut.InAndOut
+	specs3.ShapeInOut = Enum.ParticleEmitterShapeInOut.InAndOut [cite: 12]
 	specs3.Rate = 70
 	specs3.Texture = 'rbxassetid://8801300936'
 	specs3.Orientation = Enum.ParticleOrientation.FacingCameraWorldUp
@@ -610,7 +612,7 @@ local function createEffectTemplates()
 		NumberSequenceKeypoint.new(0.899734, 0),
 		NumberSequenceKeypoint.new(1, 0),
 	})
-	lines.VelocityInheritance = 1
+	lines.VelocityInheritance = 1 [cite: 13]
 	lines.Rate = 200
 	lines.Texture = 'rbxassetid://8984664353'
 	lines.EmissionDirection = Enum.NormalId.Back
@@ -662,3 +664,297 @@ local function createEffectTemplates()
 
 	trail.FaceCamera = true
 	trail.Color = ColorSequence.new(Color3.fromRGB(79, 25, 255))
+	trail.WidthScale = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(0.0666667, 0.13125),
+		NumberSequenceKeypoint.new(0.180117, 0.23125),
+		NumberSequenceKeypoint.new(0.3309942, 0.2375),
+		NumberSequenceKeypoint.new(0.4842105, 0.16875),
+		NumberSequenceKeypoint.new(0.5918128, 0.1),
+		NumberSequenceKeypoint.new(0.7274854, 0.05),
+		NumberSequenceKeypoint.new(1, 0),
+	})
+	trail.Transparency = NumberSequence.new(0)
+	trail.Lifetime = 0.2
+	trail.Brightness = 13
+	trail.Attachment0 = meteorStart
+	trail.Attachment1 = meteorEnd
+	trail.Parent = meteorAttachment
+
+	local fireSpiky = Instance.new('ParticleEmitter')
+
+	fireSpiky.Name = 'FireGroundSpikeyFire'
+	fireSpiky.Lifetime = NumberRange.new(0.1, 0.3)
+	fireSpiky.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
+	fireSpiky.SpreadAngle = Vector2.new(40, 40)
+	fireSpiky.LightEmission = 0.1
+	fireSpiky.Color = ColorSequence.new(Color3.fromRGB(72, 26, 255))
+	fireSpiky.Drag = 9
+	fireSpiky.FlipbookStartRandom = true
+	fireSpiky.VelocitySpread = 40
+	fireSpiky.Speed = NumberRange.new(100, 200)
+	fireSpiky.Brightness = 4.57 [cite: 14]
+	fireSpiky.ZOffset = -0.1146465
+	fireSpiky.Size = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 14.1784506, 0.3640427),
+		NumberSequenceKeypoint.new(0.374578, 16.1989517, 0.3758909),
+		NumberSequenceKeypoint.new(1, 10.3182821, 0.689132),
+	})
+	fireSpiky.Rate = 30
+	fireSpiky.Texture = 'http://www.roblox.com/asset/?id=13136714025'
+	fireSpiky.EmissionDirection = Enum.NormalId.Back
+	fireSpiky.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
+	fireSpiky.Rotation = NumberRange.new(0, 360)
+	fireSpiky.Enabled = false
+	fireSpiky.Parent = meteorEnd
+
+	local stars = Instance.new('ParticleEmitter')
+
+	stars.Name = 'Stars'
+	stars.Lifetime = NumberRange.new(0.15, 0.25)
+	stars.SpreadAngle = Vector2.new(30, 30)
+	stars.LockedToPart = true
+	stars.LightEmission = 0.6
+	stars.Color = ColorSequence.new(Color3.fromRGB(69, 44, 255))
+	stars.Drag = 26
+	stars.VelocitySpread = 30
+	stars.Squash = NumberSequence.new(0.2624998, 0.5625)
+	stars.Speed = NumberRange.new(0.1326618, 0.1326618)
+	stars.Brightness = 6.885
+	stars.ZOffset = 3
+	stars.Size = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(0.2652124, 1.1607907, 0.820863),
+		NumberSequenceKeypoint.new(0.398578, 4.1880746, 1.0401549),
+		NumberSequenceKeypoint.new(0.480578, 7.5677743, 1.1607915),
+		NumberSequenceKeypoint.new(0.530578, 4.3972955, 1.0044292),
+		NumberSequenceKeypoint.new(0.7210103, 1.4095318, 0.7420586),
+		NumberSequenceKeypoint.new(1, 0),
+	})
+	stars.Rate = 50
+	stars.Texture = 'rbxassetid://16722791958'
+	stars.EmissionDirection = Enum.NormalId.Back
+	stars.Rotation = NumberRange.new(150, 150)
+	stars.Enabled = false
+	stars.Parent = meteorEnd
+
+	local sparks = Instance.new('ParticleEmitter')
+
+	sparks.Name = 'Sparks'
+	sparks.Lifetime = NumberRange.new(0.2, 0.4)
+	sparks.SpreadAngle = Vector2.new(50, 50)
+	sparks.Color = ColorSequence.new(Color3.fromRGB(84, 41, 255)) [cite: 15]
+	sparks.Drag = 8
+	sparks.VelocitySpread = 50
+	sparks.Speed = NumberRange.new(141.4421234, 183.8747559)
+	sparks.Brightness = 12
+	sparks.ZOffset = -0.3245147
+	sparks.Size = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(0.2594719, 1.777688, 0.3979976),
+		NumberSequenceKeypoint.new(1, 0),
+	})
+	sparks.Acceleration = Vector3.new(0, -282.8842468261719, 0)
+	sparks.RotSpeed = NumberRange.new(-30, 30)
+	sparks.Rate = 40
+	sparks.Texture = 'rbxassetid://11995504618'
+	sparks.EmissionDirection = Enum.NormalId.Back
+	sparks.Orientation = Enum.ParticleOrientation.VelocityParallel
+	sparks.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
+	sparks.Enabled = false
+	sparks.Parent = meteorEnd
+
+	local meteorFlash = Instance.new('ParticleEmitter')
+
+	meteorFlash.Name = 'Flash'
+	meteorFlash.Lifetime = NumberRange.new(0.07, 0.12)
+	meteorFlash.SpreadAngle = Vector2.new(30, 30)
+	meteorFlash.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(0.1301587, 0.6625),
+		NumberSequenceKeypoint.new(0.2412698, 0.91875),
+		NumberSequenceKeypoint.new(0.4952381, 0.74375),
+		NumberSequenceKeypoint.new(0.7603174, 0.94375),
+		NumberSequenceKeypoint.new(0.8857143, 0.8375),
+		NumberSequenceKeypoint.new(1, 1),
+	})
+	meteorFlash.Color = ColorSequence.new(Color3.fromRGB(108, 34, 255))
+	meteorFlash.Drag = 14
+	meteorFlash.FlipbookStartRandom = true
+	meteorFlash.VelocitySpread = 30
+	meteorFlash.Speed = NumberRange.new(57.6029854, 230.4119415)
+	meteorFlash.Brightness = 14
+	meteorFlash.ZOffset = 1.7270366
+	meteorFlash.Size = NumberSequence.new(5.0313563, 6.708528)
+	meteorFlash.Rate = 80
+	meteorFlash.Texture = 'rbxassetid://11995386251'
+	meteorFlash.EmissionDirection = Enum.NormalId.Back
+	meteorFlash.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
+	meteorFlash.Rotation = NumberRange.new(0, 360)
+	meteorFlash.Enabled = false
+	meteorFlash.Parent = meteorEnd
+	effectTemplates['Meteor'] = meteorAttachment
+
+	-- RESTORED CLASSIC VOID CIRCLE - BUT SCALED LARGER
+	local voidAttachment = Instance.new('Attachment')
+	voidAttachment:SetAttribute("AdaptiveLifetime", 1.0) [cite: 16]
+	voidAttachment:SetAttribute("IgnoreColorOverride", true) [cite: 16]
+
+	local vfx_1 = Instance.new("ParticleEmitter")
+	vfx_1.Name = "ParticleEmitter"
+	vfx_1.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 1.000000, 1.000000)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 1.000000, 1.000000))})
+	vfx_1.Drag = 0
+	vfx_1.ZOffset = 1
+	vfx_1.LightInfluence = 0
+	vfx_1.Lifetime = NumberRange.new(1.000000, 1.000000)
+	vfx_1.Speed = NumberRange.new(0.000000, 0.000000)
+	vfx_1.Brightness = 0.8
+	vfx_1.LightEmission = 0
+	vfx_1.Texture = "rbxassetid://8581559101"
+	vfx_1.Enabled = false 
+	vfx_1.Acceleration = Vector3.new(0.000000, 0.000000, 0.000000)
+	vfx_1.LockedToPart = true
+	vfx_1.Rate = 100
+	vfx_1.VelocityInheritance = 0
+	vfx_1.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 1.000000, 0.000000)})
+	
+	vfx_1.Rotation = NumberRange.new(0.000000, 360.000000)
+	vfx_1.RotSpeed = NumberRange.new(90, 180)
+	vfx_1.SpreadAngle = Vector2.new(0.000000, 0.000000)
+	
+	-- Increased size of the void circle slightly as requested (Originally 8.5 to 6.5)
+	vfx_1.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 11.5, 0.000000), NumberSequenceKeypoint.new(1.000000, 9.5, 0.000000)})
+	vfx_1.Parent = voidAttachment
+	effectTemplates['Void'] = voidAttachment
+end
+
+
+local function applyColor(inst, color)
+	if inst:GetAttribute("IgnoreColorOverride") then return end
+
+	for _, d in ipairs(inst:GetDescendants()) do
+		if d:IsA("ParticleEmitter") then
+			d.Color = ColorSequence.new(color)
+		end
+	end
+end
+
+
+local function emitAll(inst)
+	local ignoreColor = inst:GetAttribute("IgnoreColorOverride")
+
+	for _, d in ipairs(inst:GetDescendants()) do [cite: 17]
+		if d:IsA("ParticleEmitter") then
+			if not ignoreColor then
+				d.Color = ColorSequence.new(effectColor)
+			end
+			table.insert(activeEmitters, d)
+
+			local count = d:GetAttribute("EmitCount") or d.Rate or 10
+			d:Emit(count)
+		end
+	end
+end
+
+
+function HitEffects:SetSelectedEffects(list)
+	selectedEffects = {}
+	for _, name in ipairs(list or {}) do
+		selectedEffects[name] = true
+	end
+end
+
+function HitEffects:AddEffect(name)
+	selectedEffects[name] = true
+end
+
+function HitEffects:RemoveEffect(name)
+	selectedEffects[name] = nil
+end
+
+function HitEffects:ClearEffects()
+	selectedEffects = {}
+end
+
+function HitEffects:SetColor(color)
+	effectColor = color
+
+	for i = #activeEmitters, 1, -1 do
+		local emitter = activeEmitters[i]
+		if emitter and emitter.Parent then
+			local parentPart = emitter.Parent
+			if parentPart and parentPart:GetAttribute("IgnoreColorOverride") then
+			else
+				emitter.Color = ColorSequence.new(color)
+			end
+		else
+			table.remove(activeEmitters, i)
+		end
+	end
+end
+
+function HitEffects:SetLifetime(seconds)
+	effectLifetime = seconds
+end
+
+
+function HitEffects:Play(character)
+	if not character then return end
+
+	createEffectTemplates()
+
+	local root =
+		character:FindFirstChild("HumanoidRootPart")
+		or character:FindFirstChild("Torso")
+		or character:FindFirstChild("UpperTorso")
+
+	if not root then return end
+
+	for effectName in pairs(selectedEffects) do
+		local template = effectTemplates[effectName]
+		if template then
+			local effect = template:Clone()
+			applyColor(effect, effectColor)
+			effect.Parent = root
+
+			local baseLifetime = effect:GetAttribute("AdaptiveLifetime")
+
+			if baseLifetime then [cite: 18]
+				local timeRatio = baseLifetime / effectLifetime
+
+				for _, d in ipairs(effect:GetDescendants()) do
+					if d:IsA("ParticleEmitter") then
+						d.Lifetime = NumberRange.new(effectLifetime, effectLifetime)
+						
+						local originalMin = d.RotSpeed.Min
+						local originalMax = d.RotSpeed.Max
+						d.RotSpeed = NumberRange.new(originalMin * timeRatio, originalMax * timeRatio)
+					end
+				end
+			else
+				-- PROTECTS STABILIZED BEAM STRUCTURE FROM CORRUPTING ALIGNMENTS
+				local isLightning = effect:GetAttribute("IsLightningEffect")
+				
+				for _, d in ipairs(effect:GetDescendants()) do
+					if d:IsA("ParticleEmitter") then
+						d.Lifetime = NumberRange.new(0, effectLifetime)
+					elseif d:IsA("Attachment") and isLightning then
+						-- Locks the vertical positions inside the root space so rotations leave it completely flat
+						local currentCF = d.CFrame
+						d.CFrame = CFrame.new(0, currentCF.Position.Y, 0)
+					end
+				end
+			end
+
+			emitAll(effect)
+
+			task.delay(effectLifetime, function()
+				if effect then
+					effect:Destroy()
+				end
+			end)
+		end
+	end
+end
+
+return HitEffects
