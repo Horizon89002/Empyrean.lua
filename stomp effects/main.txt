@@ -797,7 +797,7 @@ local function createEffectTemplates()
 	meteorFlash.Parent = meteorEnd
 	effectTemplates['Meteor'] = meteorAttachment
 
-	-- FIXED VOID EFFECT
+	-- FIXED VOID EFFECT (responsive color & visibility)
 	local voidAttachment = Instance.new('Attachment')
 	voidAttachment:SetAttribute("AdaptiveLifetime", 1.0) 
 
@@ -808,12 +808,13 @@ local function createEffectTemplates()
 	vfx_1.LightInfluence = 0
 	vfx_1.Lifetime = NumberRange.new(1.0)
 	vfx_1.Speed = NumberRange.new(0.0)
-	vfx_1.Brightness = 1.5
+	vfx_1.Brightness = 2.0
 	vfx_1.LightEmission = 0.5
-	vfx_1.Texture = "rbxassetid://10849912193" -- Clean Grayscale Void Texture Template
+	vfx_1.Texture = "rbxassetid://14224159518" -- High contrast white vortex ring
 	vfx_1.Enabled = false 
 	vfx_1.LockedToPart = true
-	vfx_1.Rate = 15
+	vfx_1.Rate = 25
+	vfx_1:SetAttribute("EmitCount", 30) -- Force robust manual bursts
 	vfx_1.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
 		NumberSequenceKeypoint.new(0.2, 0),
@@ -831,7 +832,7 @@ local function createEffectTemplates()
 	vfx_1.Parent = voidAttachment
 	effectTemplates['Void'] = voidAttachment
 
-	-- NEW EFFECT 1: GLITCH OVERDRIVE ('Glitch')
+	-- FIXED EFFECT 1: GLITCH OVERDRIVE ('Glitch')
 	local glitchAttachment = Instance.new('Attachment')
 	local glitchE = Instance.new('ParticleEmitter')
 	glitchE.Name = "GlitchEmitter"
@@ -839,29 +840,31 @@ local function createEffectTemplates()
 	glitchE.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
 	glitchE.FlipbookFramerate = NumberRange.new(20, 25)
 	glitchE.Texture = "rbxassetid://15130456100"
-	glitchE.Lifetime = NumberRange.new(0.3, 0.4)
-	glitchE.Rate = 8
+	glitchE.Lifetime = NumberRange.new(0.4, 0.5)
+	glitchE.Rate = 20
+	glitchE:SetAttribute("EmitCount", 25)
 	glitchE.Speed = NumberRange.new(0)
-	glitchE.Size = NumberSequence.new(6)
-	glitchE.Brightness = 3
+	glitchE.Size = NumberSequence.new(8)
+	glitchE.Brightness = 4
 	glitchE.LightEmission = 1
 	glitchE.Orientation = Enum.ParticleOrientation.FacingCamera
 	glitchE.Enabled = false
 	glitchE.Parent = glitchAttachment
 	effectTemplates['Glitch'] = glitchAttachment
 
-	-- NEW EFFECT 2: COSMIC IMPACT ('Cosmic')
+	-- FIXED EFFECT 2: COSMIC IMPACT ('Cosmic')
 	local cosmicAttachment = Instance.new('Attachment')
 	local cosmicRing = Instance.new('ParticleEmitter')
 	cosmicRing.Name = "CosmicRing"
 	cosmicRing.Texture = "rbxassetid://6342832511"
-	cosmicRing.Lifetime = NumberRange.new(0.5)
-	cosmicRing.Rate = 4
+	cosmicRing.Lifetime = NumberRange.new(0.6)
+	cosmicRing.Rate = 10
+	cosmicRing:SetAttribute("EmitCount", 15)
 	cosmicRing.Speed = NumberRange.new(0)
 	cosmicRing.ZOffset = 2
 	cosmicRing.Size = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 0),
-		NumberSequenceKeypoint.new(1, 12)
+		NumberSequenceKeypoint.new(1, 14)
 	})
 	cosmicRing.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 0),
@@ -875,49 +878,51 @@ local function createEffectTemplates()
 	cosmicRing.Parent = cosmicAttachment
 	effectTemplates['Cosmic'] = cosmicAttachment
 
-	-- NEW EFFECT 3: PHANTOM ECHO ('Phantom')
+	-- FIXED EFFECT 3: PHANTOM ECHO ('Phantom')
 	local phantomAttachment = Instance.new('Attachment')
 	local phantomWisp = Instance.new('ParticleEmitter')
 	phantomWisp.Name = "PhantomWisp"
 	phantomWisp.Texture = "rbxassetid://14400247656"
-	phantomWisp.Lifetime = NumberRange.new(0.4, 0.6)
-	phantomWisp.Rate = 12
-	phantomWisp.Speed = NumberRange.new(10, 20)
+	phantomWisp.Lifetime = NumberRange.new(0.5, 0.7)
+	phantomWisp.Rate = 30
+	phantomWisp:SetAttribute("EmitCount", 35)
+	phantomWisp.Speed = NumberRange.new(15, 30)
 	phantomWisp.SpreadAngle = Vector2.new(180, 180)
-	phantomWisp.Acceleration = Vector3.new(0, 25, 0)
-	phantomWisp.Drag = 5
+	phantomWisp.Acceleration = Vector3.new(0, 35, 0)
+	phantomWisp.Drag = 3
 	phantomWisp.Size = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 4),
+		NumberSequenceKeypoint.new(0, 5),
 		NumberSequenceKeypoint.new(1, 0)
 	})
 	phantomWisp.Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 0.5),
+		NumberSequenceKeypoint.new(0, 0.3),
 		NumberSequenceKeypoint.new(1, 1)
 	})
 	phantomWisp.Enabled = false
 	phantomWisp.Parent = phantomAttachment
 	effectTemplates['Phantom'] = phantomAttachment
 
-	-- NEW EFFECT 4: CYBERPUNK SPARKS ('CyberSpark')
+	-- FIXED EFFECT 4: CYBERPUNK SPARKS ('CyberSpark')
 	local cyberAttachment = Instance.new('Attachment')
 	local cyberLine = Instance.new('ParticleEmitter')
 	cyberLine.Name = "CyberLine"
 	cyberLine.Texture = "rbxassetid://9840428788"
-	cyberLine.Lifetime = NumberRange.new(0.2, 0.3)
-	cyberLine.Rate = 25
-	cyberLine.Speed = NumberRange.new(35, 75)
-	cyberLine.SpreadAngle = Vector2.new(360, 0)
+	cyberLine.Lifetime = NumberRange.new(0.3, 0.4)
+	cyberLine.Rate = 40
+	cyberLine:SetAttribute("EmitCount", 45)
+	cyberLine.Speed = NumberRange.new(40, 85)
+	cyberLine.SpreadAngle = Vector2.new(360, 360)
 	cyberLine.Orientation = Enum.ParticleOrientation.VelocityParallel
 	cyberLine.Squash = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 4),
+		NumberSequenceKeypoint.new(0, 3),
 		NumberSequenceKeypoint.new(1, 0)
 	})
 	cyberLine.Size = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 0.4),
+		NumberSequenceKeypoint.new(0, 0.6),
 		NumberSequenceKeypoint.new(1, 0)
 	})
 	cyberLine.LightEmission = 1
-	cyberLine.Brightness = 4
+	cyberLine.Brightness = 5
 	cyberLine.Enabled = false
 	cyberLine.Parent = cyberAttachment
 	effectTemplates['CyberSpark'] = cyberAttachment
@@ -945,7 +950,8 @@ local function emitAll(inst)
 			end
 			table.insert(activeEmitters, d)
 
-			local count = d:GetAttribute("EmitCount") or d.Rate or 10
+			-- Patched fallback chain to ensure custom burst counts fire properly
+			local count = d:GetAttribute("EmitCount") or d.Rate or 25
 			d:Emit(count)
 		end
 	end
