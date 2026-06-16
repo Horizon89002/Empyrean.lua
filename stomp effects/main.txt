@@ -797,35 +797,130 @@ local function createEffectTemplates()
 	meteorFlash.Parent = meteorEnd
 	effectTemplates['Meteor'] = meteorAttachment
 
+	-- FIXED VOID EFFECT
 	local voidAttachment = Instance.new('Attachment')
 	voidAttachment:SetAttribute("AdaptiveLifetime", 1.0) 
-	voidAttachment:SetAttribute("IgnoreColorOverride", true)
 
 	local vfx_1 = Instance.new("ParticleEmitter")
 	vfx_1.Name = "ParticleEmitter"
-	vfx_1.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 1.000000, 1.000000)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 1.000000, 1.000000))})
-	vfx_1.Drag = 0
+	vfx_1.Color = ColorSequence.new(Color3.new(1, 1, 1))
 	vfx_1.ZOffset = 1
 	vfx_1.LightInfluence = 0
-	vfx_1.Lifetime = NumberRange.new(1.000000, 1.000000)
-	vfx_1.Speed = NumberRange.new(0.000000, 0.000000)
-	vfx_1.Brightness = 0.8
-	vfx_1.LightEmission = 0
-	vfx_1.Texture = "rbxassetid://8581559101"
+	vfx_1.Lifetime = NumberRange.new(1.0)
+	vfx_1.Speed = NumberRange.new(0.0)
+	vfx_1.Brightness = 1.5
+	vfx_1.LightEmission = 0.5
+	vfx_1.Texture = "rbxassetid://10849912193" -- Clean Grayscale Void Texture Template
 	vfx_1.Enabled = false 
-	vfx_1.Acceleration = Vector3.new(0.000000, 0.000000, 0.000000)
 	vfx_1.LockedToPart = true
-	vfx_1.Rate = 100
-	vfx_1.VelocityInheritance = 0
-	vfx_1.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 1.000000, 0.000000)})
-	
-	vfx_1.Rotation = NumberRange.new(0.000000, 360.000000)
+	vfx_1.Rate = 15
+	vfx_1.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(0.2, 0),
+		NumberSequenceKeypoint.new(0.8, 0),
+		NumberSequenceKeypoint.new(1, 1)
+	})
+	vfx_1.Rotation = NumberRange.new(0, 360)
 	vfx_1.RotSpeed = NumberRange.new(90, 180)
-	vfx_1.SpreadAngle = Vector2.new(0.000000, 0.000000)
-	
-	vfx_1.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 8.500000, 0.000000), NumberSequenceKeypoint.new(1.000000, 6.500000, 0.000000)})
+	vfx_1.Size = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(0.15, 8.5),
+		NumberSequenceKeypoint.new(0.85, 8.5),
+		NumberSequenceKeypoint.new(1, 0)
+	})
 	vfx_1.Parent = voidAttachment
 	effectTemplates['Void'] = voidAttachment
+
+	-- NEW EFFECT 1: GLITCH OVERDRIVE ('Glitch')
+	local glitchAttachment = Instance.new('Attachment')
+	local glitchE = Instance.new('ParticleEmitter')
+	glitchE.Name = "GlitchEmitter"
+	glitchE.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
+	glitchE.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
+	glitchE.FlipbookFramerate = NumberRange.new(20, 25)
+	glitchE.Texture = "rbxassetid://15130456100"
+	glitchE.Lifetime = NumberRange.new(0.3, 0.4)
+	glitchE.Rate = 8
+	glitchE.Speed = NumberRange.new(0)
+	glitchE.Size = NumberSequence.new(6)
+	glitchE.Brightness = 3
+	glitchE.LightEmission = 1
+	glitchE.Orientation = Enum.ParticleOrientation.FacingCamera
+	glitchE.Enabled = false
+	glitchE.Parent = glitchAttachment
+	effectTemplates['Glitch'] = glitchAttachment
+
+	-- NEW EFFECT 2: COSMIC IMPACT ('Cosmic')
+	local cosmicAttachment = Instance.new('Attachment')
+	local cosmicRing = Instance.new('ParticleEmitter')
+	cosmicRing.Name = "CosmicRing"
+	cosmicRing.Texture = "rbxassetid://6342832511"
+	cosmicRing.Lifetime = NumberRange.new(0.5)
+	cosmicRing.Rate = 4
+	cosmicRing.Speed = NumberRange.new(0)
+	cosmicRing.ZOffset = 2
+	cosmicRing.Size = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(1, 12)
+	})
+	cosmicRing.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(0.8, 0.2),
+		NumberSequenceKeypoint.new(1, 1)
+	})
+	cosmicRing.Rotation = NumberRange.new(0, 360)
+	cosmicRing.RotSpeed = NumberRange.new(-45, 45)
+	cosmicRing.LightEmission = 0.8
+	cosmicRing.Enabled = false
+	cosmicRing.Parent = cosmicAttachment
+	effectTemplates['Cosmic'] = cosmicAttachment
+
+	-- NEW EFFECT 3: PHANTOM ECHO ('Phantom')
+	local phantomAttachment = Instance.new('Attachment')
+	local phantomWisp = Instance.new('ParticleEmitter')
+	phantomWisp.Name = "PhantomWisp"
+	phantomWisp.Texture = "rbxassetid://14400247656"
+	phantomWisp.Lifetime = NumberRange.new(0.4, 0.6)
+	phantomWisp.Rate = 12
+	phantomWisp.Speed = NumberRange.new(10, 20)
+	phantomWisp.SpreadAngle = Vector2.new(180, 180)
+	phantomWisp.Acceleration = Vector3.new(0, 25, 0)
+	phantomWisp.Drag = 5
+	phantomWisp.Size = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 4),
+		NumberSequenceKeypoint.new(1, 0)
+	})
+	phantomWisp.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.5),
+		NumberSequenceKeypoint.new(1, 1)
+	})
+	phantomWisp.Enabled = false
+	phantomWisp.Parent = phantomAttachment
+	effectTemplates['Phantom'] = phantomAttachment
+
+	-- NEW EFFECT 4: CYBERPUNK SPARKS ('CyberSpark')
+	local cyberAttachment = Instance.new('Attachment')
+	local cyberLine = Instance.new('ParticleEmitter')
+	cyberLine.Name = "CyberLine"
+	cyberLine.Texture = "rbxassetid://9840428788"
+	cyberLine.Lifetime = NumberRange.new(0.2, 0.3)
+	cyberLine.Rate = 25
+	cyberLine.Speed = NumberRange.new(35, 75)
+	cyberLine.SpreadAngle = Vector2.new(360, 0)
+	cyberLine.Orientation = Enum.ParticleOrientation.VelocityParallel
+	cyberLine.Squash = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 4),
+		NumberSequenceKeypoint.new(1, 0)
+	})
+	cyberLine.Size = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.4),
+		NumberSequenceKeypoint.new(1, 0)
+	})
+	cyberLine.LightEmission = 1
+	cyberLine.Brightness = 4
+	cyberLine.Enabled = false
+	cyberLine.Parent = cyberAttachment
+	effectTemplates['CyberSpark'] = cyberAttachment
 end
 
 
