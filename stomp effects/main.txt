@@ -815,7 +815,7 @@ local function createEffectTemplates()
 	vfx_1.Enabled = false 
 	vfx_1.Acceleration = Vector3.new(0.000000, 0.000000, 0.000000)
 	vfx_1.LockedToPart = true
-	vfx_1.Rate = 200
+	vfx_1.Rate = 150
 	vfx_1.VelocityInheritance = 0
 	vfx_1.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 1.000000, 0.000000)})
 	
