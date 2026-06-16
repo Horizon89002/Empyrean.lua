@@ -1,3 +1,5 @@
+--------
+
 local HitEffects = {}
 
 local Players = game:GetService("Players")
@@ -258,11 +260,11 @@ local function createEffectTemplates()
 	effectTemplates['Light'] = lightAttachment
 
 	local lightningAttachment = Instance.new('Attachment')
-	lightningAttachment:SetAttribute("IsLightning", true) -- Added tag to prevent dynamic warping
+	lightningAttachment:SetAttribute("IsLightning", true) -- Attribute flag added to intercept runtime configuration
 
 	local startAttachment = Instance.new('Attachment')
 	startAttachment.Name = 'Start'
-	startAttachment.CFrame = CFrame.new(0, 45, 0) -- Increased vertical strike height & locked straight
+	startAttachment.CFrame = CFrame.new(0, 45, 0) -- Increased vertical sky strike radius
 	startAttachment.Parent = lightningAttachment
 
 	local endAttachment = Instance.new('Attachment')
@@ -274,8 +276,8 @@ local function createEffectTemplates()
 	beam1.FaceCamera = true
 	beam1.ZOffset = 0.3
 	beam1.TextureSpeed = 1.5
-	beam1.Width1 = 18 -- Heavily increased thickness (was 5)
-	beam1.Width0 = 12 -- Heavily increased thickness (was 2)
+	beam1.Width1 = 18 -- Enhanced profile width matching high intensity visuals
+	beam1.Width0 = 12 
 	beam1.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
 		NumberSequenceKeypoint.new(0.0112219, 0),
@@ -293,8 +295,8 @@ local function createEffectTemplates()
 	beam2.FaceCamera = true
 	beam2.ZOffset = 0.3
 	beam2.TextureSpeed = 1.5
-	beam2.Width1 = 18 -- Heavily increased thickness (was 5)
-	beam2.Width0 = 12 -- Heavily increased thickness (was 2)
+	beam2.Width1 = 18 
+	beam2.Width0 = 12 
 	beam2.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
 		NumberSequenceKeypoint.new(0.0112219, 0),
@@ -317,7 +319,7 @@ local function createEffectTemplates()
 	lightningOne.Speed = NumberRange.new(0.01, 0.01)
 	lightningOne.Brightness = 15
 	lightningOne.ZOffset = 3
-	lightningOne.Size = NumberSequence.new(10) -- Increased footprint slightly
+	lightningOne.Size = NumberSequence.new(10)
 	lightningOne.Rate = 5
 	lightningOne.Texture = 'rbxassetid://14582813693'
 	lightningOne.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
@@ -334,7 +336,7 @@ local function createEffectTemplates()
 	lightningTwo.Speed = NumberRange.new(0.01, 0.01)
 	lightningTwo.Brightness = 15
 	lightningTwo.ZOffset = 3
-	lightningTwo.Size = NumberSequence.new(10) -- Increased footprint slightly
+	lightningTwo.Size = NumberSequence.new(10)
 	lightningTwo.Rate = 5
 	lightningTwo.Texture = 'rbxassetid://14582813693'
 	lightningTwo.Orientation = Enum.ParticleOrientation.VelocityParallel
@@ -353,7 +355,7 @@ local function createEffectTemplates()
 	glow.Speed = NumberRange.new(0.0099825, 0.0099825)
 	glow.Brightness = 5
 	glow.ZOffset = 4
-	glow.Size = NumberSequence.new(10) -- Increased footprint slightly
+	glow.Size = NumberSequence.new(10)
 	glow.Rate = 2
 	glow.Texture = 'rbxassetid://13305806509'
 	glow.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
@@ -818,7 +820,6 @@ local function createEffectTemplates()
 	vfx_1.RotSpeed = NumberRange.new(90, 180)
 	vfx_1.SpreadAngle = Vector2.new(0.000000, 0.000000)
 	
-	-- Restored Void Circle form factor & increased its size layout slightly
 	vfx_1.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 12.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 9.500000, 0.000000)})
 	vfx_1.Parent = voidAttachment
 	effectTemplates['Void'] = voidAttachment
@@ -929,13 +930,18 @@ function HitEffects:Play(character)
 				end
 			else
 				local isLightning = effect:GetAttribute("IsLightning")
+				
 				for _, d in ipairs(effect:GetDescendants()) do
 					if d:IsA("ParticleEmitter") then
 						d.Lifetime = NumberRange.new(0, effectLifetime)
 					elseif d:IsA("Attachment") and isLightning then
-						-- Force lock position variations out to keep the structural points strictly vertical
-						local originalPos = d.Position
-						d.CFrame = CFrame.new(0, originalPos.Y, 0)
+						-- STRATEGY FOR LOCKED VERTICAL ALIGNMENT:
+						-- Convert the local offsets to World Positions immediately at the exact instant the effect spawns.
+						-- By overriding the Attachment's WorldPosition, it gets severed from the player part's directional rotation tracking!
+						local initialWorldPos = d.WorldPosition
+						task.spawn(function()
+							d.WorldPosition = initialWorldPos
+						end)
 					end
 				end
 			end
