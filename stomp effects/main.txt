@@ -257,13 +257,13 @@ local function createEffectTemplates()
 	light3.Parent = lightAttachment
 	effectTemplates['Light'] = lightAttachment
 
-	-- RESTORED & OPTIMIZED LIGHTNING BEAMS WITH HIGH GRAPHICS 1 VISIBILITY
+	-- RESTORED ORIGINAL STABLE LIGHTNING - NOW THICK AND LOCKED AGAINST ROTATION
 	local lightningAttachment = Instance.new('Attachment')
-	lightningAttachment:SetAttribute("IgnoreColorOverride", true) -- Prevents void color mixing
+	lightningAttachment:SetAttribute("IsLightningEffect", true) -- Protected from rotation/lifetime distortion
 
 	local startAttachment = Instance.new('Attachment')
 	startAttachment.Name = 'Start'
-	startAttachment.CFrame = CFrame.new(0, 65, 0) -- High straight-beam lightning strike
+	startAttachment.CFrame = CFrame.new(0, 45, 0) -- High vertical offset
 	startAttachment.Parent = lightningAttachment
 
 	local endAttachment = Instance.new('Attachment')
@@ -275,8 +275,8 @@ local function createEffectTemplates()
 	beam1.FaceCamera = true
 	beam1.ZOffset = 0.3
 	beam1.TextureSpeed = 1.5
-	beam1.Width1 = 12 -- Thick straight beam strike dimensions
-	beam1.Width0 = 6
+	beam1.Width1 = 20 -- Heavily increased thickness
+	beam1.Width0 = 10 -- Heavily increased thickness
 	beam1.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
 		NumberSequenceKeypoint.new(0.0112219, 0),
@@ -294,8 +294,8 @@ local function createEffectTemplates()
 	beam2.FaceCamera = true
 	beam2.ZOffset = 0.3
 	beam2.TextureSpeed = 1.5
-	beam2.Width1 = 12
-	beam2.Width0 = 6
+	beam2.Width1 = 20 -- Heavily increased thickness
+	beam2.Width0 = 10 -- Heavily increased thickness
 	beam2.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
 		NumberSequenceKeypoint.new(0.0112219, 0),
@@ -318,9 +318,8 @@ local function createEffectTemplates()
 	lightningOne.Speed = NumberRange.new(0.01, 0.01)
 	lightningOne.Brightness = 15
 	lightningOne.ZOffset = 3
-	lightningOne.Size = NumberSequence.new(10) -- Large electric sparks
-	lightningOne.Rate = 180 -- Ultra high generation to pierce Graphics Quality 1 capping
-	lightningOne:SetAttribute("EmitCount", 60)
+	lightningOne.Size = NumberSequence.new(12) -- Increased size slightly
+	lightningOne.Rate = 12 -- Slightly adjusted rate
 	lightningOne.Texture = 'rbxassetid://14582813693'
 	lightningOne.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
 	lightningOne.Rotation = NumberRange.new(-360, 360)
@@ -336,9 +335,8 @@ local function createEffectTemplates()
 	lightningTwo.Speed = NumberRange.new(0.01, 0.01)
 	lightningTwo.Brightness = 15
 	lightningTwo.ZOffset = 3
-	lightningTwo.Size = NumberSequence.new(10)
-	lightningTwo.Rate = 180
-	lightningTwo:SetAttribute("EmitCount", 60)
+	lightningTwo.Size = NumberSequence.new(12) -- Increased size slightly
+	lightningTwo.Rate = 12 -- Slightly adjusted rate
 	lightningTwo.Texture = 'rbxassetid://14582813693'
 	lightningTwo.Orientation = Enum.ParticleOrientation.VelocityParallel
 	lightningTwo.Rotation = NumberRange.new(-360, 360)
@@ -356,9 +354,8 @@ local function createEffectTemplates()
 	glow.Speed = NumberRange.new(0.0099825, 0.0099825)
 	glow.Brightness = 5
 	glow.ZOffset = 4
-	glow.Size = NumberSequence.new(12) -- Expanded thunder impact ground ring
-	glow.Rate = 40
-	glow:SetAttribute("EmitCount", 20)
+	glow.Size = NumberSequence.new(12) -- Increased size slightly
+	glow.Rate = 5 -- Slightly adjusted rate
 	glow.Texture = 'rbxassetid://13305806509'
 	glow.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
 	glow.Enabled = false
@@ -665,297 +662,3 @@ local function createEffectTemplates()
 
 	trail.FaceCamera = true
 	trail.Color = ColorSequence.new(Color3.fromRGB(79, 25, 255))
-	trail.WidthScale = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 0),
-		NumberSequenceKeypoint.new(0.0666667, 0.13125),
-		NumberSequenceKeypoint.new(0.180117, 0.23125),
-		NumberSequenceKeypoint.new(0.3309942, 0.2375),
-		NumberSequenceKeypoint.new(0.4842105, 0.16875),
-		NumberSequenceKeypoint.new(0.5918128, 0.1),
-		NumberSequenceKeypoint.new(0.7274854, 0.05),
-		NumberSequenceKeypoint.new(1, 0),
-	})
-	trail.Transparency = NumberSequence.new(0)
-	trail.Lifetime = 0.2
-	trail.Brightness = 13
-	trail.Attachment0 = meteorStart
-	trail.Attachment1 = meteorEnd
-	trail.Parent = meteorAttachment
-
-	local fireSpiky = Instance.new('ParticleEmitter')
-
-	fireSpiky.Name = 'FireGroundSpikeyFire'
-	fireSpiky.Lifetime = NumberRange.new(0.1, 0.3)
-	fireSpiky.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
-	fireSpiky.SpreadAngle = Vector2.new(40, 40)
-	fireSpiky.LightEmission = 0.1
-	fireSpiky.Color = ColorSequence.new(Color3.fromRGB(72, 26, 255))
-	fireSpiky.Drag = 9
-	fireSpiky.FlipbookStartRandom = true
-	fireSpiky.VelocitySpread = 40
-	fireSpiky.Speed = NumberRange.new(100, 200)
-	fireSpiky.Brightness = 4.57
-	fireSpiky.ZOffset = -0.1146465
-	fireSpiky.Size = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 14.1784506, 0.3640427),
-		NumberSequenceKeypoint.new(0.374578, 16.1989517, 0.3758909),
-		NumberSequenceKeypoint.new(1, 10.3182821, 0.689132),
-	})
-	fireSpiky.Rate = 30
-	fireSpiky.Texture = 'http://www.roblox.com/asset/?id=13136714025'
-	fireSpiky.EmissionDirection = Enum.NormalId.Back
-	fireSpiky.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-	fireSpiky.Rotation = NumberRange.new(0, 360)
-	fireSpiky.Enabled = false
-	fireSpiky.Parent = meteorEnd
-
-	local stars = Instance.new('ParticleEmitter')
-
-	stars.Name = 'Stars'
-	stars.Lifetime = NumberRange.new(0.15, 0.25)
-	stars.SpreadAngle = Vector2.new(30, 30)
-	stars.LockedToPart = true
-	stars.LightEmission = 0.6
-	stars.Color = ColorSequence.new(Color3.fromRGB(69, 44, 255))
-	stars.Drag = 26
-	stars.VelocitySpread = 30
-	stars.Squash = NumberSequence.new(0.2624998, 0.5625)
-	stars.Speed = NumberRange.new(0.1326618, 0.1326618)
-	stars.Brightness = 6.885
-	stars.ZOffset = 3
-	stars.Size = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 0),
-		NumberSequenceKeypoint.new(0.2652124, 1.1607907, 0.820863),
-		NumberSequenceKeypoint.new(0.398578, 4.1880746, 1.0401549),
-		NumberSequenceKeypoint.new(0.480578, 7.5677743, 1.1607915),
-		NumberSequenceKeypoint.new(0.530578, 4.3972955, 1.0044292),
-		NumberSequenceKeypoint.new(0.7210103, 1.4095318, 0.7420586),
-		NumberSequenceKeypoint.new(1, 0),
-	})
-	stars.Rate = 50
-	stars.Texture = 'rbxassetid://16722791958'
-	stars.EmissionDirection = Enum.NormalId.Back
-	stars.Rotation = NumberRange.new(150, 150)
-	stars.Enabled = false
-	stars.Parent = meteorEnd
-
-	local sparks = Instance.new('ParticleEmitter')
-
-	sparks.Name = 'Sparks'
-	sparks.Lifetime = NumberRange.new(0.2, 0.4)
-	sparks.SpreadAngle = Vector2.new(50, 50)
-	sparks.Color = ColorSequence.new(Color3.fromRGB(84, 41, 255))
-	sparks.Drag = 8
-	sparks.VelocitySpread = 50
-	sparks.Speed = NumberRange.new(141.4421234, 183.8747559)
-	sparks.Brightness = 12
-	sparks.ZOffset = -0.3245147
-	sparks.Size = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 0),
-		NumberSequenceKeypoint.new(0.2594719, 1.777688, 0.3979976),
-		NumberSequenceKeypoint.new(1, 0),
-	})
-	sparks.Acceleration = Vector3.new(0, -282.8842468261719, 0)
-	sparks.RotSpeed = NumberRange.new(-30, 30)
-	sparks.Rate = 40
-	sparks.Texture = 'rbxassetid://11995504618'
-	sparks.EmissionDirection = Enum.NormalId.Back
-	sparks.Orientation = Enum.ParticleOrientation.VelocityParallel
-	sparks.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-	sparks.Enabled = false
-	sparks.Parent = meteorEnd
-
-	local meteorFlash = Instance.new('ParticleEmitter')
-
-	meteorFlash.Name = 'Flash'
-	meteorFlash.Lifetime = NumberRange.new(0.07, 0.12)
-	meteorFlash.SpreadAngle = Vector2.new(30, 30)
-	meteorFlash.Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 1),
-		NumberSequenceKeypoint.new(0.1301587, 0.6625),
-		NumberSequenceKeypoint.new(0.2412698, 0.91875),
-		NumberSequenceKeypoint.new(0.4952381, 0.74375),
-		NumberSequenceKeypoint.new(0.7603174, 0.94375),
-		NumberSequenceKeypoint.new(0.8857143, 0.8375),
-		NumberSequenceKeypoint.new(1, 1),
-	})
-	meteorFlash.Color = ColorSequence.new(Color3.fromRGB(108, 34, 255))
-	meteorFlash.Drag = 14
-	meteorFlash.FlipbookStartRandom = true
-	meteorFlash.VelocitySpread = 30
-	meteorFlash.Speed = NumberRange.new(57.6029854, 230.4119415)
-	meteorFlash.Brightness = 14
-	meteorFlash.ZOffset = 1.7270366
-	meteorFlash.Size = NumberSequence.new(5.0313563, 6.708528)
-	meteorFlash.Rate = 80
-	meteorFlash.Texture = 'rbxassetid://11995386251'
-	meteorFlash.EmissionDirection = Enum.NormalId.Back
-	meteorFlash.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-	meteorFlash.Rotation = NumberRange.new(0, 360)
-	meteorFlash.Enabled = false
-	meteorFlash.Parent = meteorEnd
-	effectTemplates['Meteor'] = meteorAttachment
-
-	-- BEAUTIFUL WHITE GALAXY/SPACE-TIME VORTEX VOID EFFECT
-	local voidAttachment = Instance.new('Attachment')
-	voidAttachment:SetAttribute("AdaptiveLifetime", 1.0) 
-
-	local vfx_1 = Instance.new("ParticleEmitter")
-	vfx_1.Name = "ParticleEmitter"
-	vfx_1.Color = ColorSequence.new(Color3.new(1, 1, 1))
-	vfx_1.ZOffset = 1
-	vfx_1.LightInfluence = 0
-	vfx_1.Lifetime = NumberRange.new(1.0)
-	vfx_1.Speed = NumberRange.new(0.0)
-	vfx_1.Brightness = 3.5 
-	vfx_1.LightEmission = 0.6
-	vfx_1.Texture = "rbxassetid://10822190705" 
-	vfx_1.Enabled = false 
-	vfx_1.LockedToPart = true
-	vfx_1.Rate = 45
-	vfx_1:SetAttribute("EmitCount", 35)
-	vfx_1.Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 1),
-		NumberSequenceKeypoint.new(0.15, 0),
-		NumberSequenceKeypoint.new(0.8, 0),
-		NumberSequenceKeypoint.new(1, 1)
-	})
-	vfx_1.Rotation = NumberRange.new(0, 360)
-	vfx_1.RotSpeed = NumberRange.new(120, 240) 
-	vfx_1.Size = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 0),
-		NumberSequenceKeypoint.new(0.2, 10.5), 
-		NumberSequenceKeypoint.new(0.8, 10.5),
-		NumberSequenceKeypoint.new(1, 0)
-	})
-	vfx_1.Parent = voidAttachment
-	effectTemplates['Void'] = voidAttachment
-end
-
-
-local function applyColor(inst, color)
-	if inst:GetAttribute("IgnoreColorOverride") then return end
-
-	for _, d in ipairs(inst:GetDescendants()) do
-		if d:IsA("ParticleEmitter") then
-			d.Color = ColorSequence.new(color)
-		end
-	end
-end
-
-
-local function emitAll(inst)
-	local ignoreColor = inst:GetAttribute("IgnoreColorOverride")
-
-	for _, d in ipairs(inst:GetDescendants()) do
-		if d:IsA("ParticleEmitter") then
-			if not ignoreColor then
-				d.Color = ColorSequence.new(effectColor)
-			end
-			table.insert(activeEmitters, d)
-
-			local count = d:GetAttribute("EmitCount") or d.Rate or 30
-			d:Emit(count)
-		end
-	end
-end
-
-
-function HitEffects:SetSelectedEffects(list)
-	selectedEffects = {}
-	for _, name in ipairs(list or {}) do
-		selectedEffects[name] = true
-	end
-end
-
-function HitEffects:AddEffect(name)
-	selectedEffects[name] = true
-end
-
-function HitEffects:RemoveEffect(name)
-	selectedEffects[name] = nil
-end
-
-function HitEffects:ClearEffects()
-	selectedEffects = {}
-end
-
-function HitEffects:SetColor(color)
-	effectColor = color
-
-	for i = #activeEmitters, 1, -1 do
-		local emitter = activeEmitters[i]
-		if emitter and emitter.Parent then
-			local parentPart = emitter.Parent
-			-- Check both parent and template container attributes to safeguard lightning beams
-			if parentPart and (parentPart:GetAttribute("IgnoreColorOverride") or parentPart.Parent:GetAttribute("IgnoreColorOverride")) then
-			else
-				emitter.Color = ColorSequence.new(color)
-			end
-		else
-			table.remove(activeEmitters, i)
-		end
-	end
-end
-
-function HitEffects:SetLifetime(seconds)
-	effectLifetime = seconds
-end
-
-
-function HitEffects:Play(character)
-	if not character then return end
-
-	createEffectTemplates()
-
-	local root =
-		character:FindFirstChild("HumanoidRootPart")
-		or character:FindFirstChild("Torso")
-		or character:FindFirstChild("UpperTorso")
-
-	if not root then return end
-
-	for effectName in pairs(selectedEffects) do
-		local template = effectTemplates[effectName]
-		if template then
-			local effect = template:Clone()
-			applyColor(effect, effectColor)
-			effect.Parent = root
-
-			local baseLifetime = effect:GetAttribute("AdaptiveLifetime")
-
-			if baseLifetime then
-				local timeRatio = baseLifetime / effectLifetime
-
-				for _, d in ipairs(effect:GetDescendants()) do
-					if d:IsA("ParticleEmitter") then
-						d.Lifetime = NumberRange.new(effectLifetime, effectLifetime)
-						
-						local originalMin = d.RotSpeed.Min
-						local originalMax = d.RotSpeed.Max
-						d.RotSpeed = NumberRange.new(originalMin * timeRatio, originalMax * timeRatio)
-					end
-				end
-			else
-				for _, d in ipairs(effect:GetDescendants()) do
-					if d:IsA("ParticleEmitter") then
-						-- Safely ignore structural beam configurations inside lightning
-						if not effect:GetAttribute("IgnoreColorOverride") then
-							d.Lifetime = NumberRange.new(0, effectLifetime)
-						end
-					end
-				end
-			end
-
-			emitAll(effect)
-
-			task.delay(effectLifetime, function()
-				if effect then
-					effect:Destroy()
-				end
-			end)
-		end
-	end
-end
-
-return HitEffects
