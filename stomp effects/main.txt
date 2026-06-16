@@ -809,7 +809,7 @@ local function createEffectTemplates()
 	vfx_1.LightInfluence = 0
 	vfx_1.Lifetime = NumberRange.new(1.000000, 1.000000)
 	vfx_1.Speed = NumberRange.new(0.000000, 0.000000)
-	vfx_1.Brightness = 1
+	vfx_1.Brightness = 0.8
 	vfx_1.LightEmission = 0
 	vfx_1.Texture = "rbxassetid://8581559101"
 	vfx_1.Enabled = false 
