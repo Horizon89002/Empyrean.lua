@@ -1,5 +1,3 @@
----
-
 local HitEffects = {}
 
 local Players = game:GetService("Players")
@@ -259,27 +257,33 @@ local function createEffectTemplates()
 	light3.Parent = lightAttachment
 	effectTemplates['Light'] = lightAttachment
 
-	-- LIGHTNING ATTACHMENT HOLDER
 	local lightningAttachment = Instance.new('Attachment')
-	lightningAttachment:SetAttribute("IsLightning", true) 
-
 	local startAttachment = Instance.new('Attachment')
+
 	startAttachment.Name = 'Start'
+	startAttachment.CFrame = CFrame.new(0, 20, 0)
 	startAttachment.Parent = lightningAttachment
 
 	local endAttachment = Instance.new('Attachment')
+
 	endAttachment.Name = 'End'
+	endAttachment.CFrame = CFrame.new(0, 0, 0)
 	endAttachment.Parent = lightningAttachment
 
-	-- Core High-Intensity Beams
 	local beam1 = Instance.new('Beam')
+
 	beam1.FaceCamera = true
-	beam1.ZOffset = 0.5
-	beam1.TextureSpeed = 3.5
-	beam1.Width1 = 14
-	beam1.Width0 = 14 
-	beam1.Transparency = NumberSequence.new(0)
-	beam1.TextureLength = 1
+	beam1.ZOffset = 0.3
+	beam1.TextureSpeed = 1.5
+	beam1.Width1 = 5
+	beam1.Width0 = 2
+	beam1.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(0.0112219, 0),
+		NumberSequenceKeypoint.new(0.9912719, 0),
+		NumberSequenceKeypoint.new(1, 1),
+	})
+	beam1.TextureLength = 0.5
 	beam1.LightEmission = 1
 	beam1.Texture = 'rbxassetid://7216850022'
 	beam1.Attachment0 = startAttachment
@@ -287,79 +291,75 @@ local function createEffectTemplates()
 	beam1.Parent = startAttachment
 
 	local beam2 = Instance.new('Beam')
+
 	beam2.FaceCamera = true
-	beam2.ZOffset = -0.5
-	beam2.TextureSpeed = -3.5
-	beam2.Width1 = 14 
-	beam2.Width0 = 14 
-	beam2.Transparency = NumberSequence.new(0)
-	beam2.TextureLength = 1
+	beam2.ZOffset = 0.3
+	beam2.TextureSpeed = 1.5
+	beam2.Width1 = 5
+	beam2.Width0 = 2
+	beam2.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(0.0112219, 0),
+		NumberSequenceKeypoint.new(0.9912719, 0),
+		NumberSequenceKeypoint.new(1, 1),
+	})
+	beam2.TextureLength = 0.5
 	beam2.LightEmission = 1
 	beam2.Texture = 'rbxassetid://7216850022'
 	beam2.Attachment0 = startAttachment
 	beam2.Attachment1 = endAttachment
 	beam2.Parent = startAttachment
 
-	-- LOW GRAPHICS CRITICAL FIX: A transparent block script won't load particles on Graphics Level 1.
-	-- We insert a flat, bright, neon visual mesh part that completely mirrors the strike vertically to guarantee 100% visibility.
-	local fallbackStrike = Instance.new("Part")
-	fallbackStrike.Name = "LowGraphicsStrike"
-	fallbackStrike.Material = Enum.Material.Neon
-	fallbackStrike.Transparency = 0.1
-	fallbackStrike.CanCollide = false
-	fallbackStrike.CanQuery = false
-	fallbackStrike.CanTouch = false
-	fallbackStrike.Anchored = true
-	fallbackStrike.Size = Vector3.new(3, 75, 3)
-	fallbackStrike.Parent = lightningAttachment
-
 	local lightningOne = Instance.new('ParticleEmitter')
+
 	lightningOne.Name = 'Lightning One'
-	lightningOne.FlipbookFramerate = NumberRange.new(30, 30)
-	lightningOne.Lifetime = NumberRange.new(0.1, 0.2)
+	lightningOne.FlipbookFramerate = NumberRange.new(17, 17)
+	lightningOne.Lifetime = NumberRange.new(0.1, 1)
 	lightningOne.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
 	lightningOne.LockedToPart = true
-	lightningOne.Speed = NumberRange.new(0, 0)
-	lightningOne.Brightness = 10
+	lightningOne.Speed = NumberRange.new(0.01, 0.01)
+	lightningOne.Brightness = 15
 	lightningOne.ZOffset = 3
-	lightningOne.Size = NumberSequence.new(20) 
-	lightningOne.Rate = 500 -- Maximized rate
+	lightningOne.Size = NumberSequence.new(5)
+	lightningOne.Rate = 5
 	lightningOne.Texture = 'rbxassetid://14582813693'
-	lightningOne.Orientation = Enum.ParticleOrientation.FacingCamera
+	lightningOne.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
 	lightningOne.Rotation = NumberRange.new(-360, 360)
 	lightningOne.Enabled = false
 	lightningOne.Parent = endAttachment
 
 	local lightningTwo = Instance.new('ParticleEmitter')
+
 	lightningTwo.Name = 'Lightning two'
-	lightningTwo.FlipbookFramerate = NumberRange.new(30, 30)
-	lightningTwo.Lifetime = NumberRange.new(0.1, 0.2)
+	lightningTwo.FlipbookFramerate = NumberRange.new(17, 17)
+	lightningTwo.Lifetime = NumberRange.new(0.1, 1)
 	lightningTwo.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
 	lightningTwo.LockedToPart = true
-	lightningTwo.Speed = NumberRange.new(0, 0)
-	lightningTwo.Brightness = 10
+	lightningTwo.Speed = NumberRange.new(0.01, 0.01)
+	lightningTwo.Brightness = 15
 	lightningTwo.ZOffset = 3
-	lightningTwo.Size = NumberSequence.new(20)
-	lightningTwo.Rate = 500 -- Maximized rate
+	lightningTwo.Size = NumberSequence.new(5)
+	lightningTwo.Rate = 5
 	lightningTwo.Texture = 'rbxassetid://14582813693'
-	lightningTwo.Orientation = Enum.ParticleOrientation.FacingCamera
+	lightningTwo.Orientation = Enum.ParticleOrientation.VelocityParallel
 	lightningTwo.Rotation = NumberRange.new(-360, 360)
 	lightningTwo.Enabled = false
 	lightningTwo.Parent = endAttachment
 
 	local glow = Instance.new('ParticleEmitter')
+
 	glow.Name = 'Glow'
-	glow.Lifetime = NumberRange.new(0.3, 0.3)
+	glow.Lifetime = NumberRange.new(0.4, 0.4)
 	glow.SpreadAngle = Vector2.new(360, 360)
 	glow.Transparency = NumberSequence.new(0, 1)
 	glow.LightEmission = 1
 	glow.Drag = 15
 	glow.VelocitySpread = 360
-	glow.Speed = NumberRange.new(0, 0)
-	glow.Brightness = 8
+	glow.Speed = NumberRange.new(0.0099825, 0.0099825)
+	glow.Brightness = 5
 	glow.ZOffset = 4
-	glow.Size = NumberSequence.new(18)
-	glow.Rate = 100 
+	glow.Size = NumberSequence.new(5)
+	glow.Rate = 2
 	glow.Texture = 'rbxassetid://13305806509'
 	glow.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
 	glow.Enabled = false
@@ -823,9 +823,423 @@ local function createEffectTemplates()
 	vfx_1.RotSpeed = NumberRange.new(90, 180)
 	vfx_1.SpreadAngle = Vector2.new(0.000000, 0.000000)
 	
-	vfx_1.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 12.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 9.500000, 0.000000)})
+	vfx_1.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 8.500000, 0.000000), NumberSequenceKeypoint.new(1.000000, 6.500000, 0.000000)})
 	vfx_1.Parent = voidAttachment
 	effectTemplates['Void'] = voidAttachment
+
+	-- ==========================================================
+	-- NEW HIT EFFECT: Strike
+	-- ==========================================================
+	local strikeFolder = Instance.new("Folder")
+	strikeFolder:SetAttribute("IgnoreColorOverride", true) -- Retains original color mapping from reconstruct script
+
+	local strike_att1 = Instance.new("Attachment")
+	strike_att1.Rotation = Vector3.new(-0.000000, 0.000000, -0.000000)
+	strike_att1.Position = Vector3.new(0.000000, -0.400000, 0.000000)
+	strike_att1.Orientation = Vector3.new(-0.000000, 0.000000, 0.000000)
+	strike_att1.Visible = false
+	strike_att1.Name = "Attachment"
+	strike_att1.Parent = strikeFolder
+
+	local strike_vfx2 = Instance.new("ParticleEmitter")
+	strike_vfx2.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(0.992157, 1.000000, 0.482353)), ColorSequenceKeypoint.new(1.000000, Color3.new(0.992157, 1.000000, 0.482353))})
+	strike_vfx2.Drag = 4
+	strike_vfx2.ZOffset = 1
+	strike_vfx2.LightInfluence = 0
+	strike_vfx2.Lifetime = NumberRange.new(0.500000, 0.500000)
+	strike_vfx2.Speed = NumberRange.new(20.000000, 20.000000)
+	strike_vfx2.Brightness = 1
+	strike_vfx2.Texture = "rbxassetid://1882230139"
+	strike_vfx2.Enabled = false
+	strike_vfx2.Acceleration = Vector3.new(0.000000, 100.000000, 0.000000)
+	strike_vfx2.LockedToPart = true
+	strike_vfx2.Rate = 100
+	strike_vfx2.VelocityInheritance = 0
+	strike_vfx2.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 1.000000, 0.000000), NumberSequenceKeypoint.new(0.484255, 0.912500, 0.000000), NumberSequenceKeypoint.new(1.000000, 1.000000, 0.000000)})
+	strike_vfx2.LightEmission = 0
+	strike_vfx2.Rotation = NumberRange.new(0.000000, 0.000000)
+	strike_vfx2.SpreadAngle = Vector2.new(45.000000, 45.000000)
+	strike_vfx2.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 2.000000, 0.000000), NumberSequenceKeypoint.new(0.439468, 5.250000, 0.000000), NumberSequenceKeypoint.new(0.560532, 2.125000, 2.125000), NumberSequenceKeypoint.new(0.674822, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx2.Name = "Aura1"
+	strike_vfx2.Parent = strike_att1
+
+	local strike_vfx3 = Instance.new("ParticleEmitter")
+	strike_vfx3.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(0.992157, 1.000000, 0.482353)), ColorSequenceKeypoint.new(1.000000, Color3.new(0.992157, 1.000000, 0.482353))})
+	strike_vfx3.Drag = 3
+	strike_vfx3.ZOffset = 0
+	strike_vfx3.LightInfluence = 0
+	strike_vfx3.Lifetime = NumberRange.new(1.000000, 1.000000)
+	strike_vfx3.Speed = NumberRange.new(20.000000, 20.000000)
+	strike_vfx3.Brightness = 1
+	strike_vfx3.Texture = "rbxassetid://476778304"
+	strike_vfx3.Enabled = false
+	strike_vfx3.Acceleration = Vector3.new(0.000000, 0.000000, 0.000000)
+	strike_vfx3.LockedToPart = false
+	strike_vfx3.Rate = 300
+	strike_vfx3.VelocityInheritance = 0
+	strike_vfx3.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(0.427850, 0.887500, 0.000000), NumberSequenceKeypoint.new(1.000000, 1.000000, 0.000000)})
+	strike_vfx3.LightEmission = 1
+	strike_vfx3.Rotation = NumberRange.new(0.000000, 0.000000)
+	strike_vfx3.SpreadAngle = Vector2.new(-75.000000, 75.000000)
+	strike_vfx3.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 1.375000, 0.000000), NumberSequenceKeypoint.new(1.000000, 1.875000, 0.000000)})
+	strike_vfx3.Name = "ParticleEmitter"
+	strike_vfx3.Parent = strike_att1
+
+	local strike_att4 = Instance.new("Attachment")
+	strike_att4.Rotation = Vector3.new(90.000000, 0.000000, -0.000000)
+	strike_att4.Position = Vector3.new(0.000000, -1.000008, 0.000015)
+	strike_att4.Orientation = Vector3.new(90.000000, 0.000000, 0.000000)
+	strike_att4.Visible = false
+	strike_att4.Name = "Attachment"
+	strike_att4.Parent = strikeFolder
+
+	local strike_vfx5 = Instance.new("ParticleEmitter")
+	strike_vfx5.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 0.913725, 0.474510)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 0.682353, 0.321569))})
+	strike_vfx5.Drag = 0
+	strike_vfx5.ZOffset = 0.75
+	strike_vfx5.LightInfluence = 0
+	strike_vfx5.Lifetime = NumberRange.new(1.000000, 1.500000)
+	strike_vfx5.Speed = NumberRange.new(15.000000, 30.000000)
+	strike_vfx5.Brightness = 1
+	strike_vfx5.Texture = "http://www.roblox.com/asset/?id=459960092"
+	strike_vfx5.Enabled = false
+	strike_vfx5.Acceleration = Vector3.new(0.000000, 0.000000, 25.000000)
+	strike_vfx5.LockedToPart = true
+	strike_vfx5.Rate = 300
+	strike_vfx5.VelocityInheritance = 0
+	strike_vfx5.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.300000, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.300000, 0.000000)})
+	strike_vfx5.LightEmission = 0
+	strike_vfx5.Rotation = NumberRange.new(-360.000000, 360.000000)
+	strike_vfx5.SpreadAngle = Vector2.new(-75.000000, 75.000000)
+	strike_vfx5.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.200000, 0.125000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx5.Name = "Debris"
+	strike_vfx5.Parent = strike_att4
+
+	local strike_vfx6 = Instance.new("ParticleEmitter")
+	strike_vfx6.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(0.992157, 1.000000, 0.482353)), ColorSequenceKeypoint.new(1.000000, Color3.new(0.992157, 1.000000, 0.482353))})
+	strike_vfx6.Drag = 0
+	strike_vfx6.ZOffset = 1
+	strike_vfx6.LightInfluence = 0
+	strike_vfx6.Lifetime = NumberRange.new(2.000000, 2.000000)
+	strike_vfx6.Speed = NumberRange.new(7.500000, 10.000000)
+	strike_vfx6.Brightness = 1
+	strike_vfx6.Texture = "rbxassetid://1084997326"
+	strike_vfx6.Enabled = false
+	strike_vfx6.Acceleration = Vector3.new(0.000000, -2.500000, 0.000000)
+	strike_vfx6.LockedToPart = false
+	strike_vfx6.Rate = 200
+	strike_vfx6.VelocityInheritance = 0
+	strike_vfx6.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(0.031359, 0.000000, 0.000000), NumberSequenceKeypoint.new(0.598606, 0.000000, 0.000000), NumberSequenceKeypoint.new(0.600000, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 1.000000, 0.000000)})
+	strike_vfx6.LightEmission = 1
+	strike_vfx6.Rotation = NumberRange.new(-360.000000, 360.000000)
+	strike_vfx6.SpreadAngle = Vector2.new(360.000000, -360.000000)
+	strike_vfx6.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 1.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 1.000000, 0.000000)})
+	strike_vfx6.Name = "Sparks"
+	strike_vfx6.Parent = strike_att4
+
+	local strike_att7 = Instance.new("Attachment")
+	strike_att7.Rotation = Vector3.new(-90.000000, 0.000101, 0.000006)
+	strike_att7.Position = Vector3.new(-0.064642, -0.674123, 0.003931)
+	strike_att7.Orientation = Vector3.new(-90.000000, 0.000006, 0.000000)
+	strike_att7.Visible = false
+	strike_att7.Name = "1"
+	strike_att7.Parent = strikeFolder
+
+	local strike_att8 = Instance.new("Attachment")
+	strike_att8.Rotation = Vector3.new(-90.000000, 0.000101, 0.000006)
+	strike_att8.Position = Vector3.new(-0.064642, 40.976257, 0.003931)
+	strike_att8.Orientation = Vector3.new(-90.000000, 0.000006, 0.000000)
+	strike_att8.Visible = false
+	strike_att8.Name = "2" -- Renamed uniquely so individual attachment links establish properly if needed
+	strike_att8.Parent = strikeFolder
+
+	local strike_vfx9 = Instance.new("Beam")
+	strike_vfx9.FaceCamera = true
+	strike_vfx9.CurveSize1 = 0
+	strike_vfx9.ZOffset = 0.20000000298023224
+	strike_vfx9.LightInfluence = 0
+	strike_vfx9.Width0 = 5
+	strike_vfx9.Width1 = 0.10000000149011612
+	strike_vfx9.Brightness = 1
+	strike_vfx9.Texture = "rbxassetid://296874871"
+	strike_vfx9.Enabled = true
+	strike_vfx9.TextureSpeed = -4
+	strike_vfx9.CurveSize0 = 0
+	strike_vfx9.Segments = 150
+	strike_vfx9.LightEmission = 1
+	strike_vfx9.TextureLength = 0.10000000149011612
+	strike_vfx9.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 0.913725, 0.474510)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 0.682353, 0.321569))})
+	strike_vfx9.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx9.Name = "1"
+	strike_vfx9.Attachment0 = strike_att7
+	strike_vfx9.Attachment1 = strike_att8
+	strike_vfx9.Parent = strikeFolder
+
+	local strike_vfx10 = Instance.new("Beam")
+	strike_vfx10.FaceCamera = true
+	strike_vfx10.CurveSize1 = 0
+	strike_vfx10.ZOffset = 0.20000000298023224
+	strike_vfx10.LightInfluence = 0
+	strike_vfx10.Width0 = 5
+	strike_vfx10.Width1 = 0.10000000149011612
+	strike_vfx10.Brightness = 1
+	strike_vfx10.Texture = "rbxassetid://296874871"
+	strike_vfx10.Enabled = true
+	strike_vfx10.TextureSpeed = -4
+	strike_vfx10.CurveSize0 = 0
+	strike_vfx10.Segments = 150
+	strike_vfx10.LightEmission = 1
+	strike_vfx10.TextureLength = 0.10000000149011612
+	strike_vfx10.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 0.913725, 0.474510)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 0.682353, 0.321569))})
+	strike_vfx10.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx10.Name = "1"
+	strike_vfx10.Attachment0 = strike_att7
+	strike_vfx10.Attachment1 = strike_att8
+	strike_vfx10.Parent = strikeFolder
+
+	local strike_vfx11 = Instance.new("Beam")
+	strike_vfx11.FaceCamera = true
+	strike_vfx11.CurveSize1 = 0
+	strike_vfx11.ZOffset = 0.20000000298023224
+	strike_vfx11.LightInfluence = 0
+	strike_vfx11.Width0 = 5
+	strike_vfx11.Width1 = 0.10000000149011612
+	strike_vfx11.Brightness = 1
+	strike_vfx11.Texture = "rbxassetid://296874871"
+	strike_vfx11.Enabled = true
+	strike_vfx11.TextureSpeed = -14
+	strike_vfx11.CurveSize0 = 0
+	strike_vfx11.Segments = 150
+	strike_vfx11.LightEmission = 1
+	strike_vfx11.TextureLength = 0.10000000149011612
+	strike_vfx11.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 0.913725, 0.474510)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 0.682353, 0.321569))})
+	strike_vfx11.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx11.Name = "1"
+	strike_vfx11.Attachment0 = strike_att7
+	strike_vfx11.Attachment1 = strike_att8
+	strike_vfx11.Parent = strikeFolder
+
+	local strike_vfx12 = Instance.new("PointLight")
+	strike_vfx12.Enabled = true
+	strike_vfx12.Shadows = false
+	strike_vfx12.Color = Color3.fromRGB(85, 255, 127)
+	strike_vfx12.Brightness = 0.10000000149011612
+	strike_vfx12.Range = 20
+	strike_vfx12.Name = "PointLight"
+	strike_vfx12.Parent = strikeFolder
+
+	local strike_att13 = Instance.new("Attachment")
+	strike_att13.Rotation = Vector3.new(-0.000000, 0.000000, -0.000000)
+	strike_att13.Position = Vector3.new(0.155853, 43.000053, 0.516426)
+	strike_att13.Orientation = Vector3.new(-0.000000, 0.000000, 0.000000)
+	strike_att13.Visible = false
+	strike_att13.Name = "Attachment"
+	strike_att13.Parent = strikeFolder
+
+	local strike_att14 = Instance.new("Attachment")
+	strike_att14.Rotation = Vector3.new(-0.000000, 0.000000, -0.000000)
+	strike_att14.Position = Vector3.new(0.155853, 42.000053, 0.516426)
+	strike_att14.Orientation = Vector3.new(-0.000000, 0.000000, 0.000000)
+	strike_att14.Visible = false
+	strike_att14.Name = "Attachment"
+	strike_att14.Parent = strikeFolder
+
+	local strike_vfx15 = Instance.new("PointLight")
+	strike_vfx15.Enabled = true
+	strike_vfx15.Shadows = false
+	strike_vfx15.Color = Color3.fromRGB(255, 231, 135)
+	strike_vfx15.Brightness = 2
+	strike_vfx15.Range = 16
+	strike_vfx15.Name = "PointLight"
+	strike_vfx15.Parent = strike_att14
+
+	local strike_vfx16 = Instance.new("ParticleEmitter")
+	strike_vfx16.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 0.913725, 0.474510)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 0.682353, 0.321569))})
+	strike_vfx16.Drag = 0
+	strike_vfx16.ZOffset = 0
+	strike_vfx16.LightInfluence = 0
+	strike_vfx16.Lifetime = NumberRange.new(0.200000, 0.200000)
+	strike_vfx16.Speed = NumberRange.new(47.000000, 47.000000)
+	strike_vfx16.Brightness = 1
+	strike_vfx16.Texture = "http://www.roblox.com/asset/?id=459960092"
+	strike_vfx16.Enabled = false
+	strike_vfx16.Acceleration = Vector3.new(0.000000, 0.000000, 0.000000)
+	strike_vfx16.LockedToPart = false
+	strike_vfx16.Rate = 100
+	strike_vfx16.VelocityInheritance = 0
+	strike_vfx16.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx16.LightEmission = 1
+	strike_vfx16.Rotation = NumberRange.new(-180.000000, 180.000000)
+	strike_vfx16.SpreadAngle = Vector2.new(360.000000, 360.000000)
+	strike_vfx16.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.687500, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx16.Name = "ParticleEmitter"
+	strike_vfx16.Parent = strike_att14
+
+	local strike_vfx17 = Instance.new("ParticleEmitter")
+	strike_vfx17.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 0.913725, 0.474510)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 0.682353, 0.321569))})
+	strike_vfx17.Drag = 0
+	strike_vfx17.ZOffset = 0
+	strike_vfx17.LightInfluence = 0
+	strike_vfx17.Lifetime = NumberRange.new(5.500000, 5.500000)
+	strike_vfx17.Speed = NumberRange.new(0.000000, 0.000000)
+	strike_vfx17.Brightness = 1
+	strike_vfx17.Texture = "http://www.roblox.com/asset/?id=5043599095"
+	strike_vfx17.Enabled = false
+	strike_vfx17.Acceleration = Vector3.new(0.000000, 0.000000, 0.000000)
+	strike_vfx17.LockedToPart = true
+	strike_vfx17.Rate = 5
+	strike_vfx17.VelocityInheritance = 0
+	strike_vfx17.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 1.000000, 0.000000), NumberSequenceKeypoint.new(0.001936, 0.000000, 0.000000), NumberSequenceKeypoint.new(0.159729, 0.000000, 0.000000), NumberSequenceKeypoint.new(0.400000, 1.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 1.000000, 0.000000)})
+	strike_vfx17.LightEmission = 1
+	strike_vfx17.Rotation = NumberRange.new(0.000000, 0.000000)
+	strike_vfx17.SpreadAngle = Vector2.new(0.000000, 0.000000)
+	strike_vfx17.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 6.500000, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx17.Name = "ParticleEmitter"
+	strike_vfx17.Parent = strike_att14
+
+	local strike_vfx18 = Instance.new("ParticleEmitter")
+	strike_vfx18.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 0.913725, 0.474510)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 0.682353, 0.321569))})
+	strike_vfx18.Drag = 0
+	strike_vfx18.ZOffset = 0
+	strike_vfx18.LightInfluence = 0
+	strike_vfx18.Lifetime = NumberRange.new(0.200000, 0.200000)
+	strike_vfx18.Speed = NumberRange.new(20.000000, 20.000000)
+	strike_vfx18.Brightness = 1
+	strike_vfx18.Texture = "http://www.roblox.com/asset/?id=459960092"
+	strike_vfx18.Enabled = false
+	strike_vfx18.Acceleration = Vector3.new(0.000000, 0.000000, 0.000000)
+	strike_vfx18.LockedToPart = false
+	strike_vfx18.Rate = 100
+	strike_vfx18.VelocityInheritance = 0
+	strike_vfx18.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx18.LightEmission = 1
+	strike_vfx18.Rotation = NumberRange.new(-180.000000, 180.000000)
+	strike_vfx18.SpreadAngle = Vector2.new(360.000000, 360.000000)
+	strike_vfx18.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.687500, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx18.Name = "ParticleEmitter"
+	strike_vfx18.Parent = strike_att14
+
+	local strike_vfx19 = Instance.new("ParticleEmitter")
+	strike_vfx19.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 0.913725, 0.474510)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 0.682353, 0.321569))})
+	strike_vfx19.Drag = 0
+	strike_vfx19.ZOffset = 0
+	strike_vfx19.LightInfluence = 0
+	strike_vfx19.Lifetime = NumberRange.new(0.500000, 0.500000)
+	strike_vfx19.Speed = NumberRange.new(20.000000, 20.000000)
+	strike_vfx19.Brightness = 1
+	strike_vfx19.Texture = "http://www.roblox.com/asset/?id=459960092"
+	strike_vfx19.Enabled = false
+	strike_vfx19.Acceleration = Vector3.new(0.000000, 0.000000, 0.000000)
+	strike_vfx19.LockedToPart = true
+	strike_vfx19.Rate = 100
+	strike_vfx19.VelocityInheritance = 0
+	strike_vfx19.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx19.LightEmission = 1
+	strike_vfx19.Rotation = NumberRange.new(-180.000000, 180.000000)
+	strike_vfx19.SpreadAngle = Vector2.new(360.000000, 360.000000)
+	strike_vfx19.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.687500, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx19.Name = "ParticleEmitter"
+	strike_vfx19.Parent = strike_att14
+
+	local strike_vfx20 = Instance.new("ParticleEmitter")
+	strike_vfx20.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 0.913725, 0.474510)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 0.682353, 0.321569))})
+	strike_vfx20.Drag = 0
+	strike_vfx20.ZOffset = 0
+	strike_vfx20.LightInfluence = 0
+	strike_vfx20.Lifetime = NumberRange.new(1.000000, 1.000000)
+	strike_vfx20.Speed = NumberRange.new(0.000000, 0.000000)
+	strike_vfx20.Brightness = 1
+	strike_vfx20.Texture = "http://www.roblox.com/asset/?id=5043715023"
+	strike_vfx20.Enabled = false
+	strike_vfx20.Acceleration = Vector3.new(0.000000, 0.000000, 0.000000)
+	strike_vfx20.LockedToPart = true
+	strike_vfx20.Rate = 2
+	strike_vfx20.VelocityInheritance = 0
+	strike_vfx20.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx20.LightEmission = 1
+	strike_vfx20.Rotation = NumberRange.new(0.000000, 0.000000)
+	strike_vfx20.SpreadAngle = Vector2.new(0.000000, 0.000000)
+	strike_vfx20.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 2.500000, 0.000000), NumberSequenceKeypoint.new(0.100000, 5.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx20.Name = "ParticleEmitter"
+	strike_vfx20.Parent = strike_att14
+
+	local strike_att21 = Instance.new("Attachment")
+	strike_att21.Rotation = Vector3.new(-0.000000, 0.000000, -0.000000)
+	strike_att21.Position = Vector3.new(0.155853, 41.000053, 0.516426)
+	strike_att21.Orientation = Vector3.new(-0.000000, 0.000000, 0.000000)
+	strike_att21.Visible = false
+	strike_att21.Name = "Attachment"
+	strike_att21.Parent = strikeFolder
+
+	local strike_att22 = Instance.new("Attachment")
+	strike_att22.Rotation = Vector3.new(-90.000000, -0.000107, -0.000061)
+	strike_att22.Position = Vector3.new(0.000004, -3.000000, -0.000000)
+	strike_att22.Orientation = Vector3.new(-90.000000, -0.000061, 0.000000)
+	strike_att22.Visible = false
+	strike_att22.Name = "Attachment"
+	strike_att22.Parent = strikeFolder
+
+	local strike_vfx23 = Instance.new("ParticleEmitter")
+	strike_vfx23.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 0.913725, 0.474510)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 0.682353, 0.321569))})
+	strike_vfx23.Drag = 0
+	strike_vfx23.ZOffset = 1
+	strike_vfx23.LightInfluence = 0
+	strike_vfx23.Lifetime = NumberRange.new(0.400000, 0.600000)
+	strike_vfx23.Speed = NumberRange.new(18.000000, 20.000000)
+	strike_vfx23.Brightness = 1
+	strike_vfx23.Texture = "http://www.roblox.com/asset/?id=459960092"
+	strike_vfx23.Enabled = false
+	strike_vfx23.Acceleration = Vector3.new(0.000000, 0.000000, 60.000000)
+	strike_vfx23.LockedToPart = true
+	strike_vfx23.Rate = 400
+	strike_vfx23.VelocityInheritance = 0
+	strike_vfx23.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 1.000000, 0.000000), NumberSequenceKeypoint.new(0.200000, 0.000000, 0.000000), NumberSequenceKeypoint.new(0.901840, 0.012500, 0.000000), NumberSequenceKeypoint.new(1.000000, 1.000000, 0.000000)})
+	strike_vfx23.LightEmission = 1
+	strike_vfx23.Rotation = NumberRange.new(-180.000000, 180.000000)
+	strike_vfx23.SpreadAngle = Vector2.new(100.000000, 100.000000)
+	strike_vfx23.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(0.378947, 0.864865, 0.000000), NumberSequenceKeypoint.new(1.000000, 0.000000, 0.000000)})
+	strike_vfx23.Name = "Flame"
+	strike_vfx23.Parent = strike_att22
+
+	effectTemplates['strike'] = strikeFolder
+
+	-- ==========================================================
+	-- NEW HIT EFFECT: Depth
+	-- ==========================================================
+	local depthFolder = Instance.new("Folder")
+	depthFolder:SetAttribute("IgnoreColorOverride", true) -- Retains original color mapping from reconstruct script
+
+	local depth_att1 = Instance.new("Attachment")
+	depth_att1.Rotation = Vector3.new(-0.000000, 0.000000, -0.000000)
+	depth_att1.Position = Vector3.new(0.000000, 0.000000, 0.000000)
+	depth_att1.Orientation = Vector3.new(-0.000000, 0.000000, 0.000000)
+	depth_att1.Visible = false
+	depth_att1.Name = "Attachment"
+	depth_att1.Parent = depthFolder
+
+	local depth_vfx2 = Instance.new("ParticleEmitter")
+	depth_vfx2.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.000000, Color3.new(1.000000, 1.000000, 1.000000)), ColorSequenceKeypoint.new(1.000000, Color3.new(1.000000, 1.000000, 1.000000))})
+	depth_vfx2.Drag = 0
+	depth_vfx2.ZOffset = 5
+	depth_vfx2.LightInfluence = 1
+	depth_vfx2.Lifetime = NumberRange.new(1.000000, 1.000000)
+	depth_vfx2.Speed = NumberRange.new(0.000000, 0.000000)
+	depth_vfx2.Brightness = 1
+	depth_vfx2.Texture = "https://assetgame.roblox.com/asset/?id=12362825943&assetName=energyball_1"
+	depth_vfx2.Enabled = false
+	depth_vfx2.Acceleration = Vector3.new(0.000000, 0.000000, 0.000000)
+	depth_vfx2.LockedToPart = true
+	depth_vfx2.Rate = 50
+	depth_vfx2.VelocityInheritance = 0
+	depth_vfx2.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(0.500529, 0.493750, 0.000000), NumberSequenceKeypoint.new(1.000000, 1.000000, 0.000000)})
+	depth_vfx2.LightEmission = 1
+	depth_vfx2.Rotation = NumberRange.new(-360.000000, 360.000000)
+	depth_vfx2.SpreadAngle = Vector2.new(0.000000, 0.000000)
+	depth_vfx2.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.000000, 0.000000, 0.000000), NumberSequenceKeypoint.new(1.000000, 10.000000, 0.000000)})
+	depth_vfx2.Name = "ParticleEmitter"
+	depth_vfx2.Parent = depth_att1
+
+	effectTemplates['depth'] = depthFolder
 end
 
 
@@ -835,8 +1249,6 @@ local function applyColor(inst, color)
 	for _, d in ipairs(inst:GetDescendants()) do
 		if d:IsA("ParticleEmitter") then
 			d.Color = ColorSequence.new(color)
-		elseif d:IsA("Part") then
-			d.Color = color
 		end
 	end
 end
@@ -886,11 +1298,14 @@ function HitEffects:SetColor(color)
 		if emitter and emitter.Parent then
 			local parentPart = emitter.Parent
 			if parentPart and parentPart:GetAttribute("IgnoreColorOverride") then
+			elseif parentPart.Parent and parentPart.Parent:GetAttribute("IgnoreColorOverride") then
+				-- Also accounts for folder templates
 			else
 				emitter.Color = ColorSequence.new(color)
 			end
 		else
 			table.remove(activeEmitters, i)
+		-- Added safe cleanup logic check
 		end
 	end
 end
@@ -917,63 +1332,39 @@ function HitEffects:Play(character)
 		if template then
 			local effect = template:Clone()
 			applyColor(effect, effectColor)
+			
+			-- Handle if the template is a configuration container (Folder) or standard Attachment
+			if effect:IsA("Folder") then
+				for _, child in ipairs(effect:GetChildren()) do
+					child.Parent = root
+				end
+				effect:Destroy()
+				effect = root
+			else
+				effect.Parent = root
+			end
 
 			local baseLifetime = effect:GetAttribute("AdaptiveLifetime")
-			local isLightning = effect:GetAttribute("IsLightning")
 
-			if isLightning then
-				-- Keep parent as root so attachments preserve correct camera orientation (no squished ball look)
-				effect.Parent = root
-				
-				local startAtt = effect:FindFirstChild("Start")
-				local endAtt = effect:FindFirstChild("End")
-				local fallback = effect:FindFirstChild("LowGraphicsStrike")
-				
-				if startAtt and endAtt then
-					-- MATH TRICK: Transform the world positions into root part's local space, 
-					-- but using identity tracking so it ignores character rotation!
-					local rootCFrame = root.CFrame
-					local rootPos = rootCFrame.Position
-					
-					-- Force the attachments to be locked perfectly in a straight line up and down
-					startAtt.CFrame = rootCFrame:ToObjectSpace(CFrame.new(rootPos + Vector3.new(0, 75, 0)))
-					endAtt.CFrame = rootCFrame:ToObjectSpace(CFrame.new(rootPos))
-					
-					-- Position fallback mesh part perfectly spanning the vertical vector
-					if fallback then
-						fallback.CFrame = CFrame.new(rootPos + Vector3.new(0, 37.5, 0))
-						
-						-- Cleanup fallback alongside the destruction window
-						task.delay(0.2, function()
-							if fallback then fallback:Destroy() end
-						end)
-					end
-				end
+			if baseLifetime then
+				local timeRatio = baseLifetime / effectLifetime
 
 				for _, d in ipairs(effect:GetDescendants()) do
 					if d:IsA("ParticleEmitter") then
-						d.Lifetime = NumberRange.new(0.1, 0.2)
-						d.Orientation = Enum.ParticleOrientation.FacingCamera -- Force flat billboard rendering
+						d.Lifetime = NumberRange.new(effectLifetime, effectLifetime)
+						
+						local originalMin = d.RotSpeed.Min
+						local originalMax = d.RotSpeed.Max
+						d.RotSpeed = NumberRange.new(originalMin * timeRatio, originalMax * timeRatio)
 					end
 				end
 			else
-				-- Standard non-lightning effects
-				effect.Parent = root
-				if baseLifetime then
-					local timeRatio = baseLifetime / effectLifetime
-					for _, d in ipairs(effect:GetDescendants()) do
-						if d:IsA("ParticleEmitter") then
-							d.Lifetime = NumberRange.new(effectLifetime, effectLifetime)
-							local originalMin = d.RotSpeed.Min
-							local originalMax = d.RotSpeed.Max
-							d.RotSpeed = NumberRange.new(originalMin * timeRatio, originalMax * timeRatio)
-						end
-					end
-				else
-					for _, d in ipairs(effect:GetDescendants()) do
-						if d:IsA("ParticleEmitter") then
-							d.Lifetime = NumberRange.new(0, effectLifetime)
-						end
+				for _, d in ipairs(effect:GetDescendants()) do
+					if d:IsA("ParticleEmitter") then
+						-- Preserve original lifespans if defined natively in the effect file configurations
+						local minLife = d.Lifetime.Min ~= 0 and d.Lifetime.Min or 0
+						local maxLife = d.Lifetime.Max ~= 0 and d.Lifetime.Max or effectLifetime
+						d.Lifetime = NumberRange.new(minLife, maxLife)
 					end
 				end
 			end
@@ -981,8 +1372,15 @@ function HitEffects:Play(character)
 			emitAll(effect)
 
 			task.delay(effectLifetime, function()
-				if effect then
+				if effect and effect ~= root then
 					effect:Destroy()
+				elseif effect == root then
+					-- Folder structure tracking cleanup fallback
+					for _, d in ipairs(root:GetDescendants()) do
+						if d.Name == "strike_att1" or d.Name == "depth_att1" then
+							d:Destroy()
+						end
+					end
 				end
 			end)
 		end
