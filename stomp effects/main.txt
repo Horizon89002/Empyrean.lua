@@ -1,3 +1,5 @@
+---
+
 local HitEffects = {}
 
 local Players = game:GetService("Players")
@@ -263,73 +265,91 @@ local function createEffectTemplates()
 
 	local startAttachment = Instance.new('Attachment')
 	startAttachment.Name = 'Start'
-	startAttachment.CFrame = CFrame.new(0, 50, 0) 
 	startAttachment.Parent = lightningAttachment
 
 	local endAttachment = Instance.new('Attachment')
 	endAttachment.Name = 'End'
-	endAttachment.CFrame = CFrame.new(0, 0, 0)
 	endAttachment.Parent = lightningAttachment
 
-	-- Multi-layered thick beams to ensure visibility on low graphics settings
-	for i = 1, 3 do
-		local beam = Instance.new('Beam')
-		beam.FaceCamera = true
-		beam.ZOffset = 0.3 + (i * 0.05)
-		beam.TextureSpeed = 2.0
-		beam.Width1 = 22
-		beam.Width0 = 15 
-		beam.Transparency = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, 1),
-			NumberSequenceKeypoint.new(0.01, 0),
-			NumberSequenceKeypoint.new(0.99, 0),
-			NumberSequenceKeypoint.new(1, 1),
-		})
-		beam.TextureLength = 0.4
-		beam.LightEmission = 1
-		beam.Texture = 'rbxassetid://7216850022'
-		beam.Attachment0 = startAttachment
-		beam.Attachment1 = endAttachment
-		beam.Parent = startAttachment
-	end
+	-- Core High-Intensity Beams
+	local beam1 = Instance.new('Beam')
+	beam1.FaceCamera = true
+	beam1.ZOffset = 0.5
+	beam1.TextureSpeed = 3.5
+	beam1.Width1 = 14
+	beam1.Width0 = 14 
+	beam1.Transparency = NumberSequence.new(0)
+	beam1.TextureLength = 1
+	beam1.LightEmission = 1
+	beam1.Texture = 'rbxassetid://7216850022'
+	beam1.Attachment0 = startAttachment
+	beam1.Attachment1 = endAttachment
+	beam1.Parent = startAttachment
+
+	local beam2 = Instance.new('Beam')
+	beam2.FaceCamera = true
+	beam2.ZOffset = -0.5
+	beam2.TextureSpeed = -3.5
+	beam2.Width1 = 14 
+	beam2.Width0 = 14 
+	beam2.Transparency = NumberSequence.new(0)
+	beam2.TextureLength = 1
+	beam2.LightEmission = 1
+	beam2.Texture = 'rbxassetid://7216850022'
+	beam2.Attachment0 = startAttachment
+	beam2.Attachment1 = endAttachment
+	beam2.Parent = startAttachment
+
+	-- LOW GRAPHICS CRITICAL FIX: A transparent block script won't load particles on Graphics Level 1.
+	-- We insert a flat, bright, neon visual mesh part that completely mirrors the strike vertically to guarantee 100% visibility.
+	local fallbackStrike = Instance.new("Part")
+	fallbackStrike.Name = "LowGraphicsStrike"
+	fallbackStrike.Material = Enum.Material.Neon
+	fallbackStrike.Transparency = 0.1
+	fallbackStrike.CanCollide = false
+	fallbackStrike.CanQuery = false
+	fallbackStrike.CanTouch = false
+	fallbackStrike.Anchored = true
+	fallbackStrike.Size = Vector3.new(3, 75, 3)
+	fallbackStrike.Parent = lightningAttachment
 
 	local lightningOne = Instance.new('ParticleEmitter')
 	lightningOne.Name = 'Lightning One'
-	lightningOne.FlipbookFramerate = NumberRange.new(25, 25)
-	lightningOne.Lifetime = NumberRange.new(0.15, 0.3)
+	lightningOne.FlipbookFramerate = NumberRange.new(30, 30)
+	lightningOne.Lifetime = NumberRange.new(0.1, 0.2)
 	lightningOne.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
 	lightningOne.LockedToPart = true
 	lightningOne.Speed = NumberRange.new(0, 0)
-	lightningOne.Brightness = 20
+	lightningOne.Brightness = 10
 	lightningOne.ZOffset = 3
-	lightningOne.Size = NumberSequence.new(15) 
-	lightningOne.Rate = 300 -- Drastically forced higher rate for low graphics
+	lightningOne.Size = NumberSequence.new(20) 
+	lightningOne.Rate = 500 -- Maximized rate
 	lightningOne.Texture = 'rbxassetid://14582813693'
-	lightningOne.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
+	lightningOne.Orientation = Enum.ParticleOrientation.FacingCamera
 	lightningOne.Rotation = NumberRange.new(-360, 360)
 	lightningOne.Enabled = false
 	lightningOne.Parent = endAttachment
 
 	local lightningTwo = Instance.new('ParticleEmitter')
 	lightningTwo.Name = 'Lightning two'
-	lightningTwo.FlipbookFramerate = NumberRange.new(25, 25)
-	lightningTwo.Lifetime = NumberRange.new(0.15, 0.3)
+	lightningTwo.FlipbookFramerate = NumberRange.new(30, 30)
+	lightningTwo.Lifetime = NumberRange.new(0.1, 0.2)
 	lightningTwo.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
 	lightningTwo.LockedToPart = true
 	lightningTwo.Speed = NumberRange.new(0, 0)
-	lightningTwo.Brightness = 20
+	lightningTwo.Brightness = 10
 	lightningTwo.ZOffset = 3
-	lightningTwo.Size = NumberSequence.new(15)
-	lightningTwo.Rate = 300 -- Drastically forced higher rate for low graphics
+	lightningTwo.Size = NumberSequence.new(20)
+	lightningTwo.Rate = 500 -- Maximized rate
 	lightningTwo.Texture = 'rbxassetid://14582813693'
-	lightningTwo.Orientation = Enum.ParticleOrientation.VelocityParallel
+	lightningTwo.Orientation = Enum.ParticleOrientation.FacingCamera
 	lightningTwo.Rotation = NumberRange.new(-360, 360)
 	lightningTwo.Enabled = false
 	lightningTwo.Parent = endAttachment
 
 	local glow = Instance.new('ParticleEmitter')
 	glow.Name = 'Glow'
-	glow.Lifetime = NumberRange.new(0.4, 0.4)
+	glow.Lifetime = NumberRange.new(0.3, 0.3)
 	glow.SpreadAngle = Vector2.new(360, 360)
 	glow.Transparency = NumberSequence.new(0, 1)
 	glow.LightEmission = 1
@@ -338,8 +358,8 @@ local function createEffectTemplates()
 	glow.Speed = NumberRange.new(0, 0)
 	glow.Brightness = 8
 	glow.ZOffset = 4
-	glow.Size = NumberSequence.new(14)
-	glow.Rate = 45 -- Boosted output
+	glow.Size = NumberSequence.new(18)
+	glow.Rate = 100 
 	glow.Texture = 'rbxassetid://13305806509'
 	glow.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
 	glow.Enabled = false
@@ -815,6 +835,8 @@ local function applyColor(inst, color)
 	for _, d in ipairs(inst:GetDescendants()) do
 		if d:IsA("ParticleEmitter") then
 			d.Color = ColorSequence.new(color)
+		elseif d:IsA("Part") then
+			d.Color = color
 		end
 	end
 end
@@ -900,28 +922,42 @@ function HitEffects:Play(character)
 			local isLightning = effect:GetAttribute("IsLightning")
 
 			if isLightning then
-				-- FIXING THE ROTATION CRITICAL BUG:
-				-- We parent the lightning directly to the Global World Workspace.
-				-- This drops local rotation tracking instantly!
-				local baseWorldPosition = root.Position
-				effect.Parent = workspace
+				-- Keep parent as root so attachments preserve correct camera orientation (no squished ball look)
+				effect.Parent = root
 				
 				local startAtt = effect:FindFirstChild("Start")
 				local endAtt = effect:FindFirstChild("End")
+				local fallback = effect:FindFirstChild("LowGraphicsStrike")
 				
 				if startAtt and endAtt then
-					-- Set fixed vertical positions completely decoupled from character orientation
-					startAtt.WorldPosition = baseWorldPosition + Vector3.new(0, 50, 0)
-					endAtt.WorldPosition = baseWorldPosition
+					-- MATH TRICK: Transform the world positions into root part's local space, 
+					-- but using identity tracking so it ignores character rotation!
+					local rootCFrame = root.CFrame
+					local rootPos = rootCFrame.Position
+					
+					-- Force the attachments to be locked perfectly in a straight line up and down
+					startAtt.CFrame = rootCFrame:ToObjectSpace(CFrame.new(rootPos + Vector3.new(0, 75, 0)))
+					endAtt.CFrame = rootCFrame:ToObjectSpace(CFrame.new(rootPos))
+					
+					-- Position fallback mesh part perfectly spanning the vertical vector
+					if fallback then
+						fallback.CFrame = CFrame.new(rootPos + Vector3.new(0, 37.5, 0))
+						
+						-- Cleanup fallback alongside the destruction window
+						task.delay(0.2, function()
+							if fallback then fallback:Destroy() end
+						end)
+					end
 				end
 
 				for _, d in ipairs(effect:GetDescendants()) do
 					if d:IsA("ParticleEmitter") then
-						d.Lifetime = NumberRange.new(0.15, effectLifetime)
+						d.Lifetime = NumberRange.new(0.1, 0.2)
+						d.Orientation = Enum.ParticleOrientation.FacingCamera -- Force flat billboard rendering
 					end
 				end
 			else
-				-- Standard local character effects (Blood, Particles, Void etc.)
+				-- Standard non-lightning effects
 				effect.Parent = root
 				if baseLifetime then
 					local timeRatio = baseLifetime / effectLifetime
